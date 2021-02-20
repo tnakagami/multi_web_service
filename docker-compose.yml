@@ -1,0 +1,119 @@
+version: '3.4'
+
+services:
+    # Setup reverse proxy
+    nginx:
+        # Build target
+        build:
+            context: ./nginx
+            # Dockerfile
+            dockerfile: Dockerfile
+        # image name
+        image: custom_nginx
+        restart: always
+        # Container name
+        container_name: nginx
+        # Setup port
+        ports :
+            - "443:443"
+        env_file:
+            - env_file/nginx/.env
+        volumes:
+            - certs:/etc/letsencrypt
+            - ./nginx/static:/static:ro
+#            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+#            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./nginx/develop_default.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./nginx/develop_nginx.conf:/etc/nginx/nginx.conf:ro
+#            - ./logfiles/access.log:/var/log/nginx/access.log
+#            - ./logfiles/error.log:/var/log/nginx/error.log
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+        links:
+            - django
+        depends_on:
+            - django
+        networks:
+            - frontend_bridge
+
+    django:
+        # Build target
+        build:
+            context: ./django
+            # Dockerfile
+            dockerfile: Dockerfile
+        # Image name
+        image: custom_django
+        # Container name
+        container_name: sns
+        restart: always
+        # Setup environment variables
+        env_file:
+            - env_file/django/.env # for django
+            - env_file/mysql/.env  # for mysql root information
+        environment:
+            DB_HOST: mysql
+            PRJ_DIRNAME: social_networking_service
+            APP_DIRNAME: sns
+            PORT_NUM: 8081
+        # Relationship config file to container directory
+        volumes:
+            - ./django/src:/code
+#            - ./logfiles/django.log:/var/log/django.log
+#            - ./logfiles/json_django_log.json:/var/log/json_django_log.json
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+        links:
+            - mysql
+        depends_on:
+            - mysql
+        # Setup port
+        expose:
+            - "8081"
+        networks:
+            - frontend_bridge
+            - backend_bridge
+
+    # database
+    mysql:
+        # Build target
+        build:
+            context: ./mysql
+            # Dockerfile
+            dockerfile: Dockerfile
+        # Image name
+        image: custom_mysql.utf8mb4_jp
+        # Container name
+        container_name: mysql
+        restart: always
+        # Setup environment variables
+        env_file:
+            - env_file/mysql/.env # for mysql root information
+        # Relationship config file to container directory
+        volumes:
+            - database:/var/lib/mysql
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+        # Setup port
+        expose:
+            - "3306"
+        networks:
+            - backend_bridge
+
+# Setup network
+networks:
+    frontend_bridge:
+    backend_bridge:
+
+volumes:
+    database:
+    certs:
