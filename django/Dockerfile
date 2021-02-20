@@ -1,5 +1,5 @@
-ARG TZ=Asia/Tokyo
 FROM alpine:3.12.3
+ARG TZ=Asia/Tokyo
 
 LABEL maintainer="user"
 LABEL description="build django"
@@ -23,7 +23,7 @@ RUN    apk --no-cache update \
     && apk add --no-cache --virtual .build-deps \
                gcc musl-dev libffi-dev g++ libgcc libstdc++ libxslt-dev \
                python3-dev libc-dev linux-headers openssl-dev curl shadow \
-    && apk add --no-cache --virtual --update-cache jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
+               jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
     \
     # install python3
     \
@@ -46,7 +46,7 @@ RUN    apk --no-cache update \
     \
     # delete temporary libraries
     \
-    && apk del .build-deps \
+    && apk --purge del .build-deps \
     && mkdir -p ${SRC_ROOT_PATH} \
     && mkdir /static \
     && echo -n > /var/log/django.log \

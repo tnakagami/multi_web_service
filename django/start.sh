@@ -11,8 +11,7 @@ done
 echo "[Django]" $(date "+%Y/%m/%d-%H:%M:%S") MySQL database ready! "(${counter}sec)"
 
 # check migration
-target_dir=${APP_DIRNAME}
-if [ ! -e ${target_dir}/migrations/0001_initial.py ]; then
+if [ ! -e ${APP_DIRNAME}/migrations/0001_initial.py ]; then
     not_exist_superuser=1
 else
     not_exist_superuser=0

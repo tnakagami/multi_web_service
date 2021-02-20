@@ -1,5 +1,5 @@
-ARG TZ=Asia/Tokyo
 FROM alpine:3.12.3
+ARG TZ=Asia/Tokyo
 
 LABEL maintainer="user"
 LABEL description="build mariadb"

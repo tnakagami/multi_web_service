@@ -20,16 +20,19 @@ including database configuration, Django-specific options and application-specif
 From the command line, run the following command:
 
 ```bash
-docker run --rm --name create-project -it custom_django django-admin startproject django-admin startproject ${PRJ_DIRNAME} .
+# project name is social_networking_service.
+docker-compose run --rm django django-admin startproject social_networking_service .
 ```
 
 ## Creating the SNS app
 Now that your environment - a "project" - is set up, you're set to start doing work.
 
-To create your "sns" app, cd into the same directory as manage.py and type this command:
+To create your app, cd into the same directory as manage.py and type these commands:
 
 ```bash
-docker run --rm --name create-app -it custom_django python manage.py startapp sns
+# app name is sns.
+docker-compose run --rm django python manage.py startapp sns
+docker-compose down -v
 ```
 
 ## Changing the owner
@@ -46,4 +49,4 @@ Finally, cd into a directory where this Readme.md exists and type this command:
 docker-compose up -d
 ```
 
-** Let's start development! **
+Let's start development!
