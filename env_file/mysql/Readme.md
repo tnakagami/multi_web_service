@@ -1,4 +1,4 @@
-# Creating .env file
+# Create .env file
 An example follows:
 
 ```bash

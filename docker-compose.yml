@@ -48,7 +48,7 @@ services:
         # Image name
         image: custom_django
         # Container name
-        container_name: sns
+        container_name: web_service
         restart: always
         # Setup environment variables
         env_file:

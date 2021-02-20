@@ -1,4 +1,4 @@
-# Creating .evn file
+# Create .evn file
 An example follows:
 
 ```bash
