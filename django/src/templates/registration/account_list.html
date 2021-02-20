@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+{% if user.is_superuser %}
+<div class="row  justify-content-center">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="h2">登録アカウント一覧</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th>ユーザ名</th>
+                            <th>メールアドレス</th>
+                            <th>表示名</th>
+                            <th>アカウント状態</th>
+                            <th colspan="2">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for target in accounts %}
+                        <tr>
+                            <td scope="row">{{ target.id }}</td>
+                            <td>{{ target.username }}</td>
+                            <td>{{ target.email }}</td>
+                            {% if target.viewname %}
+                            <td>{{ target.viewname }}</td>
+                            {% else %}
+                            <td>-（未登録）</td>
+                            {% endif %}
+                            {% if target.is_active %}
+                            <td>有効</td>
+                            <td>
+                                <form method="post" action="{% url 'registration:update_user_status' target.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary btn-md btn-block">無効化</button>
+                                </form>
+                            </td>
+                            <td><button type="button" class="btn btn-outline-light btn-md btn-block" disabled>　　</button></td>
+                            {% else %}
+                            <td>無効</td>
+                            <td>
+                                <form method="post" action="{% url 'registration:update_user_status' target.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-md btn-block">有効化</button>
+                                </form>
+                            </td>
+                            <td><a href="{% url 'registration:delete_user_page' target.pk %}" class="btn btn-danger btn-md btn-block">削除</a></td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <ul class="pagination">
+                    {# before #}
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {# number #}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if num <= page_obj.number|add:5 and num >= page_obj.number|add:-5 %}
+                            {% if page_obj.number == num %}
+                            <span>{{ num }}</span>
+                            {% else %}
+                            <a href="?page={{ num }}">{{ num }}</a>
+                            {% endif%}
+                        {% endif %}
+                    {% endfor %}
+
+                    {# next #}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

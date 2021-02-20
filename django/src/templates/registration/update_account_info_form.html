@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row  justify-content-center">
+    <div class="col-12">
+        <form action="" method="POST">
+            <div class="row">
+                <div class="col-12">
+                {{ form.non_field_errors }}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">項目</th>
+                            <th>値</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for field in form %}
+                        <tr>
+                            <td scope="row"><label for="{{ field.id_for_label }}">{{ field.label }}</label></td>
+                            <td>{{ field }} {{ field.errors }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% csrf_token %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">情報を更新</button>
+                </div>
+                <div class="col-6">
+                    <a href="{% url 'registration:detail_account_info' user.pk %}" class="btn btn-secondary btn-lg btn-block">戻る</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

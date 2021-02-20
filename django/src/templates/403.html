@@ -1,0 +1,13 @@
+{% extends 'err_base.html' %}
+{% block content %}
+<div class="row  justify-content-center">
+    <div class="col-12">
+        <h2 class="h2">403 Forbidden</h2>
+        <p>リクエストされたページにアクセス権限がありません。</p>
+        {% if exception %}
+        <p stype="color: red;">{{ exception }}</p>
+        {% endif %}
+        <p>3秒後にトップページへリダイレクトします。</p>
+    </div>
+</div>
+{% endblock %}
