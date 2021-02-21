@@ -12,7 +12,7 @@
 下記のURLより、アカウント本登録を行ってください。
 
 ■本登録用URL
-{{ protocol }}://{{ domain }}{% url 'registration:create_ftpuser_complete' token %}
+{{ protocol }}://{{ domain }}{% url 'registration:create_user_complete' token %}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ご注意

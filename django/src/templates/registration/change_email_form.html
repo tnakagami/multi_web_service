@@ -1,4 +1,13 @@
 {% extends "base.html" %}
+{% block header %}
+<style>
+    label.required::after {
+        content: ' *';
+        color: red;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row  justify-content-center">
     <div class="col-12">

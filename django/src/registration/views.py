@@ -75,7 +75,6 @@ class UpdateUserStatus(UserPassesTestMixin, UpdateView):
 
         return redirect('registration:accounts_page')
 
-
 class DeleteUserPage(UserPassesTestMixin, DeleteView):
     raise_exception = True
     model = User

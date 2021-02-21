@@ -4,7 +4,7 @@ from django.contrib.auth.forms import (
     PasswordResetForm, SetPasswordForm
 )
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy
 
 User = get_user_model()
 
@@ -12,6 +12,7 @@ class LoginForm(AuthenticationForm):
     """
     Login form
     """
+    username = forms.CharField(label=ugettext_lazy('username or e-mail address'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,6 +33,7 @@ class CreateUserForm(UserCreationForm):
     """
     Form of user registeration
     """
+    required_css_class = 'required'
 
     class Meta:
         model = User
@@ -42,7 +44,13 @@ class CreateUserForm(UserCreationForm):
 
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
-        self.fields['viewname'].label = '表示名'
+        self.fields['viewname'].label = ugettext_lazy('view name')
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        User.objects.filter(email=email, is_active=False).delete()
+
+        return email
 
     def clean_username(self):
         username = self.cleaned_data['username']
@@ -64,12 +72,13 @@ class UpdateAccountInfoForm(forms.ModelForm):
 
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
-        self.fields['viewname'].label = '表示名'
+        self.fields['viewname'].label = ugettext_lazy('view name')
 
 class ChangePasswordForm(PasswordChangeForm):
     """
     Change own password
     """
+    required_css_class = 'required'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -81,6 +90,7 @@ class RequestInitPasswordForm(PasswordResetForm):
     """
     Request initialized Password
     """
+    required_css_class = 'required'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -91,7 +101,7 @@ class RequestInitPasswordForm(PasswordResetForm):
     def clean_email(self):
         email = self.cleaned_data['email']
         if not User.objects.filter(email__iexact=email, is_active=True).exists():
-            msg = ugettext('There is no user registered with the specified e-mail address.')
+            msg = ugettext_lazy('There is no user registered with the specified e-mail address.')
             self.add_error('email', msg)
 
         return email
@@ -100,6 +110,7 @@ class ResetPasswordForm(SetPasswordForm):
     """
     Reset Password
     """
+    required_css_class = 'required'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -111,6 +122,7 @@ class ChangeEmailForm(forms.ModelForm):
     """
     Change E-mail address
     """
+    required_css_class = 'required'
 
     class Meta:
         model = User

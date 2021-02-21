@@ -1,3 +1,8 @@
-from django.test import TestCase
+from django.core import mail, management
+from django.core.urlresolvers import reverse, resolve
+from django.test import Client, TestCase
+from django.contrib.auth import get_user_model
+from . import views, forms, models
 
-# Create your tests here.
+User = get_user_model()
+

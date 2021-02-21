@@ -13,7 +13,7 @@ COPY ./requirements.txt /
 
 # Install
 RUN    apk --no-cache update \
-    && apk add --no-cache bash tzdata pcre-dev mysql-client bind-tools \
+    && apk add --no-cache bash tzdata gettext pcre-dev mysql-client bind-tools \
                           mariadb-dev mariadb-connector-c-dev libsodium libxml2-dev \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
