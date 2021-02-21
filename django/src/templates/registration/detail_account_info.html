@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row  justify-content-center">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="h2 mt-3">アカウント情報</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">項目</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td scope="row">ユーザ名</td>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row">メールアドレス</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row">表示名</td>
+                            {% if user.viewname %}
+                            <td>{{ user.viewname }}</td>
+                            {% else %}
+                            <td>-（未設定）</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if not user.is_superuser %}
+        <div class="row">
+            <div class="col-12">
+                <hr>
+                <h2 class="h2 mt-3">変更操作</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <a href="{% url 'registration:update_account_info' user.pk %}" class="btn btn-primary btn-lg btn-block">表示名の更新</a>
+            </div>
+            <div class="col-4">
+                <a href="{% url 'registration:change_email' %}"  class="btn btn-success btn-lg btn-block">登録メールアドレス変更</a>
+            </div>
+            <div class="col-4">
+                <a href="{% url 'registration:change_own_password' %}"  class="btn btn-info btn-lg btn-block">パスワードの変更</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

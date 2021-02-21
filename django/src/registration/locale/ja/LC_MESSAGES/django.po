@@ -1,0 +1,101 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-21 12:47+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: registration/admin.py:27
+msgid "Permissions"
+msgstr "権限"
+
+#: registration/admin.py:28
+msgid "Important dates"
+msgstr "最終ログイン日とアカウント作成日"
+
+#: registration/forms.py:15
+msgid "username or e-mail address"
+msgstr "ユーザ名またはメールアドレス"
+
+#: registration/forms.py:47 registration/forms.py:75 registration/models.py:74
+msgid "view name"
+msgstr "表示名"
+
+#: registration/forms.py:104
+msgid "There is no user registered with the specified e-mail address."
+msgstr "指定されたメールアドレスのユーザが存在しません。"
+
+#: registration/models.py:15
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and _ characters."
+msgstr ""
+"有効なユーザ名を指定してください。ユーザ名に利用できる文字は、アルファベッ"
+"ト、数字、アンダースコアのみです。"
+
+#: registration/models.py:64
+msgid "username"
+msgstr "ユーザ名"
+
+#: registration/models.py:67
+msgid "Required. 128 characters or fewer. Letters, digits and _ only."
+msgstr ""
+"必須項目：アルファベット、数字、アンダースコアを用いて、128文字以下で入力して"
+"ください。"
+
+#: registration/models.py:70
+msgid "A user with that username already exists."
+msgstr "指定されたユーザ名は、既に存在します。"
+
+#: registration/models.py:77
+#, fuzzy
+#| msgid "Required. 128 characters or fewer."
+msgid "Option. 128 characters or fewer."
+msgstr "オプション：128文字以下で入力してください。"
+
+#: registration/models.py:79
+msgid "email address"
+msgstr "メールアドレス"
+
+#: registration/models.py:81
+msgid "staff status"
+msgstr "スタッフ権限"
+
+#: registration/models.py:83
+msgid "Designates whether the user can log into this admin site."
+msgstr "管理者サイトへのアクセス権の指定"
+
+#: registration/models.py:86
+msgid "active"
+msgstr "アカウントの状態（有効or無効）"
+
+#: registration/models.py:89
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "アカウントの状態（有効or無効）の指定"
+
+#: registration/models.py:92
+msgid "date joined"
+msgstr "アカウント作成日"
+
+#: registration/models.py:101
+msgid "user"
+msgstr "ユーザ"
+
+#: registration/models.py:102
+msgid "users"
+msgstr "ユーザグループ"

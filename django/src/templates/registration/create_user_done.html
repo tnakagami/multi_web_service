@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row  justify-content-center">
+    <div class="col-12">
+        <p>アカウント登録確認メールを送信いたしました。まだ、アカウント登録は完了していません。</p>
+        <p>確認メールに記載されているリンクから本登録を行ってください。</p>
+        <p>5秒後にトップページへリダイレクトします。</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function(){
+    setTimeout(() => {
+        window.location.href = "{% url 'registration:logout' %}";
+    }, 5000);
+}());
+</script>
+{% endblock %}

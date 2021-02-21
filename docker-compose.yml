@@ -111,7 +111,9 @@ services:
 # Setup network
 networks:
     frontend_bridge:
+        name: frontend
     backend_bridge:
+        name: backend
 
 volumes:
     database:

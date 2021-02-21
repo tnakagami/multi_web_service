@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load custom_filter %}
+{% block content %}
+<div class="row  justify-content-center">
+    {% if user.is_superuser %}
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <h3 class="h3">リンク一覧</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th scope="col">リンク</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td scope="row">
+                            <a href="/admin">Admin管理サイト</a>
+                        </td></tr>
+                        <tr><td scope="row">
+                            <a href="{% url 'registration:accounts_page' %}">登録アカウント一覧</a>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        {% if user.is_authenticated  %}
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-12">
+                {% if user.viewname %}
+                        <h2 class="h2">ようこそ！{{ user.viewname }}さん</h2>
+                {% else %}
+                        <h2 class="h2">ようこそ！{{ user.username }}さん</h2>
+                {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+        <div class="col-12">
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

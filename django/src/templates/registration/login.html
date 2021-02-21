@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row  justify-content-center">
+    {# 左側：ログインエリア #}
+    <div class="card col-6">
+        <div class="card-body">
+            <form action="{% url 'registration:login' %}" method="POST">
+                <div class="row">
+                    <div class="col-12">
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        {{ field }}
+                        {{ field.errors }}
+                        <hr>
+                    {% endfor %}
+                    {% csrf_token %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block" >ログイン</button>
+                        <input type="hidden" name="next" value="{{ next }}" />
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'registration:top_page' %}" class="btn btn-secondary btn-lg btn-block" >戻る</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {# 右側：新規登録エリア #}
+    <div class="card col-6">
+        <div class="card-body">
+            <a class="btn btn-success btn-lg btn-block" href="{% url 'registration:create_user' %}">新規登録</a>
+            <a class="btn btn-warning btn-lg btn-block" href="{% url 'registration:reset_password' %}">パスワードを忘れた方</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
