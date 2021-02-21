@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load user_filter %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <h2 class="h2">フォロワーの検索</h2>
+        <form method="GET">
+            <div class="row">
+                <div class="col-10">
+                    {{ filter.form.name }}
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary btn-block">検索</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>見つかったフォロワー</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for target in filter.qs|ignored_userpk:user.pk %}
+                <tr>
+                    {% if target.viewname %}
+                    <td>{{ target.viewname }} <font color="gray">@{{ target.username }}</td>
+                    {% else %}
+                    <td>{{ target.username }}</td>
+                    {% endif %}
+                    {% with relationships|filtered_follower:target.pk|filtered_owner:user.pk as exact_relation %}
+                    {% if exact_relation %}
+                    <td>
+                        {# give up optimization #}
+                        {% for element in exact_relation %}
+                        <button type="button" class="btn btn-secondary btn-md btn-block un-follow-modal-button" data-deleteurl="{% url 'sns:delete_follower' element.pk %}">
+                            フォロー解除
+                        </button>
+                        {% endfor %}
+                    </td>
+                    {% else %}
+                    <td>
+                        <button type="button" class="btn btn-primary btn-md btn-block follow-modal-button" data-ownerid="{{ user.pk }}" data-followerid="{{ target.pk }}">
+                            フォロー
+                        </button>
+                    </td>
+                    {% endif %}
+                    {% endwith %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ログイン後にフォロワーを検索できます。
+    </div>
+</div>
+{% endif %}
+
+<div class="modal" tabindex="-1" role="dialog" id="follow-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">フォローの確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>フォローしますか？</p>
+            </div>
+            <div class="modal-footer">
+                <form action="{% url 'sns:create_follower' %}" method="POST" id="follow-form">
+                    {% csrf_token %}
+                    {{ relationship_form }}
+                    <button type="submit" class="btn btn-danger">フォロー</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="un-follow-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">フォロー解除の確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>本当にフォローを解除しますか？</p>
+            </div>
+            <div class="modal-footer">
+                <form action="" method="POST" id="un-follow-form">
+                    {% csrf_token %}
+                    {{ relationship_form }}
+                    <button type="submit" class="btn btn-danger">フォロー解除</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    /* Follow */
+    const followForm = document.getElementById('follow-form');
+    const followModalButtons = document.getElementsByClassName('follow-modal-button');
+
+    for (const button of followModalButtons) {
+        button.addEventListener('click', () => {
+            for (const element of followForm) {
+                if (element.name === 'follower_id') {
+                    element.value = button.dataset.followerid;
+                }
+                if (element.name === 'owner_id') {
+                    element.value = button.dataset.ownerid;
+                }
+            }
+
+            $('#follow-modal').modal({
+                backdrop: true,
+                keyboard: true,
+            });
+        });
+    }
+
+    /* Un follow */
+    const unFollowForm = document.getElementById('un-follow-form');
+    const unFollowModalButtons = document.getElementsByClassName('un-follow-modal-button');
+
+    for (const button of unFollowModalButtons) {
+        button.addEventListener('click', () => {
+            unFollowForm.action = button.dataset.deleteurl;
+
+            $('#un-follow-modal').modal({
+                backdrop: true,
+                keyboard: true,
+            });
+        });
+    }
+}())
+</script>
+{% endblock %}

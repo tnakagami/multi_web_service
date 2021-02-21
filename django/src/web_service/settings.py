@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'import_export',
     'axes',
-    'registration.apps.RegistrationConfig',   # registration app
+    'registration.apps.RegistrationConfig', # registration app
+    'sns.apps.SnsConfig',                   # sns app
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -93,6 +94,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'custom_filter': 'custom_templatetags.custom_filter',
+                'user_filter': 'custom_templatetags.user_filter',
             },
         },
     },

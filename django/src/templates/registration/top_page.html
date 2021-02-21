@@ -25,17 +25,45 @@
     </div>
     {% else %}
         {% if user.is_authenticated  %}
-            <div class="col-12">
-                <div class="row">
-                    <div class="col-12">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
                 {% if user.viewname %}
-                        <h2 class="h2">ようこそ！{{ user.viewname }}さん</h2>
+                    <h2 class="h2">ようこそ！{{ user.viewname }}さん</h2>
                 {% else %}
-                        <h2 class="h2">ようこそ！{{ user.username }}さん</h2>
+                    <h2 class="h2">ようこそ！{{ user.username }}さん</h2>
                 {% endif %}
-                    </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">サービス</th>
+                                <th>リンク</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td scope="row">SNS</td>
+                                <td>
+                                    <a href="{% url 'sns:time_line' %}" class="btn btn-outline-primary btn-block" target="_self">
+                                        Let's go!
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td scope="row">Blog</td>
+                                <td>
+                                -
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         {% else %}
         <div class="col-12">
         </div>
