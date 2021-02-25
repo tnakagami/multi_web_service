@@ -8,11 +8,14 @@
         <h2 class="h2">フォロワーの検索</h2>
         <form method="GET">
             <div class="row">
-                <div class="col-10">
+                <div class="col-8">
                     {{ filter.form.name }}
                 </div>
                 <div class="col-2">
                     <button type="submit" class="btn btn-primary btn-block">検索</button>
+                </div>
+                <div class="col-2">
+                    <a href="{% url 'sns:time_line' %}" class="btn btn-secondary btn-block">戻る</a>
                 </div>
             </div>
         </form>
@@ -35,23 +38,18 @@
                     {% else %}
                     <td>{{ target.username }}</td>
                     {% endif %}
-                    {% with relationships|filtered_follower:target.pk|filtered_owner:user.pk as exact_relation %}
-                    {% if exact_relation %}
+                    {% with relationships|filtered_follower:target.pk|filtered_owner:user.pk|get_first_element as exact_relation %}
                     <td>
-                        {# give up optimization #}
-                        {% for element in exact_relation %}
-                        <button type="button" class="btn btn-secondary btn-md btn-block un-follow-modal-button" data-deleteurl="{% url 'sns:delete_follower' element.pk %}">
+                        {% if exact_relation %}
+                        <button type="button" class="btn btn-secondary btn-md btn-block un-follow-modal-button" data-deleteurl="{% url 'sns:delete_follower' exact_relation.pk %}">
                             フォロー解除
                         </button>
-                        {% endfor %}
-                    </td>
-                    {% else %}
-                    <td>
+                        {% else %}
                         <button type="button" class="btn btn-primary btn-md btn-block follow-modal-button" data-ownerid="{{ user.pk }}" data-followerid="{{ target.pk }}">
                             フォロー
                         </button>
+                        {% endif %}
                     </td>
-                    {% endif %}
                     {% endwith %}
                 </tr>
                 {% endfor %}

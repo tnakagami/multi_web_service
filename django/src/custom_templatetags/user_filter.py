@@ -19,5 +19,9 @@ def filtered_follower(relationship, pk):
     return relationship.filter(follower__pk=pk)
 
 @register.filter
+def get_first_element(queryset):
+    return queryset.first()
+
+@register.filter
 def ignored_userpk(queryset, pk):
     return queryset.exclude(pk=pk)
