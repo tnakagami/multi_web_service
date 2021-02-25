@@ -4,5 +4,6 @@ sqlparse==0.3.0
 mysqlclient==2.0.3
 requests==2.25.1
 django-import-export==2.5.0
+django-filter==2.4.0
 django-structlog==2.1.0
 django-axes==5.13.0

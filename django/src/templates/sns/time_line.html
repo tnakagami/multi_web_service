@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block header %}
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form action="{% url 'sns:time_line' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12">
+                        {{ form.non_field_errors }}
+                        {% for field in form %}
+                            {{ field }}
+                        {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-3">
+                            <a href="{% url 'sns:search_follower' %}" class="btn btn-success btn-block" target="_self">フォロワーを探す</a>
+                        </div>
+                        <div class="col-6"></div>
+                        <div class="col-3">
+                            <button type="submit" class="btn btn-primary btn-block">つぶやく</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        {% for tweet in tweets %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-10">
+                    {% if tweet.user.viewname %}
+                        <ul>
+                            <li>{{ tweet.user.viewname }} <font color="gray">@{{ tweet.user.username }} {{ tweet.created|date:"Y/m/d H:i:s" }}</font></li>
+                            <li>{{ tweet.text }}</li>
+                        </ul>
+                    {% else %}
+                        <ul>
+                            <li>{{ tweet.user.username }} {{ tweet.created|date:"Y/m/d H:i:s" }}</li>
+                            <li>{{ tweet.text }}</li>
+                        </ul>
+                    {% endif %}
+                    </div>
+                    <div class="col-2">
+                        {% ifequal tweet.user.pk user.pk %}
+                        <button type="button" class="btn btn-danger btn-block delete-modal-button" data-deleteurl="{% url 'sns:tweet_delete' tweet.pk %}">削除</button>
+                        {% endifequal %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ログイン後にツイートが表示されます。
+    </div>
+</div>
+{% endif %}
+
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">削除の確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>本当に削除してよろしいですか？</p>
+            </div>
+            <div class="modal-footer">
+                <form action="" method="POST" id="delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">本当に削除</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    const deleteForm = document.getElementById('delete-form');
+    const deleteModalButtons = document.getElementsByClassName('delete-modal-button');
+
+    for (const button of deleteModalButtons) {
+        button.addEventListener('click', () => {
+            deleteForm.action = button.dataset.deleteurl;
+
+            $('#modal').modal({
+                backdrop: true,
+                keyboard: true,
+            });
+        });
+    }
+}());
+</script>
+{% endblock %}
