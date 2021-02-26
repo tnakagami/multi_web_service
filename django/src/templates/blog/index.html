@@ -10,7 +10,7 @@
 {% block content %}
 {% if user.is_authenticated  %}
 <div class="row justify-content-center">
-    <div class="col-12">
+    <div class="col-9">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">絞り込み検索</h5>
@@ -32,21 +32,50 @@
             </div>
         </div>
     </div>
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">記事作成</h5>
+                <a href="{% url 'blog:tag_create' %}" class="btn btn-info btn-block">タグ作成</a>
+                <a href="{% url 'blog:post_create' %}" class="btn btn-success btn-block">記事を書く</a>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="row justify-content-center mt-3">
     <div class="col-12">
         <section>
-        {% for post in blogs %}
+        {% for post in posts %}
+            {% if post.is_public or post.user.pk == user.pk %}
             <article>
-                <h2 class="h2 mt-1"><a href="#">{{ post.title }}</a></h2>
-                <p>{{ post.description }}</p>
-                <div>
-                    <time datetime="{{ post.updated_at|date:'Y-m-d' }}">{{ post.updated_at|naturaltime }}に更新</time>
-                    {% for tag in post.tags.all %}
-                    <span data-pk="{{ tag.pk }}">{{ tag.name }}</span>
-                    {% endfor %}
+                <div class="row">
+                    <div class="col-8">
+                        <h2 class="h2 mt-1"><a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a></h2>
+                    </div>
+                    {% ifequal post.user.pk user.pk %}
+                    <div class="col-2">
+                        <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-success btn-block">編集</a>
+                    </div>
+                    <div class="col-2">
+                        削除
+                    </div>
+                    {% else %}
+                    <div class="col-4">-</div>
+                    {% endifequal %}
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ post.description }}</p>
+                        <div>
+                            <time datetime="{{ post.updated_at|date:'Y-m-d' }}">{{ post.updated_at|naturaltime }}に更新</time>
+                            {% for tag in post.tags.all %}
+                            <span data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </article>
+            {% endif %}
         {% empty %}
             <article>
                 <p>まだ記事がありません。</p>
@@ -55,6 +84,7 @@
         </section>
     </div>
 </div>
+{% if posts %}
 <div class="row justify-content-center">
     <div class="col-12">
         <ul class="pagination">
@@ -89,6 +119,7 @@
         </ul>
     </div>
 </div>
+{% endif %}
 {% else %}
 <div class="row justify-content-center">
     <div class="col-12">

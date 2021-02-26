@@ -1,12 +1,20 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+
+User = get_user_model()
 
 class Tag(models.Model):
     """
     tag
     """
+    # user
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # tag name
     name = models.CharField('tag name', max_length=255, unique=True)
 
+    def __str__(self):
+        return self.__unicode__()
     def __unicode__(self):
         return self.name
 
@@ -14,6 +22,8 @@ class Post(models.Model):
     """
     post
     """
+    # user
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # title
     title = models.CharField('title', max_length=64)
     # body text
@@ -21,7 +31,7 @@ class Post(models.Model):
     # tag information
     tags = models.ManyToManyField(Tag, verbose_name='tag', blank=True)
     # relation post
-    relation_posts = models.ManyToManyField('self', verbose_name='relation_posts', blank=True)
+    relation_posts = models.ManyToManyField('self', verbose_name='relation posts', blank=True)
     # is public
     is_public = models.BooleanField('public or private', default=True)
     # description
@@ -33,6 +43,8 @@ class Post(models.Model):
     # update time
     updated_at = models.DateTimeField('update time', default=timezone.now)
 
+    def __str__(self):
+        return self.__unicode__()
     def __unicode__(self):
         return self.title
 
@@ -49,6 +61,8 @@ class Comment(models.Model):
     # create time
     created_at = models.DateTimeField('create time', default=timezone.now)
 
+    def __str__(self):
+        return self.__unicode__()
     def __unicode__(self):
         return self.comment_text[:32]
 
@@ -66,4 +80,6 @@ class Reply(models.Model):
     created_at = models.DateTimeField('create time', default=timezone.now)
 
     def __str__(self):
+        return self.__unicode__()
+    def __unicode__(self):
         return self.text[:20]

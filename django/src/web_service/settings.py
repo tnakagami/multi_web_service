@@ -253,6 +253,12 @@ LOCALE_PATHS = (
 STATIC_URL = '/static/'
 STATIC_ROOT = '/static'
 
+# markdown extensions
+MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.extra',
+    'markdown.extensions.toc',
+]
+
 # define custom user model
 AUTH_USER_MODEL = 'registration.User'
 
