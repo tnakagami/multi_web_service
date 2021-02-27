@@ -1,4 +1,6 @@
-{% extends "base.html" %}
+{% extends "sns/breadcrumbs_sns.html" %}
+{% load humanize %}
+
 {% block header %}
 <style>
     ul {
@@ -46,12 +48,12 @@
                     <div class="col-10">
                     {% if tweet.user.viewname %}
                         <ul>
-                            <li>{{ tweet.user.viewname }} <font color="gray">@{{ tweet.user.username }} {{ tweet.created|date:"Y/m/d H:i:s" }}</font></li>
+                            <li>{{ tweet.user.viewname }} <font color="gray">@{{ tweet.user.username }} {{ tweet.created|naturaltime }}</font></li>
                             <li>{{ tweet.text }}</li>
                         </ul>
                     {% else %}
                         <ul>
-                            <li>{{ tweet.user.username }} {{ tweet.created|date:"Y/m/d H:i:s" }}</li>
+                            <li>{{ tweet.user.username }} {{ tweet.created|naturaltime }}</li>
                             <li>{{ tweet.text }}</li>
                         </ul>
                     {% endif %}
@@ -86,6 +88,7 @@
             </div>
             <div class="modal-body">
                 <p>本当に削除してよろしいですか？</p>
+                <p><font color="red">この操作はやり直せません</font></p>
             </div>
             <div class="modal-footer">
                 <form action="" method="POST" id="delete-form">

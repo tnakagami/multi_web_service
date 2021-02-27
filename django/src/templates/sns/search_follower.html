@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "sns/breadcrumbs_sns_search_follower.html" %}
 {% load user_filter %}
 
 {% block content %}
@@ -81,7 +81,7 @@
                 <form action="{% url 'sns:create_follower' %}" method="POST" id="follow-form">
                     {% csrf_token %}
                     {{ relationship_form }}
-                    <button type="submit" class="btn btn-danger">フォロー</button>
+                    <button type="submit" class="btn btn-primary">フォロー</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
                 </form>
             </div>
