@@ -22,6 +22,13 @@ class PostSearchForm(forms.Form):
         widget=widgets.CustomCheckboxSelectMultiple,
     )
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user is not None:
+            self.fields['tags'].queryset = models.Tag.objects.filter(user=user).order_by('name')
+
     def filtered_queryset(self, queryset):
         # get tags
         tags = self.cleaned_data.get('tags')
@@ -33,18 +40,21 @@ class PostSearchForm(forms.Form):
                 queryset = queryset.filter(tags=tag)
         if search_word:
             for word in search_word.split():
-                queryset = queryset.filter(Q(title__icontains=word) | Q(text__icontains=word))
+                queryset = queryset.filter(Q(title__icontains=word) | Q(text__icontains=word) | Q(keywords__icontains=word))
 
         return queryset
 
 class TagForm(forms.ModelForm):
     class Meta:
         model = models.Tag
-        exclude = ('user',)
+        fields = ('name',)
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+        if user is not None:
+            self.fields['name'].queryset = models.Tag.objects.filter(user=user).order_by('name')
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
@@ -61,11 +71,20 @@ class PostForm(forms.ModelForm):
                 'data-on': 'Public',
                 'data-off': 'Private',
             }),
+            'keywords': forms.TextInput(attrs={'placeholder': 'keyword'}),
         }
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        post_pk = kwargs.pop('pk', None)
         super().__init__(*args, **kwargs)
 
+        if user is not None:
+            tag_queryset = models.Tag.objects.filter(user=user).order_by('name')
+            post_queryset = models.Post.objects.filter(user=user).order_by('title')
+            self.fields['tags'].queryset = tag_queryset
+            # self post is ignored
+            self.fields['relation_posts'].queryset = post_queryset if post_pk is None else post_queryset.exclude(pk=post_pk)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 

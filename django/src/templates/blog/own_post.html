@@ -32,45 +32,39 @@
         </div>
     </div>
 </div>
-<div class="row justify-content-center">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-4">
-                        <a href="{% url 'blog:tag_create' %}" class="btn btn-primary btn-block">タグ作成</a>
-                    </div>
-                    <div class="col-4">
-                        <a href="{% url 'blog:post_create' %}" class="btn btn-success btn-block">記事を書く</a>
-                    </div>
-                    <div class="col-4">
-                        <a href="{% url 'blog:own_post' user.pk %}" class="btn btn-info btn-block">作成した記事一覧</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="row justify-content-center mt-3">
     <div class="col-12">
         <section>
         {% for post in posts %}
-            {% if post.is_public or post.user.pk == user.pk %}
+            {% if post.user.pk == user.pk %}
             <article>
-                <h2 class="h2 mt-1"><a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a></h2>
-                <p>{{ post.description }}</p>
-                <div>
-                    {% if post.user.viewname %}
-                    <span>{{ post.user.viewname }} <font color="gray">@{{ post.user.username }}</font> 作成</span>
+                <div class="row">
+                    <div class="col-9">
+                        <h2 class="h2 mt-1"><a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a></h2>
+                    </div>
+                    {% if post.user.pk == user.pk %}
+                    <div class="col-2">
+                        <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-success btn-block">編集</a>
+                    </div>
+                    <div class="col-1">
+                        <a href="#" class="btn btn-danger btn-block">削除</a>
+                    </div>
                     {% else %}
-                    <span>{{ post.user.username }} 作成</span>
+                    <div class="col-3"></div>
                     {% endif %}
-                    <time datetime="{{ post.updated_at|date:'Y-m-d' }}">（{{ post.updated_at|naturaltime }}に更新）</time>
-                    {% for tag in post.tags.all %}
-                    {% if tag.user.pk == user.pk %}
-                    <span data-pk="{{ tag.pk }}">{{ tag.name }}</span>
-                    {% endif %}
-                    {% endfor %}
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ post.description }}</p>
+                        <div>
+                            <time datetime="{{ post.updated_at|date:'Y-m-d' }}">{{ post.updated_at|naturaltime }}に更新</time>
+                            {% for tag in post.tags.all %}
+                            {% if tag.user.pk == user.pk %}
+                            <span data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </article>
             {% endif %}

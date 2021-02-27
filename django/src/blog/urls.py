@@ -5,6 +5,7 @@ app_name = 'blog'
 
 urlpatterns = [
     path('', views.PostListView.as_view(), name='index'),
+    path('own/<int:pk>', views.OwnPostListView.as_view(), name='own_post'),
     path('create/tag', views.TagCreateView.as_view(), name='tag_create'),
     path('update/tag/<int:pk>', views.TagUpdateView.as_view(), name='tag_update'),
     path('create/post', views.PostCreateView.as_view(), name='post_create'),

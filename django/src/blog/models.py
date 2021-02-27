@@ -37,7 +37,7 @@ class Post(models.Model):
     # description
     description = models.TextField('description', max_length=128)
     # keyword
-    keywords = models.CharField('post keyword', max_length=255, default='default keyword')
+    keywords = models.CharField('post keyword', max_length=255, default='')
     # create time
     created_at = models.DateTimeField('create time', default=timezone.now)
     # update time

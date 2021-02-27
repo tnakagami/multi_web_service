@@ -11,7 +11,6 @@
 <script>hljs.initHighlightingOnLoad();</script>
 {% endblock %}
 
-
 {% block content %}
 {% if user.is_authenticated  %}
 <div class="row justify-content-center">
@@ -21,7 +20,7 @@
                 <div class="col-8">
                     <h1 class="h1">{{ post.title }}</h1>
                 </div>
-                {% ifequal post.user.pk user.pk %}
+                {% if post.user.pk == user.pk %}
                 <div class="col-2">
                     <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-success btn-block">編集</a>
                 </div>
@@ -30,7 +29,7 @@
                 </div>
                 {% else %}
                 <div class="col-4"></div>
-                {% endifequal %}
+                {% endif %}
             </div>
             <div class="row">
                 <div class="col-12">
