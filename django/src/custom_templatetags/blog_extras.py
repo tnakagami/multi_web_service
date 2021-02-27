@@ -23,7 +23,7 @@ class EscapeHtml(Extension):
 
 
 @register.filter
-def markdown_to_html_with_escape(text):
+def markdown2html_with_escape(text):
     """
     convert markdown to escapsed html
     """

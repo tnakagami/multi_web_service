@@ -92,9 +92,7 @@
                     {% endif %}
                     <time datetime="{{ post.updated_at|date:'Y-m-d' }}">（{{ post.updated_at|naturaltime }}に更新）</time>
                     {% for tag in post.tags.all %}
-                    {% if tag.user.pk == user.pk %}
                     <span class="tag" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
-                    {% endif %}
                     {% endfor %}
                 </div>
             </article>

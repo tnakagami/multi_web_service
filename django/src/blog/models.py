@@ -54,7 +54,7 @@ class Comment(models.Model):
     comment
     """
     # name
-    name = models.CharField(ugettext_lazy('name'), max_length=255, default='no name')
+    name = models.CharField(ugettext_lazy('name'), max_length=255, default=ugettext_lazy('no name'))
     # comment text
     text = models.TextField(ugettext_lazy('comment'))
     # target post
@@ -72,7 +72,7 @@ class Reply(models.Model):
     reply to comment
     """
     # name
-    name = models.CharField(ugettext_lazy('name'), max_length=255, default='no name')
+    name = models.CharField(ugettext_lazy('name'), max_length=255, default=ugettext_lazy('no name'))
     # reply text
     text = models.TextField(ugettext_lazy('reply text'))
     # target comment

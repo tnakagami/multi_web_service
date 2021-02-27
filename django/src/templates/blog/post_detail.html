@@ -22,28 +22,114 @@
 <div class="row justify-content-center">
     <div class="col-12">
         <article>
-            {% if post.is_public or post.user.pk == user.pk %}
-            <div class="row">
-                <div class="col-12">
-                    <h1 class="h1">{{ post.title }}</h1>
+        {% if post.is_public or post.user.pk == user.pk %}
+            <section>
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="h1">{{ post.title }}</h1>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <time datetime="{{ post.updated_at|date:'Y-m-d' }}">{{ post.updated_at|naturaltime }}に更新</time>
-                    {% for tag in post.tags.all %}
-                    <span class="tag-no-click" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
-                    {% endfor %}
+                <div class="row">
+                    <div class="col-12">
+                        <time datetime="{{ post.updated_at|date:'Y-m-d' }}">{{ post.updated_at|naturaltime }}に更新</time>
+                        {% for tag in post.tags.all %}
+                        <span class="tag-no-click" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    {{ post.text|markdown2html }}
+                <div class="row">
+                    <div class="col-12">
+                        {{ post.text|markdown2html }}
+                    </div>
                 </div>
-            </div>
-            {% else %}
-            記事を表示する権限がありません。
-            {% endif %}
+            </section>
+            <section class="mt-5">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="h3">関連記事</h3>
+                    </div>
+                </div>
+                {% for relation_post in post.relation_posts.all %}
+                <div class="row">
+                    <div class="col-12">
+                        <h4 class="h4"><a href="{% url 'blog:post_detail' relation_post.pk %}">{{ relation_post.title }}</a></h4>
+                        <p>{{ relation_post.description }}</p>
+                        <div>
+                            {% if relation_post.user.viewname %}
+                            <span>{{ relation_post.user.viewname }} <font color="gray">@{{ relation_post.user.username }}</font> 作成</span>
+                            {% else %}
+                            <span>{{ relation_post.user.username }} 作成</span>
+                            {% endif %}
+                            <time datetime="{{ relation_post.updated_at|date:'Y-m-d' }}">（{{ relation_post.updated_at|naturaltime }}に更新）</time>
+                            {% for tag in relation_post.tags.all %}
+                            <span class="tag" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="row">
+                    <div class="col-12">
+                        関連記事はありません。
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+            <section class="mt-5">
+                <div class="row">
+                    <div class="col-8">
+                        <h3 class="h3">コメント</h3>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-primary btn-block comment-modal-button">記事にコメントする</button>
+                    </div>
+                </div>
+                {% for comment in post.comment_set.all %}
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">{{ comment.name }} さん</h4>
+                                <p>
+                                    <time datetime="{{ comment.created_at|date:'Y-m-d' }}">{{ comment.created_at|naturaltime }}</time>
+                                </p>
+                                <div>
+                                    {{ comment.text|markdown2html_with_escape }}
+                                </div>
+                                <p>
+                                    <button type="button" class="btn btn-outline-primary reply-modal-button" data-replyurl="{% url 'blog:reply_create' comment.pk %}">
+                                        返信する
+                                    </button>
+                                </p>
+
+                                {% for reply in comment.reply_set.all %}
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title">{{ reply.name }} さん</h4>
+                                        <p>
+                                            <time datetime="{{ reply.created_at|date:'Y-m-d' }}">{{ reply.created_at|naturaltime }}</time>
+                                        </p>
+                                        <div>
+                                            {{ reply.text|markdown2html_with_escape }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="row">
+                    <div class="col-12">
+                        表示するコメントはありません。
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+        {% else %}
+            <p>記事を表示する権限がありません。</p>
+        {% endif %}
         </article>
     </div>
 </div>
@@ -54,4 +140,79 @@
     </div>
 </div>
 {% endif %}
+
+<div class="modal" tabindex="-1" role="dialog" id="comment-modal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">コメントの作成</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{{ post.title }}に対するコメント</p>
+                <form action="{% url 'blog:comment_create' post.pk %}" method="POST" id="comment-form">
+                    {% csrf_token %}
+                    {{ comment_form }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="comment-form">コメントを送信する</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="reply-modal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">リプライの作成</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>コメントに対する返信</p>
+                <form action="" method="POST" id="reply-form">
+                    {% csrf_token %}
+                    {{ reply_form }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="reply-form">リプライを送信する</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    $('.comment-modal-button').on('click', () => {
+        $('#comment-modal').modal({
+            backdrop: false,
+            keyboard: true,
+        });
+    });
+
+    const replyForm = document.getElementById('reply-form');
+    const replyModalButtons = document.getElementsByClassName('reply-modal-button');
+
+    for (const button of replyModalButtons) {
+        button.addEventListener('click', () => {
+            replyForm.action = button.dataset.replyurl;
+
+            $('#reply-modal').modal({
+                backdrop: false,
+                keyboard: true,
+            });
+        });
+    }
+}());
+</script>
 {% endblock %}
