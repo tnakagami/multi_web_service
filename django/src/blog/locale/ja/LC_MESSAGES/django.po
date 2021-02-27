@@ -1,0 +1,98 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-27 22:49+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: blog/forms.py:13 blog/forms.py:53 blog/forms.py:56 blog/forms.py:111
+msgid "keyword"
+msgstr "キーワード"
+
+#: blog/forms.py:16
+msgid "keyword (target: title, text, keywords)"
+msgstr "キーワード（対象：タイトル、本文、関連キーワード）"
+
+#: blog/forms.py:20
+msgid "filtered by tag"
+msgstr "タグで絞り込み"
+
+#: blog/forms.py:90
+msgid ""
+"[TOC]\n"
+"\n"
+"## Introduction\n"
+" This is sample text."
+msgstr "[TOC]\n\n## 概要\n こんな感じ"
+
+#: blog/models.py:15
+msgid "tag name"
+msgstr "タグ名"
+
+#: blog/models.py:29
+msgid "title"
+msgstr "タイトル"
+
+#: blog/models.py:31
+msgid "body text"
+msgstr "本文"
+
+#: blog/models.py:33
+msgid "tag"
+msgstr "タグ"
+
+#: blog/models.py:35
+msgid "relation posts"
+msgstr "関連記事"
+
+#: blog/models.py:37
+msgid "public or private"
+msgstr "公開 or 非公開"
+
+#: blog/models.py:39
+msgid "description"
+msgstr "概要説明"
+
+#: blog/models.py:41
+msgid "post keyword"
+msgstr "関連キーワード"
+
+#: blog/models.py:43 blog/models.py:63 blog/models.py:81
+msgid "create time"
+msgstr "作成日時"
+
+#: blog/models.py:45
+msgid "update time"
+msgstr "更新日時"
+
+#: blog/models.py:57 blog/models.py:75
+msgid "name"
+msgstr "名前"
+
+#: blog/models.py:59
+msgid "comment"
+msgstr "コメント"
+
+#: blog/models.py:61
+msgid "target post"
+msgstr "対象記事"
+
+#: blog/models.py:77
+msgid "reply text"
+msgstr "リプライ"
+
+#: blog/models.py:79
+msgid "target comment"
+msgstr "対象コメント"

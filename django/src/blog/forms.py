@@ -2,6 +2,7 @@ import web_service.widgets as widgets
 from django.core.files.storage import default_storage
 from django import forms
 from django.db.models import Q
+from django.utils.translation import ugettext_lazy
 from . import models
 
 class PostSearchForm(forms.Form):
@@ -9,14 +10,14 @@ class PostSearchForm(forms.Form):
     post searching form
     """
     search_word = forms.CharField(
-        label='keyword',
+        label=ugettext_lazy('keyword'),
         required=False,
         widget=forms.TextInput(
-            attrs={'placeholder': 'keyword (target: title, text, keywords)', 'class': 'form-control'}
+            attrs={'placeholder': ugettext_lazy('keyword (target: title, text, keywords)'), 'class': 'form-control'}
         ),
     )
     tags = forms.ModelMultipleChoiceField(
-        label='filtered by tag',
+        label=ugettext_lazy('filtered by tag'),
         required=False,
         queryset=models.Tag.objects.order_by('name'),
         widget=widgets.CustomCheckboxSelectMultiple,
@@ -49,10 +50,10 @@ class TagSearchForm(forms.Form):
     tag searching form
     """
     search_word = forms.CharField(
-        label='keyword',
+        label=ugettext_lazy('keyword'),
         required=False,
         widget=forms.TextInput(
-            attrs={'placeholder': 'keyword', 'class': 'form-control'}
+            attrs={'placeholder': ugettext_lazy('keyword'), 'class': 'form-control'}
         ),
     )
 
@@ -86,7 +87,7 @@ class PostForm(forms.ModelForm):
         fields = ('title', 'text', 'tags', 'relation_posts', 'is_public', 'description', 'keywords')
         widgets = {
             'text': widgets.UploadableTextarea(attrs={
-                'placeholder': '[TOC]\n\n## Introduction\n This is sample text.',
+                'placeholder': ugettext_lazy('[TOC]\n\n## Introduction\n This is sample text.'),
                 'rows': 20, 'cols': 10, 'style':'resize:none;',
             }),
             'tags': forms.CheckboxSelectMultiple(attrs={
@@ -107,7 +108,7 @@ class PostForm(forms.ModelForm):
                 'data-off': 'Private',
             }),
             'description': forms.Textarea(attrs={'rows': 5, 'cols': 10, 'style':'resize:none;'}),
-            'keywords': forms.TextInput(attrs={'placeholder': 'keyword'}),
+            'keywords': forms.TextInput(attrs={'placeholder': ugettext_lazy('keyword')}),
         }
 
     def __init__(self, *args, **kwargs):
