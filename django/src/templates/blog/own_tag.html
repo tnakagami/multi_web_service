@@ -46,7 +46,7 @@
                                 <a href="{% url 'blog:tag_update' tag.pk %}" class="btn btn-success btn-block">編集</a>
                             </div>
                             <div class="col-2">
-                                <a href="#" class="btn btn-success btn-block">削除</a>
+                                <button type="button" class="btn btn-danger btn-block delete-modal-button" data-deleteurl="{% url 'blog:tag_delete' tag.pk %}">削除</button>
                             </div>
                         </div>
                         {% empty %}
@@ -72,4 +72,47 @@
     </div>
 </div>
 {% endif %}
+
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">削除の確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>本当に削除してよろしいですか？</p>
+            </div>
+            <div class="modal-footer">
+                <form action="" method="POST" id="delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">本当に削除</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    const deleteForm = document.getElementById('delete-form');
+    const deleteModalButtons = document.getElementsByClassName('delete-modal-button');
+
+    for (const button of deleteModalButtons) {
+        button.addEventListener('click', () => {
+            deleteForm.action = button.dataset.deleteurl;
+
+            $('#modal').modal({
+                backdrop: true,
+                keyboard: true,
+            });
+        });
+    }
+}());
+</script>
 {% endblock %}

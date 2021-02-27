@@ -144,6 +144,25 @@ class TagUpdateView(AccessMixin, UpdateView):
     def get_success_url(self):
         return reverse('blog:own_tag', kwargs={'pk': self.request.user.pk})
 
+class TagDeleteView(AccessMixin, DeleteView):
+    raise_exception = True
+    model = models.Tag
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            tag = self.model.objects.get(pk=kwargs['pk'])
+        except Exception:
+            return Http404
+
+        # if user is not authenticated or tag is not request user's
+        if not request.user.is_authenticated or request.user.pk != tag.user.pk:
+            return self.handle_no_permission()
+        # checks pass let http method handlers process the request
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('blog:own_tag', kwargs={'pk': self.request.user.pk})
+
 class PostCreateView(LoginRequiredMixin, CreateView):
     raise_exception = True
     model = models.Post
@@ -176,6 +195,25 @@ class PostUpdateView(AccessMixin, UpdateView):
         kwargs['pk'] = self.kwargs['pk']
 
         return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            post = self.model.objects.get(pk=kwargs['pk'])
+        except Exception:
+            return Http404
+
+        # if user is not authenticated or post is not request user's
+        if not request.user.is_authenticated or request.user.pk != post.user.pk:
+            return self.handle_no_permission()
+        # checks pass let http method handlers process the request
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('blog:own_post', kwargs={'pk': self.request.user.pk})
+
+class PostDeleteView(AccessMixin, DeleteView):
+    raise_exception = True
+    model = models.Post
 
     def dispatch(self, request, *args, **kwargs):
         try:
