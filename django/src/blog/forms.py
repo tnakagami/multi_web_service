@@ -87,7 +87,7 @@ class PostForm(forms.ModelForm):
         fields = ('title', 'text', 'tags', 'relation_posts', 'is_public', 'description', 'keywords')
         widgets = {
             'text': widgets.UploadableTextarea(attrs={
-                'placeholder': ugettext_lazy('[TOC]\n\n## Introduction\n This is sample text.'),
+                'placeholder': ugettext_lazy('Markdown support\n\n## Introduction\nThis is sample text.'),
                 'rows': 20, 'cols': 10, 'style':'resize:none;',
             }),
             'tags': forms.CheckboxSelectMultiple(attrs={
@@ -122,6 +122,40 @@ class PostForm(forms.ModelForm):
             self.fields['tags'].queryset = tag_queryset
             # self post is ignored
             self.fields['relation_posts'].queryset = post_queryset if post_pk is None else post_queryset.exclude(pk=post_pk)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = models.Comment
+        fields = ('name', 'text')
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'placeholder': ugettext_lazy('Markdown support\n\n## Comment\nThis is comment.\n\n[link text](http://link/to/page)\n\n![image alt](path/to/image)'),
+                'rows': 5, 'cols': 10, 'style':'resize:none;',
+            })
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+class ReplyForm(forms.ModelForm):
+    class Meta:
+        model = models.Reply
+        fields = ('name', 'text')
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'placeholder': ugettext_lazy('Markdown support\n\n## Reply\nThis is reply.\n\n[link text](http://link/to/page)\n\n![image alt](path/to/image)'),
+                'rows': 5, 'cols': 10, 'style':'resize:none;',
+            })
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 

@@ -11,14 +11,18 @@ urlpatterns = [
     # own tag
     path('own/tag/<int:pk>', views.OwnTagListView.as_view(), name='own_tag'),
     # create, update or delete tag
-    path('create/tag', views.TagCreateView.as_view(), name='tag_create'),
-    path('update/tag/<int:pk>', views.TagUpdateView.as_view(), name='tag_update'),
-    path('delete/tag/<int:pk>', views.TagDeleteView.as_view(), name='tag_delete'),
+    path('tag/create', views.TagCreateView.as_view(), name='tag_create'),
+    path('tag/update/<int:pk>', views.TagUpdateView.as_view(), name='tag_update'),
+    path('tag/delete/<int:pk>', views.TagDeleteView.as_view(), name='tag_delete'),
     # create, update or delete post
-    path('create/post', views.PostCreateView.as_view(), name='post_create'),
-    path('update/post/<int:pk>', views.PostUpdateView.as_view(), name='post_update'),
-    path('delete/post/<int:pk>', views.PostDeleteView.as_view(), name='post_delete'),
+    path('post/create', views.PostCreateView.as_view(), name='post_create'),
+    path('post/update/<int:pk>', views.PostUpdateView.as_view(), name='post_update'),
+    path('post/delete/<int:pk>', views.PostDeleteView.as_view(), name='post_delete'),
     # detail post
-    path('detail/post/<int:pk>', views.PostDetailView.as_view(), name='post_detail'),
+    path('post/detail/<int:pk>', views.PostDetailView.as_view(), name='post_detail'),
+    # create comment
+    path('comment/create/<int:pk>', views.CommentCreateView.as_view(), name='comment_create'),
+    # reply
+    path('reply/create/<int:pk>', views.ReplyCreateView.as_view(), name='reply_create'),
     path('image/upload/', views.image_upload, name='image_upload'),
 ]

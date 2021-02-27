@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, AccessMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.http import Http404, JsonResponse, HttpResponseBadRequest
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
@@ -242,6 +242,44 @@ class PostDetailView(LoginRequiredMixin, DeleteView):
             return post
         else:
             return self.handle_no_permission()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = forms.CommentForm()
+        context['reply_form'] = forms.ReplyForm()
+
+        return context
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = models.Comment
+    form_class = forms.CommentForm
+
+    def get(self, request, *args, **kwargs):
+        return self.handle_no_permission()
+
+    def form_valid(self, form):
+        post_pk = self.kwargs['pk']
+        post = get_object_or_404(models.Post, pk=post_pk)
+        comment = form.save(commit=False)
+        comment.target = post
+        comment.save()
+
+        return redirect('blog:post_detail', pk=post_pk)
+
+class ReplyCreateView(LoginRequiredMixin, CreateView):
+    model = models.Reply
+    form_class = forms.ReplyForm
+
+    def get(self, request, *args, **kwargs):
+        return self.handle_no_permission()
+
+    def form_valid(self, form):
+        comment = get_object_or_404(models.Comment, pk=self.kwargs['pk'])
+        reply = form.save(commit=False)
+        reply.target = comment
+        reply.save()
+
+        return redirect('blog:post_detail', pk=comment.target.pk)
 
 def image_upload(request):
     """
