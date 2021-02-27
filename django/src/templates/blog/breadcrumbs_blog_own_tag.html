@@ -1,0 +1,7 @@
+{% extends 'blog/breadcrumbs_blog.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Own Tag" "blog:own_tag" user.pk %}
+{% endblock %}

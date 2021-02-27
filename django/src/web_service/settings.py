@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fezef!#ccxok@&)0wx%ztm&f#b&q&6zo*in(e#_cf7r4k%ad6z'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,10 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'django.forms',
     'import_export',
+    'django_bootstrap_breadcrumbs',
     'axes',
     'registration.apps.RegistrationConfig', # registration app
     'sns.apps.SnsConfig',                   # sns app
+    'blog.apps.BlogConfig',                 # blog app
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -91,14 +95,21 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request', # for django bootstrap breadcrumbs
             ],
             'libraries': {
                 'custom_filter': 'custom_templatetags.custom_filter',
                 'user_filter': 'custom_templatetags.user_filter',
+                'blog_extras': 'custom_templatetags.blog_extras',
+                'pagination': 'custom_templatetags.pagination',
             },
         },
     },
 ]
+
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+
+BREADCRUMBS_TEMPLATE = 'django_bootstrap_breadcrumbs/bootstrap4.html'
 
 WSGI_APPLICATION = 'web_service.wsgi.application'
 
@@ -246,6 +257,12 @@ LOCALE_PATHS = (
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/static'
+
+# markdown extensions
+MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.extra',
+    'markdown.extensions.toc',
+]
 
 # define custom user model
 AUTH_USER_MODEL = 'registration.User'

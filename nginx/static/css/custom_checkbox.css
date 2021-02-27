@@ -1,0 +1,26 @@
+.custom-checkbox {
+    display: none;
+}
+
+.custom-checkbox:checked + .custom-checkbox-label {
+    background: #00809d;
+    color: #fff;
+}
+
+.custom-checkbox-label {
+    box-sizing: border-box;
+    display: inline-block;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    border: solid 1px #ccc;
+    transition: 0.25s;
+    padding: 4px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 3px;
+}
+
+.custom-checkbox-label:hover {
+    opacity: 0.5;
+}

@@ -1,0 +1,150 @@
+{% extends 'blog/breadcrumbs_blog_own_post.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'css/custom_checkbox.css' %}">
+<script src="{% static 'js/blog_search_helper.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">絞り込み検索</h5>
+                <form action="", method="GET">
+                    <div class="form-row">
+                        <div class="col-10">
+                            <div class="row">
+                                <div class="col-12">
+                                    {{ search_form.search_word }}
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                    {{ search_form.tags }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-block">検索</button>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                    <a href="{% url 'blog:own_post' user.pk %}" class="btn btn-secondary btn-block">全件表示</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        <section>
+        {% for post in posts %}
+            {% if post.user.pk == user.pk %}
+            <article>
+                <div class="row">
+                    <div class="col-8">
+                        <h2 class="h2 mt-1"><a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a></h2>
+                    </div>
+                    {% if post.user.pk == user.pk %}
+                    <div class="col-2">
+                        <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-success btn-block">編集</a>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-danger btn-block delete-modal-button" data-deleteurl="{% url 'blog:post_delete' post.pk %}">削除</button>
+                    </div>
+                    {% else %}
+                    <div class="col-4"></div>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ post.description }}</p>
+                        <div>
+                            <time datetime="{{ post.updated_at|date:'Y-m-d' }}">{{ post.updated_at|naturaltime }}に更新</time>
+                            {% for tag in post.tags.all %}
+                            {% if tag.user.pk == user.pk %}
+                            <span class="tag" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endif %}
+        {% empty %}
+            <article>
+                <p>表示できる記事がありません。</p>
+            </article>
+        {% endfor %}
+        </section>
+    </div>
+</div>
+{% if posts %}
+<div class="row justify-content-center">
+    <div class="col-12">
+{% include "pagination.html" %}
+    </div>
+</div>
+{% endif %}
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ログイン後にブログ一覧が表示されます。
+    </div>
+</div>
+{% endif %}
+
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">削除の確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>本当に削除してよろしいですか？</p>
+            </div>
+            <div class="modal-footer">
+                <form action="" method="POST" id="delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">本当に削除</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    const deleteForm = document.getElementById('delete-form');
+    const deleteModalButtons = document.getElementsByClassName('delete-modal-button');
+
+    for (const button of deleteModalButtons) {
+        button.addEventListener('click', () => {
+            deleteForm.action = button.dataset.deleteurl;
+
+            $('#modal').modal({
+                backdrop: true,
+                keyboard: true,
+            });
+        });
+    }
+}());
+</script>
+{% endblock %}
