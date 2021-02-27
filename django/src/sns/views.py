@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, 
 from django.contrib.auth.models import Permission
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.http import Http404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 from django.db.models import Q
@@ -38,14 +39,14 @@ class DeleteTweetView(AccessMixin, DeleteView):
     success_url = reverse_lazy('sns:time_line')
 
     def dispatch(self, request, *args, **kwargs):
-        tweet = self.model.objects.get(pk=kwargs['pk'])
+        try:
+            tweet = self.model.objects.get(pk=kwargs['pk'])
+        except Exception:
+            return Http404
 
-        # if user is not authenticated
-        if not request.user.is_authenticated:
+        # if user is not authenticated or tweet is not request user's
+        if not request.user.is_authenticated or request.user.pk != tweet.user.pk:
             return self.handle_no_permission()
-        # if tweet is not request user's tweet
-        if request.user.pk != tweet.user.pk:
-            return redirect('sns:time_line')
         # checks pass let http method handlers process the request
         return super().dispatch(request, *args, **kwargs)
 
