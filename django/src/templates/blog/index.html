@@ -4,6 +4,7 @@
 
 {% block header %}
 <link rel="stylesheet" href="{% static 'css/custom_checkbox.css' %}">
+<script src="{% static 'js/blog_search_helper.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -16,15 +17,28 @@
                 <form action="", method="GET">
                     <div class="form-row">
                         <div class="col-10">
-                            {{ search_form.search_word }}
+                            <div class="row">
+                                <div class="col-12">
+                                    {{ search_form.search_word }}
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                    {{ search_form.tags }}
+                                </div>
+                            </div>
                         </div>
                         <div class="col-2">
-                            <button type="submit" class="btn btn-primary btn-block">検索</button>
-                        </div>
-                    </div>
-                    <div class="form-row mt-1">
-                        <div class="col-12">
-                            {{ search_form.tags }}
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-block">検索</button>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                    <a href="{% url 'blog:index' %}" class="btn btn-secondary btn-block">全件表示</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -37,13 +51,16 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-3">
                         <a href="{% url 'blog:tag_create' %}" class="btn btn-primary btn-block">タグ作成</a>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <a href="{% url 'blog:post_create' %}" class="btn btn-success btn-block">記事を書く</a>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
+                        <a href="{% url 'blog:own_tag' user.pk %}" class="btn btn-warning btn-block">作成したタグ一覧</a>
+                    </div>
+                    <div class="col-3">
                         <a href="{% url 'blog:own_post' user.pk %}" class="btn btn-info btn-block">作成した記事一覧</a>
                     </div>
                 </div>
@@ -54,6 +71,14 @@
 <div class="row justify-content-center mt-3">
     <div class="col-12">
         <section>
+        {% if search_form.cleaned_data.tags %}
+            <p class="tags" id="select-tags">
+                選択しているタグ：
+                {% for tag in search_form.cleaned_data.tags %}
+                <span class="tag" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                {% endfor %}
+            </p>
+        {% endif %}
         {% for post in posts %}
             {% if post.is_public or post.user.pk == user.pk %}
             <article>
@@ -68,7 +93,7 @@
                     <time datetime="{{ post.updated_at|date:'Y-m-d' }}">（{{ post.updated_at|naturaltime }}に更新）</time>
                     {% for tag in post.tags.all %}
                     {% if tag.user.pk == user.pk %}
-                    <span data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                    <span class="tag" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -76,7 +101,7 @@
             {% endif %}
         {% empty %}
             <article>
-                <p>まだ記事がありません。</p>
+                <p>表示できる記事がありません。</p>
             </article>
         {% endfor %}
         </section>

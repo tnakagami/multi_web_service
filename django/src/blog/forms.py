@@ -10,9 +10,9 @@ class PostSearchForm(forms.Form):
     """
     search_word = forms.CharField(
         label='keyword',
-        required=True,
+        required=False,
         widget=forms.TextInput(
-            attrs={'placeholder': 'keyword', 'class': 'form-control'}
+            attrs={'placeholder': 'keyword (target: title, text, keywords)', 'class': 'form-control'}
         ),
     )
     tags = forms.ModelMultipleChoiceField(
@@ -44,6 +44,28 @@ class PostSearchForm(forms.Form):
 
         return queryset
 
+class TagSearchForm(forms.Form):
+    """
+    tag searching form
+    """
+    search_word = forms.CharField(
+        label='keyword',
+        required=False,
+        widget=forms.TextInput(
+            attrs={'placeholder': 'keyword', 'class': 'form-control'}
+        ),
+    )
+
+    def filtered_queryset(self, queryset):
+        # get tags
+        search_word = self.cleaned_data.get('search_word')
+
+        if search_word:
+            for word in search_word.split():
+                queryset = queryset.filter(name__icontains=word)
+
+        return queryset
+
 class TagForm(forms.ModelForm):
     class Meta:
         model = models.Tag
@@ -63,7 +85,20 @@ class PostForm(forms.ModelForm):
         model = models.Post
         fields = ('title', 'text', 'tags', 'relation_posts', 'is_public', 'description', 'keywords')
         widgets = {
-            'text': widgets.UploadableTextarea(attrs={'placeholder': '[TOC]\n\n## Introduction\n This is sample text.'}),
+            'text': widgets.UploadableTextarea(attrs={
+                'placeholder': '[TOC]\n\n## Introduction\n This is sample text.',
+                'rows': 20, 'cols': 10, 'style':'resize:none;',
+            }),
+            'tags': forms.CheckboxSelectMultiple(attrs={
+                'data-toggle': 'toggle',
+                'data-onstyle': 'primary',
+                'data-offstyle': 'secondary',
+            }),
+            'relation_posts': forms.CheckboxSelectMultiple(attrs={
+                'data-toggle': 'toggle',
+                'data-onstyle': 'primary',
+                'data-offstyle': 'secondary',
+            }),
             'is_public': forms.CheckboxInput(attrs={
                 'data-toggle': 'toggle',
                 'data-onstyle': 'primary',
@@ -71,6 +106,7 @@ class PostForm(forms.ModelForm):
                 'data-on': 'Public',
                 'data-off': 'Private',
             }),
+            'description': forms.Textarea(attrs={'rows': 5, 'cols': 10, 'style':'resize:none;'}),
             'keywords': forms.TextInput(attrs={'placeholder': 'keyword'}),
         }
 

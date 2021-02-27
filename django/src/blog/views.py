@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.http import Http404, JsonResponse, HttpResponseBadRequest
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.db.models import Q
 from . import models, forms
 
 User = get_user_model()
@@ -31,8 +32,7 @@ class PostListView(LoginRequiredMixin, ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        user = self.request.user
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(Q(is_public=True) | Q(user=self.request.user))
         form = forms.PostSearchForm(self.request.GET or None)
 
         # check form
@@ -73,11 +73,35 @@ class OwnPostListView(OnlyYouMixin, ListView):
 
         return context
 
+class OwnTagListView(OnlyYouMixin, ListView):
+    model = models.Tag
+    template_name = 'blog/own_tag.html'
+    paginate_by = 10
+    context_object_name = 'tags'
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(user=self.request.user)
+        form = forms.TagSearchForm(self.request.GET or None)
+
+        # check form
+        if form.is_valid():
+            queryset = form.filtered_queryset(queryset)
+        # ordering
+        queryset = queryset.order_by('-name')
+
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['search_form'] = forms.TagSearchForm(self.request.GET or None)
+
+        return context
+
 class TagCreateView(LoginRequiredMixin, CreateView):
     raise_exception = True
     model = models.Tag
     form_class = forms.TagForm
-    template_name = 'blog/tag_form.html'
+    template_name = 'blog/tag_create_form.html'
     success_url = reverse_lazy('blog:index')
 
     def get_form_kwargs(self):
@@ -97,8 +121,7 @@ class TagUpdateView(AccessMixin, UpdateView):
     raise_exception = True
     model = models.Tag
     form_class = forms.TagForm
-    template_name = 'blog/tag_form.html'
-    success_url = reverse_lazy('blog:index')
+    template_name = 'blog/tag_update_form.html'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -110,22 +133,22 @@ class TagUpdateView(AccessMixin, UpdateView):
         try:
             tag = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return redirect('blog:index')
+            return Http404
 
-        # if user is not authenticated
-        if not request.user.is_authenticated:
+        # if user is not authenticated or tag is not request user's
+        if not request.user.is_authenticated or request.user.pk != tag.user.pk:
             return self.handle_no_permission()
-        # if tag is not request user's
-        if request.user.pk != tag.user.pk:
-            return redirect('blog:index')
         # checks pass let http method handlers process the request
         return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('blog:own_tag', kwargs={'pk': self.request.user.pk})
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     raise_exception = True
     model = models.Post
     form_class = forms.PostForm
-    template_name = 'blog/post_form.html'
+    template_name = 'blog/post_create_form.html'
     success_url = reverse_lazy('blog:index')
 
     def get_form_kwargs(self):
@@ -145,7 +168,7 @@ class PostUpdateView(AccessMixin, UpdateView):
     raise_exception = True
     model = models.Post
     form_class = forms.PostForm
-    template_name = 'blog/post_form.html'
+    template_name = 'blog/post_update_form.html'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -158,26 +181,21 @@ class PostUpdateView(AccessMixin, UpdateView):
         try:
             post = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return redirect('blog:index')
+            return Http404
 
-        # if user is not authenticated
-        if not request.user.is_authenticated:
+        # if user is not authenticated or post is not request user's
+        if not request.user.is_authenticated or request.user.pk != post.user.pk:
             return self.handle_no_permission()
-        # if post is not request user's
-        if request.user.pk != post.user.pk:
-            return redirect('blog:index')
         # checks pass let http method handlers process the request
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse('blog:post_detail', kwargs={'pk': self.kwargs['pk']})
+        return reverse('blog:own_post', kwargs={'pk': self.request.user.pk})
 
 class PostDetailView(LoginRequiredMixin, DeleteView):
+    raise_exception = True
     model = models.Post
     template_name = 'blog/post_detail.html'
-
-    #def get_queryset(self):
-    #    return super().get_queryset().prefetch_related('tags', 'comment_set__reply_set')
 
     def get_object(self, queryset=None):
         post = super().get_object()
@@ -185,8 +203,7 @@ class PostDetailView(LoginRequiredMixin, DeleteView):
         if post.is_public or post.user.pk == self.request.user.pk:
             return post
         else:
-            return Http404
-
+            return self.handle_no_permission()
 
 def image_upload(request):
     """

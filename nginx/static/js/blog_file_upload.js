@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', e => {
         };
 
         const formData = new FormData();
-        formData.append('file', uploadFile);
+        formData.append('upload_file', uploadFile);
         fetch(textarea.dataset.url, {
             method: 'POST',
             body: formData,

@@ -99,6 +99,7 @@ TEMPLATES = [
                 'custom_filter': 'custom_templatetags.custom_filter',
                 'user_filter': 'custom_templatetags.user_filter',
                 'blog_extras': 'custom_templatetags.blog_extras',
+                'pagination': 'custom_templatetags.pagination',
             },
         },
     },

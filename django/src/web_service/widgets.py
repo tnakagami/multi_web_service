@@ -15,7 +15,7 @@ class CustomCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
 
 class UploadableTextarea(forms.Textarea):
     class Media:
-        js = ['js/upload.js']
+        js = ['js/blog_file_upload.js']
 
     def __init__(self, attrs=None):
         super().__init__(attrs)

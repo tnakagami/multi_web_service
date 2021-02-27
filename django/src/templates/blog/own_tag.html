@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'css/custom_checkbox.css' %}">
+<script src="{% static 'js/blog_search_helper.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">絞り込み検索</h5>
+                <form action="", method="GET">
+                    <div class="form-row">
+                        <div class="col-8">
+                            {{ search_form.search_word }}
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-primary btn-block">検索</button>
+                        </div>
+                        <div class="col-2">
+                            <a href="{% url 'blog:own_tag' user.pk %}" class="btn btn-secondary btn-block">全件表示</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        <section>
+            <article>
+                <div class="row">
+                    <div class="col-12">
+                        {% for tag in tags %}
+                        <div class="row mt-1">
+                            <div class="col-8">
+                                <span class="tag" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
+                            </div>
+                            <div class="col-2">
+                                <a href="{% url 'blog:tag_update' tag.pk %}" class="btn btn-success btn-block">編集</a>
+                            </div>
+                            <div class="col-2">
+                                <a href="#" class="btn btn-success btn-block">削除</a>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>表示できるタグがありません。</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </article>
+        </section>
+    </div>
+</div>
+{% if tags %}
+<div class="row justify-content-center">
+    <div class="col-12">
+{% include "pagination.html" %}
+    </div>
+</div>
+{% endif %}
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ログイン後にブログ一覧が表示されます。
+    </div>
+</div>
+{% endif %}
+{% endblock %}

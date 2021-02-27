@@ -1,4 +1,11 @@
 {% extends 'base.html' %}
+{% block header %}
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated  %}
@@ -17,7 +24,7 @@
                     <button type="submit" class="btn btn-primary btn-block">完了</button>
                 </div>
                 <div class="col-6">
-                    <a href="{% url 'blog:index' %}" class="btn btn-secondary btn-block">戻る</a>
+                    <a href="{% url 'blog:own_post' user.pk %}" class="btn btn-secondary btn-block">戻る</a>
                 </div>
             </div>
         </form>
