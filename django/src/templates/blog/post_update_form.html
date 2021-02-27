@@ -1,10 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'blog/breadcrumbs_blog_own_post.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
 {% block header %}
 <style>
     ul {
         list-style: none;
     }
 </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb form.title.value "blog:post_update" pk %}
 {% endblock %}
 
 {% block content %}

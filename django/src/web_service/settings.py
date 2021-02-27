@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.forms',
     'import_export',
+    'django_bootstrap_breadcrumbs',
     'axes',
     'registration.apps.RegistrationConfig', # registration app
     'sns.apps.SnsConfig',                   # sns app
@@ -94,6 +95,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request', # for django bootstrap breadcrumbs
             ],
             'libraries': {
                 'custom_filter': 'custom_templatetags.custom_filter',
@@ -106,6 +108,8 @@ TEMPLATES = [
 ]
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+
+BREADCRUMBS_TEMPLATE = 'django_bootstrap_breadcrumbs/bootstrap4.html'
 
 WSGI_APPLICATION = 'web_service.wsgi.application'
 

@@ -1,7 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'blog/breadcrumbs_blog.html' %}
 {% load static %}
 {% load humanize %}
 {% load blog_extras %}
+{% load django_bootstrap_breadcrumbs %}
 
 {% block header %}
 <link rel="stylesheet" href="{% static 'css/custom_checkbox.css' %}">
@@ -9,6 +10,11 @@
 <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/dracula.min.css">
 <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb post.title "blog:post_detail" post.pk %}
 {% endblock %}
 
 {% block content %}

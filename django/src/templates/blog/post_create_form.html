@@ -1,10 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'blog/breadcrumbs_blog.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
 {% block header %}
 <style>
     ul {
         list-style: none;
     }
 </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Create Post" "blog:post_create" %}
 {% endblock %}
 
 {% block content %}

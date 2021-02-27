@@ -1,4 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'blog/breadcrumbs_blog.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Create Tag" "blog:tag_create" %}
+{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated  %}
