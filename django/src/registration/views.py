@@ -193,6 +193,18 @@ class UpdateAccountInfo(OnlyYouMixin, UpdateView):
     def get_success_url(self):
         return resolve_url('registration:detail_account_info', pk=self.kwargs['pk'])
 
+class DeleteOwnAccount(OnlyYouMixin, DeleteView):
+    """
+    Delete Own Account
+    """
+    raise_exception = True
+    model = User
+    success_url = reverse_lazy('registration:login')
+
+    def get(self, request, *args, **kwargs):
+        # ignore direct access
+        return self.handle_no_permission()
+
 # ===============
 # Change Password
 # ===============
