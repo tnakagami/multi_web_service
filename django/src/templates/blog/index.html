@@ -71,14 +71,6 @@
 <div class="row justify-content-center mt-3">
     <div class="col-12">
         <section>
-        {% if search_form.cleaned_data.tags %}
-            <p class="tags" id="select-tags">
-                選択しているタグ：
-                {% for tag in search_form.cleaned_data.tags %}
-                <span class="tag" data-pk="{{ tag.pk }}">{{ tag.name }}</span>
-                {% endfor %}
-            </p>
-        {% endif %}
         {% for post in posts %}
             {% if post.is_public or post.user.pk == user.pk %}
             <article>
