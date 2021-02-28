@@ -20,7 +20,7 @@ including database configuration, Django-specific options and application-specif
 From the command line, run the following command:
 
 ```bash
-# project name is web_service.
+# project name is web_service
 docker-compose run --rm django django-admin startproject web_service .
 ```
 
@@ -30,9 +30,9 @@ Now that your environment - a "project" - is set up, you're set to start doing w
 To create your app, cd into the same directory as manage.py and type these commands:
 
 ```bash
-# app name is registration.
+# app name is registration
 docker-compose run --rm django python manage.py startapp registration
-# app name is sns.
+# app name is sns
 docker-compose run --rm django python manage.py startapp sns
 # app name is blog
 docker-compose run --rm django python manage.py startapp blog

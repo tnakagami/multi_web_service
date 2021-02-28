@@ -25,8 +25,8 @@ services:
 #            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
             - ./nginx/develop_default.conf:/etc/nginx/conf.d/default.conf:ro  # for development
             - ./nginx/develop_execute.sh:/execute.sh:ro                       # for development
-#            - ./logfiles/access.log:/var/log/nginx/access.log
-#            - ./logfiles/error.log:/var/log/nginx/error.log
+            - ./logfiles/access.log:/var/log/nginx/access.log
+            - ./logfiles/error.log:/var/log/nginx/error.log
         logging:
             driver: "json-file"
             options:
@@ -61,8 +61,8 @@ services:
         # Relationship config file to container directory
         volumes:
             - ./django/src:/code
-#            - ./logfiles/django.log:/var/log/django.log
-#            - ./logfiles/json_django_log.json:/var/log/json_django_log.json
+            - ./logfiles/django.log:/var/log/django.log
+            - ./logfiles/json_django.log:/var/log/json_django_log.json
         logging:
             driver: "json-file"
             options:
