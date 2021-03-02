@@ -8,13 +8,13 @@
         <h2 class="h2">フォロワーの検索</h2>
         <form method="GET">
             <div class="row">
-                <div class="col-8">
+                <div class="col-4 col-md-6 col-lg-8 col-xl-8">
                     {{ filter.form.name }}
                 </div>
-                <div class="col-2">
+                <div class="col-4 col-md-3 col-lg-2 col-xl-2">
                     <button type="submit" class="btn btn-primary btn-block">検索</button>
                 </div>
-                <div class="col-2">
+                <div class="col-4 col-md-3 col-lg-2 col-xl-2">
                     <a href="{% url 'sns:time_line' %}" class="btn btn-secondary btn-block">戻る</a>
                 </div>
             </div>
