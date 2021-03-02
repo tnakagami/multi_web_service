@@ -26,11 +26,10 @@
                         </div>
                     </div>
                     <div class="row mt-1">
-                        <div class="col-3">
+                        <div class="col-6 col-md-6 col-lg-3 col-xl-3">
                             <a href="{% url 'sns:search_follower' %}" class="btn btn-success btn-block" target="_self">フォロワーを探す</a>
                         </div>
-                        <div class="col-6"></div>
-                        <div class="col-3">
+                        <div class="col-6 col-md-6 col-lg-3 col-xl-3 offset-lg-6 offset-xl-6">
                             <button type="submit" class="btn btn-primary btn-block">つぶやく</button>
                         </div>
                     </div>
@@ -45,7 +44,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-8 col-md-8 col-lg-10 col-xl-10">
                     {% if tweet.user.viewname %}
                         <ul>
                             <li>{{ tweet.user.viewname }} <font color="gray">@{{ tweet.user.username }} {{ tweet.created|naturaltime }}</font></li>
@@ -58,7 +57,7 @@
                         </ul>
                     {% endif %}
                     </div>
-                    <div class="col-2">
+                    <div class="col-4 col-md-4 col-lg-2 col-xl-2">
                         {% ifequal tweet.user.pk user.pk %}
                         <button type="button" class="btn btn-danger btn-block delete-modal-button" data-deleteurl="{% url 'sns:tweet_delete' tweet.pk %}">削除</button>
                         {% endifequal %}
