@@ -16,7 +16,7 @@
                 <h5 class="card-title">絞り込み検索</h5>
                 <form action="", method="GET">
                     <div class="form-row">
-                        <div class="col-10">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
                             <div class="row">
                                 <div class="col-12">
                                     {{ search_form.search_word }}
@@ -28,7 +28,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
                             <div class="row">
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-primary btn-block">検索</button>
@@ -51,16 +51,16 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                         <a href="{% url 'blog:tag_create' %}" class="btn btn-primary btn-block">タグ作成</a>
                     </div>
-                    <div class="col-3">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                         <a href="{% url 'blog:post_create' %}" class="btn btn-success btn-block">記事を書く</a>
                     </div>
-                    <div class="col-3">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                         <a href="{% url 'blog:own_tag' user.pk %}" class="btn btn-warning btn-block">作成したタグ一覧</a>
                     </div>
-                    <div class="col-3">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                         <a href="{% url 'blog:own_post' user.pk %}" class="btn btn-info btn-block">作成した記事一覧</a>
                     </div>
                 </div>
