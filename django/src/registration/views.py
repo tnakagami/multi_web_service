@@ -49,6 +49,7 @@ class AccountsPage(UserPassesTestMixin, ListView):
     model = User
     template_name = 'registration/account_list.html'
     context_object_name = 'accounts'
+    queryset = User.objects.filter(pk__gt=1)
 
     def test_func(self):
         user = self.request.user
