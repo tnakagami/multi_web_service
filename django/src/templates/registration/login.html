@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row  justify-content-center">
+<div class="row justify-content-center">
     {# 左側：ログインエリア #}
-    <div class="card col-6">
+    <div class="card col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
         <div class="card-body">
             <form action="{% url 'registration:login' %}" method="POST">
                 <div class="row">
@@ -18,21 +18,29 @@
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                        <button type="submit" class="btn btn-primary btn-block" >ログイン</button>
+                        <button type="submit" class="btn btn-primary btn-block">ログイン</button>
                         <input type="hidden" name="next" value="{{ next }}" />
                     </div>
                     <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                        <a href="{% url 'registration:top_page' %}" class="btn btn-secondary btn-block" >戻る</a>
+                        <a href="{% url 'registration:top_page' %}" class="btn btn-secondary btn-block">戻る</a>
                     </div>
                 </div>
             </form>
         </div>
     </div>
     {# 右側：新規登録エリア #}
-    <div class="card col-6">
+    <div class="card col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
         <div class="card-body">
-            <a class="btn btn-success btn-block" href="{% url 'registration:create_user' %}">新規登録</a>
-            <a class="btn btn-warning btn-block" href="{% url 'registration:reset_password' %}">パスワードを忘れた方</a>
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-success btn-block" href="{% url 'registration:create_user' %}">新規登録</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-warning btn-block" href="{% url 'registration:reset_password' %}">パスワードを忘れた方</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
