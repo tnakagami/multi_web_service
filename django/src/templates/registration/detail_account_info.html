@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Account Info" "registration:detail_account_info" user.pk %}
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-12">
