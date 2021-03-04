@@ -262,6 +262,7 @@ STATIC_ROOT = '/static'
 MARKDOWN_EXTENSIONS = [
     'markdown.extensions.extra',
     'markdown.extensions.toc',
+    'pymdownx.arithmatex',
 ]
 
 # define custom user model
