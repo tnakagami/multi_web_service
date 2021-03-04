@@ -79,8 +79,11 @@ class UpdateUserStatus(UserPassesTestMixin, UpdateView):
 class DeleteUserPage(UserPassesTestMixin, DeleteView):
     raise_exception = True
     model = User
-    template_name = 'registration/delete_user.html'
     success_url = reverse_lazy('registration:accounts_page')
+
+    def get(self, request, *args, **kwargs):
+        # ignore direct access
+        return self.handle_no_permission()
 
     def test_func(self):
         user = self.request.user
