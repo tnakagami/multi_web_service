@@ -4,6 +4,7 @@ sqlparse==0.3.0
 mysqlclient==2.0.3
 requests==2.25.1
 markdown==3.3.4
+pymdown-extensions==8.1.1
 django-import-export==2.5.0
 django-filter==2.4.0
 django-structlog==2.1.0
