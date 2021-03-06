@@ -21,6 +21,7 @@ services:
         volumes:
             - certs:/etc/letsencrypt
             - ./nginx/static:/static:ro
+            - ./nginx/storage:/storage
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 #            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
             - ./nginx/develop_default.conf:/etc/nginx/conf.d/default.conf:ro  # for development
@@ -62,6 +63,7 @@ services:
         # Relationship config file to container directory
         volumes:
             - ./django/src:/code
+            - ./nginx/storage:/storage
             - ./logfiles/django.log:/var/log/django.log
             - ./logfiles/json_django.log:/var/log/json_django_log.json
         logging:

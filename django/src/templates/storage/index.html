@@ -1,0 +1,185 @@
+{% extends 'storage/breadcrumbs_storage.html' %}
+
+{% block header %}
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">絞り込み検索</h5>
+                <form action="", method="GET">
+                    <div class="form-row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+                            <div class="row">
+                                <div class="col-12">
+                                    {{ search_form.search_word }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-primary btn-block">検索</button>
+                                </div>
+                                <div class="col-6">
+                                    <a href="{% url 'storage:index' %}" class="btn btn-secondary btn-block">全件表示</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">ファイルアップロード</h5>
+                <form action="{% url 'storage:upload' %}", method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% if upload_form.errors %}
+                    <div class="row">
+                        <div class="col-12">
+                            <ul>
+                            {% for errors in upload_form.errors.values %}
+                                {% for error in errors %}
+                                <li><font color="red">{{ error }}</font></li>
+                                {% endfor %}
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="custom-file">
+                                {{ upload_form.file }}
+                                <label class="custom-file-label" for="{{ upload_form.file.auto_id }}" data-browse="参照">ファイルを選択</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-success btn-block">アップロード</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        <table>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ファイル名</th>
+                    <th>サイズ</th>
+                    <th>作成日時</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for file in files %}
+            {% if file.user.pk == user.pk %}
+                <tr>
+                    <td>
+                        <a href="{{ file.file.url }}">{{ file.filename }}</a>
+                    </td>
+                    <td>
+                        {{ file.file.size|filesizeformat }}
+                    </td>
+                    <td>
+                        <time datetime="{{ file.created_at|date:'Y-m-d' }}">{{ file.created_at|date:'Y/m/d H:i:s' }}</time>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-block delete-modal-button" data-filename="{{ file.filename }}" data-deleteurl="{% url 'storage:delete' file.pk %}">削除</button>
+                    </td>
+                </tr>
+            {% endif %}
+            {% empty %}
+                <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% if files %}
+<div class="row justify-content-center">
+    <div class="col-12">
+{% include "pagination.html" %}
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="delete-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">削除の確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>「<span id="target-filename"></span>」を本当に削除してもよろしいですか？</p>
+                <p><font color="red">この操作はやり直せません</font></p>
+            </div>
+            <div class="modal-footer">
+                <form action="" method="POST" id="delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">本当に削除</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ログイン後にファイル一覧が表示されます。
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    $('.custom-file-input').on('change', function () {
+        const fileName = $(this).val().split('\\').pop();
+        $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
+    });
+
+    const deleteForm = document.getElementById('delete-form');
+    const deleteModalButtons = document.getElementsByClassName('delete-modal-button');
+
+    for (const button of deleteModalButtons) {
+        button.addEventListener('click', () => {
+            deleteForm.action = button.dataset.deleteurl;
+            $('#target-filename').text(button.dataset.filename);
+
+            $('#delete-modal').modal({
+                backdrop: true,
+                keyboard: true,
+            });
+        });
+    }
+}());
+</script>
+{% endblock %}

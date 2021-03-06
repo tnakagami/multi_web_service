@@ -43,9 +43,11 @@ INSTALLED_APPS = [
     'import_export',
     'django_bootstrap_breadcrumbs',
     'axes',
+    'django_cleanup.apps.CleanupConfig',
     'registration.apps.RegistrationConfig', # registration app
     'sns.apps.SnsConfig',                   # sns app
     'blog.apps.BlogConfig',                 # blog app
+    'storage.apps.StorageConfig',           # storage app
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -67,7 +69,7 @@ MIDDLEWARE = [
 ]
 
 # setup session
-SESSION_COOKIE_AGE = 300               # expiration date is 5 minutes
+SESSION_COOKIE_AGE = 3600              # expiration date is 60 minutes
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True # clear session information when user closed browser
 SESSION_SAVE_EVERY_REQUEST = True      # update session information every request
 
@@ -257,6 +259,9 @@ LOCALE_PATHS = (
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/static'
+
+MEDIA_URL  = '/media/'
+MEDIA_ROOT = os.getenv('DJANGO_MEDIA_ROOT')
 
 # markdown extensions
 MARKDOWN_EXTENSIONS = [

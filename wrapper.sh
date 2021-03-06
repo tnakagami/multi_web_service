@@ -32,8 +32,6 @@ while [ -n "$1" ]; do
             docker-compose build
             # delete image of none
             docker images | grep '<none>' | awk '{print $3;}' | xargs -I{} docker rmi {}
-            # initialize log file
-            ${CURRENT_DIR}/clean_log.sh --force
             shift
             ;;
 

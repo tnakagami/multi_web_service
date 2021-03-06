@@ -13,6 +13,8 @@ class Tweet(models.Model):
     # create time
     created = models.DateTimeField(default=timezone.now)
 
+    def __str__(self):
+        return self.__unicode__()
     def __unicode__(self):
         return self.text
 
@@ -20,3 +22,8 @@ class Relationship(models.Model):
     # follower relationship as seen by the user
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relationship_owner')
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relationship_follower')
+
+    def __str__(self):
+        return self.__unicode__()
+    def __unicode__(self):
+        return '{}-{}'.format(self.owner.username, self.follower.username)

@@ -9,4 +9,5 @@ DJANGO_SUPERUSER_NAME=superuser
 DJANGO_SUPERUSER_EMAIL=superuser@django.local
 DJANGO_SUPERUSER_PASSWORD=superuserpassword
 DJANGO_WWW_VHOST=www.example.com
+DJANGO_MEDIA_ROOT=/storage
 ```
