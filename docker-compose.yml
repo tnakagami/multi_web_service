@@ -20,8 +20,8 @@ services:
             - env_file/nginx/.env
         volumes:
             - certs:/etc/letsencrypt
-            - ./nginx/static:/static:ro
-            - ./nginx/storage:/storage
+            - ./staticfiles/static:/static:ro
+            - ./staticfiles/storage:/storage
             - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params:ro
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 #            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
@@ -61,7 +61,7 @@ services:
             DB_HOST: mysql
         # Relationship config file to container directory
         volumes:
-            - ./nginx/storage:/storage
+            - ./staticfiles/storage:/storage
             - ./django/src:/code
             - ./django/uwsgi.ini:/uwsgi.ini:ro
             - ./logfiles/uwsgi.log:/var/log/uwsgi.log
