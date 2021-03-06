@@ -78,34 +78,44 @@
 </div>
 <div class="row justify-content-center mt-3">
     <div class="col-12">
-        <div class="row">
-            <div class="col-6">ファイル名</div>
-            <div class="col-4">作成日時</div>
-            <div class="col-2">操作</div>
-        </div>
-        {% for file in files %}
-        {% if file.user.pk == user.pk %}
-        <div class="row">
-            <div class="col-6">
-                <a href="{{ file.file.url }}">{{ file.filename }}</a>
-            </div>
-            <div class="col-4">
-                <time datetime="{{ file.created_at|date:'Y-m-d' }}">{{ file.created_at|date:'Y/m/d H:i:s' }}</time>
-            </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-danger btn-block delete-modal-button" data-filename="{{ file.filename }}" data-deleteurl="{% url 'storage:delete' file.pk %}">
-                    削除
-                </button>
-            </div>
-        </div>
-        {% endif %}
-        {% empty %}
-        <div class="row">
-            <div class="col-12">
-                <p>ファイルがアップロードされていません。</p>
-            </div>
-        </div>
-        {% endfor %}
+        <table>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ファイル名</th>
+                    <th>サイズ</th>
+                    <th>作成日時</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for file in files %}
+            {% if file.user.pk == user.pk %}
+                <tr>
+                    <td>
+                        <a href="{{ file.file.url }}">{{ file.filename }}</a>
+                    </td>
+                    <td>
+                        {{ file.file.size|filesizeformat }}
+                    </td>
+                    <td>
+                        <time datetime="{{ file.created_at|date:'Y-m-d' }}">{{ file.created_at|date:'Y/m/d H:i:s' }}</time>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-block delete-modal-button" data-filename="{{ file.filename }}" data-deleteurl="{% url 'storage:delete' file.pk %}">削除</button>
+                    </td>
+                </tr>
+            {% endif %}
+            {% empty %}
+                <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% if files %}

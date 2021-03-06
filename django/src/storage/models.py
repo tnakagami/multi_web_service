@@ -12,7 +12,7 @@ def get_filepath(instance, filename):
 
 class FileStorage(models.Model):
     # user
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # file storage
     file = models.FileField(
         upload_to=get_filepath,

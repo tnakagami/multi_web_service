@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DeleteView
 from django.http import Http404
@@ -73,7 +72,7 @@ class FileDeleteView(AccessMixin, DeleteView):
         try:
             instance = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return Http404
+            raise Http404
 
         # if user is not authenticated or instance is not request user's
         if not request.user.is_authenticated or request.user.pk != instance.user.pk:
