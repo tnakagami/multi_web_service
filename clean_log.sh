@@ -28,7 +28,7 @@ while [ -n "$1" ]; do
 done
 
 {
-    echo logfiles link access.log error.log django.log json_django.log cron.log
+    echo logfiles link access.log cron.log error.log uwsgi.log
 } | while read target_path data_type log_files; do
     # Create log directory if not exist
     [ ! -e ${target_path} ] && mkdir -p ${target_path}

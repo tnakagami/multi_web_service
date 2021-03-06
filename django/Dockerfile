@@ -13,7 +13,7 @@ COPY ./requirements.txt /
 
 # Install
 RUN    apk --no-cache update \
-    && apk add --no-cache bash tzdata gettext pcre-dev mysql-client bind-tools \
+    && apk add --no-cache bash tzdata gettext pcre-dev mysql-client bind-tools libuuid \
                           mariadb-dev mariadb-connector-c-dev libsodium libxml2-dev \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
@@ -44,21 +44,20 @@ RUN    apk --no-cache update \
     \
     && pip install -r /requirements.txt \
     \
+    # create user
+    \
+    && useradd -s /sbin/nologin -M -d /dev/null nginx \
+    \
     # delete temporary libraries
     \
     && apk --purge del .build-deps \
     && mkdir -p ${SRC_ROOT_PATH} \
-    && mkdir /static \
-    && echo -n > /var/log/django.log \
-    && echo -n > /var/log/json_django_log.json \
+    && echo -n > /var/log/uwsgi.log \
     && rm -rf /root/.cache /var/cache/apk/* /tmp/*
 
 # setup nginx
 EXPOSE 8081
-# setup start.sh and Pure-FTPD
-COPY ./start.sh /start.sh
-RUN chmod 755 /start.sh
 # change work directory
 WORKDIR ${SRC_ROOT_PATH}
 
-CMD ["/start.sh"]
+CMD ["uwsgi", "--ini", "/uwsgi.ini"]
