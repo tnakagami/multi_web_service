@@ -22,6 +22,7 @@ services:
             - certs:/etc/letsencrypt
             - ./nginx/static:/static:ro
             - ./nginx/storage:/storage
+            - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params:ro
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 #            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
             - ./nginx/develop_default.conf:/etc/nginx/conf.d/default.conf:ro  # for development
@@ -62,10 +63,10 @@ services:
             PORT_NUM: 8081
         # Relationship config file to container directory
         volumes:
-            - ./django/src:/code
             - ./nginx/storage:/storage
-            - ./logfiles/django.log:/var/log/django.log
-            - ./logfiles/json_django.log:/var/log/json_django_log.json
+            - ./django/src:/code
+            - ./django/uwsgi.ini:/uwsgi.ini:ro
+            - ./logfiles/uwsgi.log:/var/log/uwsgi.log
         logging:
             driver: "json-file"
             options:
