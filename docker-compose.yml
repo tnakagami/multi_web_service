@@ -25,8 +25,8 @@ services:
             - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params:ro
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 #            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-            - ./nginx/develop_default.conf:/etc/nginx/conf.d/default.conf:ro  # for development
-            - ./nginx/develop_execute.sh:/execute.sh:ro                       # for development
+            - ./nginx/for_development/develop_default.conf:/etc/nginx/conf.d/default.conf:ro  # for development
+            - ./nginx/for_development/develop_execute.sh:/execute.sh:ro                       # for development
             - ./logfiles/access.log:/var/log/nginx/access.log
             - ./logfiles/error.log:/var/log/nginx/error.log
             - ./logfiles/cron.log:/var/log/cron.log
@@ -59,8 +59,6 @@ services:
             - env_file/mysql/.env  # for mysql root information
         environment:
             DB_HOST: mysql
-            APP_DIRNAME: sns
-            PORT_NUM: 8081
         # Relationship config file to container directory
         volumes:
             - ./nginx/storage:/storage
