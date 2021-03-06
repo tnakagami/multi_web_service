@@ -59,7 +59,7 @@ class FileUploadView(LoginRequiredMixin, CreateView):
         if 'form' in context:
             context['upload_form'] = context['form']
             del context['form']
-        else
+        else:
             context['upload_form'] = forms.UploadFileForm(self.request.GET or None)
 
         return context
