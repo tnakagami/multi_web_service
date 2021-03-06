@@ -133,7 +133,7 @@ class TagUpdateView(AccessMixin, UpdateView):
         try:
             tag = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return Http404
+            raise Http404
 
         # if user is not authenticated or tag is not request user's
         if not request.user.is_authenticated or request.user.pk != tag.user.pk:
@@ -152,7 +152,7 @@ class TagDeleteView(AccessMixin, DeleteView):
         try:
             tag = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return Http404
+            raise Http404
 
         # if user is not authenticated or tag is not request user's
         if not request.user.is_authenticated or request.user.pk != tag.user.pk:
@@ -200,7 +200,7 @@ class PostUpdateView(AccessMixin, UpdateView):
         try:
             post = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return Http404
+            raise Http404
 
         # if user is not authenticated or post is not request user's
         if not request.user.is_authenticated or request.user.pk != post.user.pk:
@@ -219,7 +219,7 @@ class PostDeleteView(AccessMixin, DeleteView):
         try:
             post = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return Http404
+            raise Http404
 
         # if user is not authenticated or post is not request user's
         if not request.user.is_authenticated or request.user.pk != post.user.pk:

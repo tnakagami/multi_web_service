@@ -42,7 +42,7 @@ class DeleteTweetView(AccessMixin, DeleteView):
         try:
             tweet = self.model.objects.get(pk=kwargs['pk'])
         except Exception:
-            return Http404
+            raise Http404
 
         # if user is not authenticated or tweet is not request user's
         if not request.user.is_authenticated or request.user.pk != tweet.user.pk:
