@@ -12,31 +12,30 @@ while [ -n "$1" ]; do
             shift
             ;;
 
-        logs )
-            docker-compose logs -t | sort -t "|" -k 1,+2d
-            shift
-            ;;
-
-        stop | restart | down )
-            exe_opt="$1"
-            docker-compose ${exe_opt}
-            shift
-            ;;
-
-        start )
-            docker-compose up -d
-            shift
-            ;;
-
         build )
-            docker-compose build
-            # delete image of none
+            docker-compose -f test_django-docker-compose.yml build
             docker images | grep '<none>' | awk '{print $3;}' | xargs -I{} docker rmi {}
             shift
             ;;
 
+        start )
+            docker-compose -f test_django-docker-compose.yml up -d
+            shift
+            ;;
+
+        stop | down )
+            exe_opt="$1"
+            docker-compose -f test_django-docker-compose.yml ${exe_opt}
+            shift
+            ;;
+
+        logs )
+            docker-compose -f test_django-docker-compose.yml logs test_django
+            shift
+            ;;
+
         -h | --help | --usage )
-            echo "Usage: $0 [build|start|stop|restart|down|ps|logs]"
+            echo "Usage: $0 [build|start|stop|down|ps|logs]"
             shift
             ;;
 

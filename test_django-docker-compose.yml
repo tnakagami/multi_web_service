@@ -4,7 +4,7 @@ services:
     test_django:
         # Build target
         build:
-            context: ./django/for_test
+            context: ./for_django_test
             # Dockerfile
             dockerfile: Dockerfile.test
         # Image name
@@ -27,7 +27,7 @@ services:
         volumes:
             - test_storage:/storage
             - ./django/src:/code
-            - ./django/for_test/result_test:/result_test
+            - ./for_django_test/result_test:/result_test
         logging:
             driver: "json-file"
             options:
@@ -66,7 +66,7 @@ services:
         # Relationship config file to container directory
         volumes:
             - test_database:/var/lib/mysql
-            - ./django/for_test/grant_option.sql:/docker-entrypoint-initdb.d/001_grant_option.sql:ro
+            - ./for_django_test/grant_option.sql:/docker-entrypoint-initdb.d/001_grant_option.sql:ro
         logging:
             driver: "json-file"
             options:
