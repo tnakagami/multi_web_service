@@ -40,7 +40,7 @@
         </div>
     </div>
 </div>
-<div class="row justify-content-center mt-3">
+<div class="row justify-content-center mt-1">
     <div class="col-12">
         <div class="card">
             <div class="card-body">
@@ -61,13 +61,13 @@
                     </div>
                     {% endif %}
                     <div class="row">
-                        <div class="col-8">
+                        <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8">
                             <div class="custom-file">
                                 {{ upload_form.file }}
-                                <label class="custom-file-label" for="{{ upload_form.file.auto_id }}" data-browse="参照">ファイルを選択</label>
+                                <label class="custom-file-label" for="{{ upload_form.file.auto_id }}">ファイルを選択</label>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
                             <button type="submit" class="btn btn-success btn-block">アップロード</button>
                         </div>
                     </div>
@@ -76,46 +76,48 @@
         </div>
     </div>
 </div>
-<div class="row justify-content-center mt-3">
+<div class="row justify-content-center mt-1">
     <div class="col-12">
-        <table>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ファイル名</th>
-                    <th>サイズ</th>
-                    <th>作成日時</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for file in files %}
-            {% if file.user.pk == user.pk %}
-                <tr>
-                    <td>
-                        <a href="{{ file.file.url }}">{{ file.filename }}</a>
-                    </td>
-                    <td>
-                        {{ file.file.size|filesizeformat }}
-                    </td>
-                    <td>
-                        <time datetime="{{ file.created_at|date:'Y-m-d' }}">{{ file.created_at|date:'Y/m/d H:i:s' }}</time>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-block delete-modal-button" data-filename="{{ file.filename }}" data-deleteurl="{% url 'storage:delete' file.pk %}">削除</button>
-                    </td>
-                </tr>
-            {% endif %}
-            {% empty %}
-                <tr>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">アップロードしたファイル一覧</h5>
+                {% for file in files %}
+                {% if file.user.pk == user.pk %}
+                    <div class="row">
+                        <div class="col-8">
+                            <ul>
+                                <li>{{ file.filename }}</li>
+                                <li><time datetime="{{ file.created_at|date:'Y-m-d' }}"><font color="gray">{{ file.created_at|date:'Y/m/d H:i:s' }}</font></li>
+                            </ul>
+                        </div>
+                        <div class="col-4">
+                            <div class="dropdown mt-2">
+                                <a class="btn btn-outline-secondary btn-block dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    操作
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <button type="button" class="dropdown-item clip" data-clipboard-text="{{ file.file.url }}">
+                                        リンクをコピー
+                                    </button>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{{ file.file.url }}">開く</a>
+                                    <a class="dropdown-item" href="{{ file.file.url }}" download="{{ file.filename }}">ダウンロード</a>
+                                    <div class="dropdown-divider"></div>
+                                    <button type="button" class="dropdown-item delete-modal-button" data-filename="{{ file.filename }}" data-deleteurl="{% url 'storage:delete' file.pk %}">
+                                        <font color="red">削除</font>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% empty %}
+                    <p>表示可能なファイルがありません。</p>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% if files %}
@@ -125,6 +127,7 @@
     </div>
 </div>
 
+{# modalの処理 #}
 <div class="modal" tabindex="-1" role="dialog" id="delete-modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
