@@ -16,5 +16,5 @@ if [ -e /storage ]; then
 fi
 
 # start django
-echo "[start]" $(date "+%Y/%m/%d-%H:%M:%S") Django server
-uwsgi --ini /uwsgi.ini
+echo "[start]" $(date "+%Y/%m/%d-%H:%M:%S") Django server with uWSGI
+exec uwsgi --ini /uwsgi.ini
