@@ -2,6 +2,7 @@ from django import forms
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy
 from . import models
+import os
 
 class UploadFileForm(forms.ModelForm):
     file = forms.FileField(
@@ -15,7 +16,7 @@ class UploadFileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.MAX_UPLOAD_SIZE = 100 * 1024 * 1024
+        self.MAX_UPLOAD_SIZE = 30 * 1024 * 1024
 
     def clean(self):
         cleaned_data = super().clean()
@@ -31,6 +32,16 @@ class UploadFileForm(forms.ModelForm):
             pass
 
         return cleaned_data
+
+    def save(self, commit=True):
+        file = self.cleaned_data.get('file')
+        instance = super().save(commit=False)
+        instance.filename = os.path.basename(file.name)
+
+        if commit:
+            instance.save()
+
+        return instance
 
 class FileSearchForm(forms.Form):
     """
@@ -50,6 +61,6 @@ class FileSearchForm(forms.Form):
 
         if search_word:
             for word in search_word.split():
-                queryset = queryset.filter(file__icontains=word)
+                queryset = queryset.filter(filename__icontains=word)
 
         return queryset
