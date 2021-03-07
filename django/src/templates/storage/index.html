@@ -87,7 +87,7 @@
                         <div class="col-8">
                             <ul>
                                 <li>{{ file.filename }}</li>
-                                <li><time datetime="{{ file.created_at|date:'Y-m-d' }}"><font color="gray">{{ file.created_at|date:'Y/m/d H:i:s' }}</font></li>
+                                <li><time datetime="{{ file.created_at|date:'Y-m-d' }}"><font color="gray">作成：{{ file.created_at|date:'Y/m/d H:i:s' }}</font></li>
                             </ul>
                         </div>
                         <div class="col-4">
@@ -121,7 +121,7 @@
     </div>
 </div>
 {% if files %}
-<div class="row justify-content-center">
+<div class="row justify-content-center mt-1">
     <div class="col-12">
 {% include "pagination.html" %}
     </div>

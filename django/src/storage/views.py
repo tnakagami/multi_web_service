@@ -13,7 +13,7 @@ class StorageListView(LoginRequiredMixin, ListView):
     """
     model = models.FileStorage
     template_name = 'storage/index.html'
-    paginate_by = 30
+    paginate_by = 10
     context_object_name = 'files'
 
     def get_queryset(self):
