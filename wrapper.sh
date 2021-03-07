@@ -35,10 +35,35 @@ while [ -n "$1" ]; do
             shift
             ;;
 
+        test_build )
+            docker-compose -f test_django-docker-compose.yml build
+            docker images | grep '<none>' | awk '{print $3;}' | xargs -I{} docker rmi {}
+            shift
+            ;;
+
+        test_start )
+            docker-compose -f test_django-docker-compose.yml up -d
+            shift
+            ;;
+
+        test_stop )
+            docker-compose -f test_django-docker-compose.yml stop
+            shift
+            ;;
+
+        test_down )
+            docker-compose -f test_django-docker-compose.yml down
+            shift
+            ;;
+
+        test_logs )
+            docker-compose -f test_django-docker-compose.yml logs test_django
+            shift
+            ;;
+
         -h | --help | --usage )
             echo "Usage: $0 [build|start|stop|restart|down|ps|logs]"
-            echo "       $0 ps"
-            echo "       $0 logs"
+            echo "       for test: $0 [ps|test_build|test_start|test_stop|test_down|test_logs]"
             shift
             ;;
 
