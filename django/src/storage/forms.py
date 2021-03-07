@@ -16,6 +16,7 @@ class UploadFileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # max upload size: 30MB
         self.MAX_UPLOAD_SIZE = 30 * 1024 * 1024
 
     def clean(self):
@@ -34,8 +35,11 @@ class UploadFileForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
+        # get forms.FileField instance
         file = self.cleaned_data.get('file')
+        # create model instance
         instance = super().save(commit=False)
+        # update filename in model instance
         instance.filename = os.path.basename(file.name)
 
         if commit:
