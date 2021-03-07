@@ -55,9 +55,11 @@ RUN    apk --no-cache update \
     && echo -n > /var/log/uwsgi.log \
     && rm -rf /root/.cache /var/cache/apk/* /tmp/*
 
-# setup nginx
 EXPOSE 8081
 # change work directory
 WORKDIR ${SRC_ROOT_PATH}
+# add shell script
+COPY ./start.sh /start.sh
+RUN chmod 777 /start.sh
 
-CMD ["uwsgi", "--ini", "/uwsgi.ini"]
+CMD ["/start.sh"]
