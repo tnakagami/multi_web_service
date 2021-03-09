@@ -8,15 +8,17 @@ class UserModelTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
+    def setUp(self):
+        self.normal_user = UserFactory(username='alice', viewname='_alice')
+
     def test_create_valid_user(self):
-        normal_user = UserFactory(username='alice', viewname='_alice')
-        self.assertEqual(normal_user.username, 'alice')
-        self.assertEqual(normal_user.get_full_name(), 'alice')
-        self.assertEqual(normal_user.get_short_name(), 'alice')
-        self.assertEqual(normal_user.viewname, '_alice')
-        self.assertEqual(normal_user.email, 'alice@example.com')
-        self.assertFalse(normal_user.is_staff)
-        self.assertTrue(normal_user.is_active)
+        self.assertEqual(self.normal_user.username, 'alice')
+        self.assertEqual(self.normal_user.get_full_name(), 'alice')
+        self.assertEqual(self.normal_user.get_short_name(), 'alice')
+        self.assertEqual(self.normal_user.viewname, '_alice')
+        self.assertEqual(self.normal_user.email, 'alice@example.com')
+        self.assertFalse(self.normal_user.is_staff)
+        self.assertTrue(self.normal_user.is_active)
 
     def test_create_valid_user_blank_viewname(self):
         blank_viewname_user = UserFactory(viewname='')
@@ -29,6 +31,8 @@ class UserModelTests(TestCase):
     def test_create_superuser(self):
         _user = UserModel.objects.create_superuser(username='superuser1', email='superuser1@example.com', password='admin1password', is_staff=True, is_superuser=True)
         self.assertTrue(isinstance(_user, UserModel))
+        self.assertTrue(_user.is_staff)
+        self.assertTrue(_user.is_superuser)
 
         with self.assertRaises(ValueError):
             _ = UserModel.objects.create_superuser(username='superuser2', email='superuser2@example.com', password='admin2password', is_staff=True, is_superuser=False)
@@ -44,8 +48,7 @@ class UserModelTests(TestCase):
     def test_send_mail(self):
         _subject = 'subject name'
         _message = 'sample message'
-        normal_user = UserFactory()
-        normal_user.email_user(_subject, _message)
+        self.normal_user.email_user(_subject, _message)
         _outbox = mail.outbox[0]
         self.assertEqual(_outbox.subject, _subject)
         self.assertEqual(_outbox.body, _message)

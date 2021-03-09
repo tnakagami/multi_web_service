@@ -3,6 +3,7 @@ import pytz
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 
 from factory import LazyAttribute, Sequence
 from factory.django import DjangoModelFactory
@@ -17,6 +18,7 @@ class UserFactory(DjangoModelFactory):
 
     username = Sequence(lambda count: 'user{}'.format(count))
     viewname = Sequence(lambda count: 'viewname{}'.format(count))
+    password = make_password('password')
     email = LazyAttribute(lambda instance: '{}@example.com'.format(instance.username))
     is_staff = False
     is_active = True
