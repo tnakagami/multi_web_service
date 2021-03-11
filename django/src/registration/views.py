@@ -212,7 +212,7 @@ class DeleteOwnAccount(OnlyYouMixin, DeleteView):
 # ===============
 # Change Password
 # ===============
-class ChangePssword(PasswordChangeView):
+class ChangePassword(PasswordChangeView):
     """
     Change Own Password
     """
@@ -226,7 +226,7 @@ class ChangePssword(PasswordChangeView):
 
         return super().form_valid(form)
 
-class ChangePassowrdComplete(PasswordChangeDoneView):
+class ChangePasswordComplete(PasswordChangeDoneView):
     """
     Complete Change Own Password
     """

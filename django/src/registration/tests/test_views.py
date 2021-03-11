@@ -3,7 +3,10 @@ from django.test import TestCase, Client
 from django.test.utils import override_settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Permission
+from django.contrib.auth.tokens import default_token_generator
 from django.core.signing import SignatureExpired, dumps
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 from django.urls import reverse, resolve
 from django.core import mail
 from registration.tests.factories import UserFactory, UserModel
@@ -368,3 +371,429 @@ class CreateUserTests(RegistrationView):
         self.assertEqual(response.status_code, 400)
         _active_user = UserModel.objects.get(pk=_active_user.pk)
         self.assertTrue(_active_user.is_active)
+
+class AccountInfoView(RegistrationView):
+    def setUp(self):
+        super().setUp()
+        view_user = Permission.objects.get(codename='view_user')
+        view_perm = Permission.objects.get(codename='view_permission')
+        # owner
+        self.owner = UserFactory(username='owner')
+        self.owner.user_permissions.add(view_user, view_perm)
+        # outsider
+        self.outsider = UserFactory(username='outsider')
+        self.outsider.user_permissions.add(view_user, view_perm)
+        # no permission user
+        self.no_permission_user = UserFactory(username='no_permission_user')
+        # super user
+        self.superuser = UserFactory(username='superuser', is_staff=True, is_superuser=True)
+
+class AccountInfoTests(AccountInfoView):
+    # =================
+    # DetailAccountInfo
+    # =================
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_owner_detail_account_info_access(self):
+        self.client.login(username=self.owner.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:detail_account_info', kwargs=params)
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/detail_account_info.html')
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_superuser_detail_account_info_access(self):
+        self.client.login(username=self.superuser.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:detail_account_info', kwargs=params)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_detail_account_info_view(self):
+        resolver = resolve('/detail_account_info/{}/'.format(self.owner.pk))
+        self.chk_class(resolver, views.DetailAccountInfo)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_invalid_outsider_detail_account_info_access(self):
+        self.client.login(username=self.outsider.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:detail_account_info', kwargs=params)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_invalid_no_permission_user_detail_account_info_access(self):
+        self.client.login(username=self.no_permission_user.username, password=self.password)
+        params = {
+            'pk': self.no_permission_user.pk,
+        }
+        url = reverse('registration:detail_account_info', kwargs=params)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    # =================
+    # UpdateAccountInfo
+    # =================
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_owner_update_account_info_access(self):
+        self.client.login(username=self.owner.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:update_account_info', kwargs=params)
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/update_account_info_form.html')
+        self.assertEqual(response.status_code, 200)
+        viewname = 'view_{}'.format(self.owner.username)
+        params = {
+            'viewname': viewname,
+        }
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _user = UserModel.objects.get(pk=self.owner.pk)
+        self.assertEqual(_user.viewname, viewname)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_superuser_update_account_info_access(self):
+        self.client.login(username=self.superuser.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:update_account_info', kwargs=params)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        viewname = 'view_{}'.format(self.owner.username)
+        superuser_viewname = self.superuser.viewname
+        params = {
+            'viewname': viewname,
+        }
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _user = UserModel.objects.get(pk=self.owner.pk)
+        _superuser = UserModel.objects.get(pk=self.superuser.pk)
+        self.assertEqual(_user.viewname, viewname)
+        self.assertEqual(_superuser.viewname, superuser_viewname)
+
+    def test_valid_update_account_info_view(self):
+        resolver = resolve('/update_account_info/{}/'.format(self.owner.pk))
+        self.chk_class(resolver, views.UpdateAccountInfo)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_invalid_outsider_update_account_info_access(self):
+        self.client.login(username=self.outsider.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:update_account_info', kwargs=params)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+        params = {
+            'viewname': 'view_{}'.format(self.owner.username),
+        }
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 403)
+        _user = UserModel.objects.get(pk=self.owner.pk)
+        self.assertEqual(_user.viewname, self.owner.viewname)
+
+    # ================
+    # DeleteOwnAccount
+    # ================
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_get_delete_own_account_access(self):
+        self.client.login(username=self.owner.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:delete_own_account', kwargs=params)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_owner_delete_own_account_access(self):
+        self.client.login(username=self.owner.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:delete_own_account', kwargs=params)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(UserModel.DoesNotExist):
+            _ = UserModel.objects.get(pk=self.owner.pk)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_superuser_delete_own_account_access(self):
+        self.client.login(username=self.superuser.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:delete_own_account', kwargs=params)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(UserModel.DoesNotExist):
+            _ = UserModel.objects.get(pk=self.owner.pk)
+
+    def test_valid_delete_own_account_view(self):
+        resolver = resolve('/delete_own_account/{}/'.format(self.owner.pk))
+        self.chk_class(resolver, views.DeleteOwnAccount)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_invalid_outsider_delete_own_account_access(self):
+        self.client.login(username=self.outsider.username, password=self.password)
+        params = {
+            'pk': self.owner.pk,
+        }
+        url = reverse('registration:delete_own_account', kwargs=params)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 403)
+        _ = UserModel.objects.get(pk=self.owner.pk)
+
+class ModifyPasswordEmailView(RegistrationView):
+    @override_settings(AXES_ENABLED=False)
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory(username='user')
+        self.client.login(username=self.user.username, password=self.password)
+
+class ChangePasswordTests(ModifyPasswordEmailView):
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('registration:change_own_password')
+        self.new_password = self.create_random_password_for_test()
+
+    # =============
+    # ChangePssword
+    # =============
+    def test_valid_change_password_access(self):
+        # get
+        response = self.client.get(self.url)
+        self.assertTemplateUsed('registration/change_password.html')
+        self.assertEqual(response.status_code, 200)
+        # post
+        params = {
+            'old_password': self.password,
+            'new_password1': self.new_password,
+            'new_password2': self.new_password,
+        }
+        response = self.client.post(self.url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _user = UserModel.objects.get(pk=self.user.pk)
+        self.assertTrue(_user.check_password(self.new_password))
+
+    def test_valid_change_password_view(self):
+        resolver = resolve('/change_own_password/')
+        self.chk_class(resolver, views.ChangePassword)
+
+    def test_invalid_mismatch_old_password_change_password_access(self):
+        params = {
+            'old_password': self.password + '0',
+            'new_password1': self.new_password,
+            'new_password2': self.new_password,
+        }
+        response = self.client.post(self.url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _user = UserModel.objects.get(pk=self.user.pk)
+        self.assertTrue(_user.check_password(self.password))
+
+    def test_invalid_mismatch_new_password_change_password_access(self):
+        params = {
+            'old_password': self.password,
+            'new_password1': self.new_password + '0',
+            'new_password2': self.new_password,
+        }
+        response = self.client.post(self.url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _user = UserModel.objects.get(pk=self.user.pk)
+        self.assertTrue(_user.check_password(self.password))
+
+    # ======================
+    # ChangePasswordComplete
+    # ======================
+    def test_valid_change_password_complete_access(self):
+        url = reverse('registration:password_change_complete')
+        response = self.client.get(self.url)
+        self.assertTemplateUsed('registration/change_password_complete.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_change_password_complete_view(self):
+        resolver = resolve('/change_own_password/complete/')
+        self.chk_class(resolver, views.ChangePasswordComplete)
+
+class ResetPasswordTests(ModifyPasswordEmailView):
+    def setUp(self):
+        super().setUp()
+        self.client.logout()
+        self.new_password = self.create_random_password_for_test()
+        self.not_active_user = UserFactory(username='not_active_user', is_active=False)
+        self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token = default_token_generator.make_token(self.user)
+
+    # =============
+    # ResetPassword
+    # =============
+    def test_valid_email_reset_password_access(self):
+        params = {
+            'email': self.user.email,
+        }
+        url = reverse('registration:reset_password')
+        response = self.client.post(url, params, follow=True)
+        self.assertTemplateUsed('registration/reset_password_form.html')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_valid_reset_password_view(self):
+        resolver = resolve('/reset_password/')
+        self.chk_class(resolver, views.ResetPassword)
+
+    def test_invalid_email_reset_password_access(self):
+        params = {
+            'email': 'invalid_' + self.user.email,
+        }
+        url = reverse('registration:reset_password')
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_invalid_not_active_user_reset_password_access(self):
+        params = {
+            'email': self.not_active_user.email,
+        }
+        url = reverse('registration:reset_password')
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
+
+    # =================
+    # ResetPasswordDone
+    # =================
+    def test_valid_reset_password_done_access(self):
+        url = reverse('registration:reset_password_done')
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/reset_password_done.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_reset_password_done_view(self):
+        resolver = resolve('/reset_password/done/')
+        self.chk_class(resolver, views.ResetPasswordDone)
+
+    # ====================
+    # ResetPasswordConfirm
+    # ====================
+    def test_valid_get_reset_password_confirm_access(self):
+        params = {
+            'uidb64': self.uid,
+            'token': self.token,
+        }
+        url = reverse('registration:reset_password_confirm', kwargs=params)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_post_reset_password_confirm_access(self):
+        get_params = {
+            'uidb64': self.uid,
+            'token': self.token,
+        }
+        get_url = reverse('registration:reset_password_confirm', kwargs=get_params)
+        self.client.get(get_url)
+        data = {
+            'new_password1': self.new_password,
+            'new_password2': self.new_password,
+        }
+        post_params = {
+            'uidb64': self.uid,
+            'token': 'set-password',
+        }
+        post_url = reverse('registration:reset_password_confirm', kwargs=post_params)
+        response = self.client.post(post_url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_get_reset_password_confirm_view(self):
+        resolver = resolve('/reset_password/confirm/{}/{}/'.format('123', '456'))
+        self.chk_class(resolver, views.ResetPasswordConfirm)
+
+    # =====================
+    # ResetPasswordComplete
+    # =====================
+    def test_valid_reset_password_complete_access(self):
+        url = reverse('registration:reset_password_complete')
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/reset_password_complete.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_reset_password_complete_view(self):
+        resolver = resolve('/reset_password/complete/')
+        self.chk_class(resolver, views.ResetPasswordComplete)
+
+class ChangeEmailTests(ModifyPasswordEmailView):
+    def setUp(self):
+        super().setUp()
+        self.new_email = 'new_{}'.format(self.user.email)
+        self.not_active_user = UserFactory(username='not_active_user', is_active=False)
+
+    # ===========
+    # ChangeEmail
+    # ===========
+    def test_valid_change_email_access(self):
+        url = reverse('registration:change_email')
+        # get
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/change_email_form.html')
+        self.assertEqual(response.status_code, 200)
+        # post
+        params = {
+            'email': self.new_email,
+        }
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_invalid_change_email_access(self):
+        url = reverse('registration:change_email')
+        # get
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/change_email_form.html')
+        self.assertEqual(response.status_code, 200)
+        # post
+        params = {
+            'email': self.new_email.replace('@', '-'),
+        }
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
+
+    # ===============
+    # ChangeEmailDone
+    # ===============
+    def test_valid_change_email_done_access(self):
+        url = reverse('registration:change_email_done')
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/change_email_done.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_change_email_done_view(self):
+        resolver = resolve('/change_email/done/')
+        self.chk_class(resolver, views.ChangeEmailDone)
+
+    # ===================
+    # ChangeEmailComplete
+    # ===================
+    def test_valid_change_email_complete_access(self):
+        params = {
+            'param': dumps(self.user.pk),
+            'token': dumps(self.new_email),
+        }
+        url = reverse('registration:change_email_complete', kwargs=params)
+        response = self.client.get(url)
+        self.assertTemplateUsed('registration/change_email_done.html')
+        self.assertEqual(response.status_code, 200)
+        _user = UserModel.objects.get(pk=self.user.pk)
+        self.assertEqual(_user.email, self.new_email)
+
+    def test_valid_change_email_complete_view(self):
+        resolver = resolve('/change_email/complete/{}/{}/'.format('123', '456'))
+        self.chk_class(resolver, views.ChangeEmailComplete)

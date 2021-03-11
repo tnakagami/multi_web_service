@@ -23,8 +23,8 @@ urlpatterns = [
     path('update_account_info/<int:pk>/', views.UpdateAccountInfo.as_view(), name='update_account_info'),
     path('delete_own_account/<int:pk>/', views.DeleteOwnAccount.as_view(), name='delete_own_account'),
     # Change password
-    path('change_own_password/', views.ChangePssword.as_view(), name='change_own_password'),
-    path('change_own_password/complete/', views.ChangePassowrdComplete.as_view(), name='password_change_complete'),
+    path('change_own_password/', views.ChangePassword.as_view(), name='change_own_password'),
+    path('change_own_password/complete/', views.ChangePasswordComplete.as_view(), name='password_change_complete'),
     # Reset Password
     path('reset_password/', views.ResetPassword.as_view(), name='reset_password'),
     path('reset_password/done/', views.ResetPasswordDone.as_view(), name='reset_password_done'),
