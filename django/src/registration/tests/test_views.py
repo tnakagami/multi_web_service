@@ -249,6 +249,14 @@ class DeleteUserPageTests(ExistStaffAndSuperuserView):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+    def test_valid_delete_no_existing_user_delete_user_page_access(self):
+        params = {
+            'pk': UserModel.objects.count() + 1,
+        }
+        url = reverse('registration:delete_user_page', kwargs=params)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 403)
+
     def test_valid_delete_user_page_view(self):
         resolver = resolve('/delete/{}/'.format(self.user.pk))
         self.chk_class(resolver, views.DeleteUserPage)
@@ -314,7 +322,7 @@ class CreateUserTests(RegistrationView):
         resolver = resolve('/create_user/done/')
         self.chk_class(resolver, views.CreateUserDone)
 
-    def test_valid_create_user_complete_access(self):
+    def test_valid_create_user_complete_view(self):
         params = {
             'token': dumps(self.user.pk)
         }
@@ -330,7 +338,7 @@ class CreateUserTests(RegistrationView):
         resolver = resolve('/create_user/complete/{}/'.format('123'))
         self.chk_class(resolver, views.CreateUserComplete)
 
-    def test_invalid_bad_signature_create_user_complete_access(self):
+    def test_invalid_bad_signature_create_user_complete_view(self):
         params = {
             'token': dumps(self.user.pk) + 'dummy'
         }
@@ -341,7 +349,7 @@ class CreateUserTests(RegistrationView):
         self.assertFalse(_user.is_active)
 
     @mock.patch('django.core.signing.TimestampSigner.unsign', side_effect=SignatureExpired)
-    def test_invalid_signature_expired_create_user_complete_access(self, _):
+    def test_invalid_signature_expired_create_user_complete_view(self, _):
         params = {
             'token': dumps(self.user.pk)
         }
@@ -351,7 +359,7 @@ class CreateUserTests(RegistrationView):
         _user = UserModel.objects.get(pk=self.user.pk)
         self.assertFalse(_user.is_active)
 
-    def test_invalid_user_doesnot_exist_create_user_complete_access(self):
+    def test_invalid_user_doesnot_exist_create_user_complete_view(self):
         params = {
             'token': dumps(UserModel.objects.count() + 1)
         }
@@ -361,7 +369,7 @@ class CreateUserTests(RegistrationView):
         _user = UserModel.objects.get(pk=self.user.pk)
         self.assertFalse(_user.is_active)
 
-    def test_invalid_active_user_create_user_complete_access(self):
+    def test_invalid_active_user_create_user_complete_view(self):
         _active_user = UserFactory(username='active_user')
         params = {
             'token': dumps(_active_user.pk)
@@ -694,22 +702,16 @@ class ResetPasswordTests(ModifyPasswordEmailView):
         self.assertEqual(response.status_code, 200)
 
     def test_valid_post_reset_password_confirm_access(self):
-        get_params = {
+        params = {
             'uidb64': self.uid,
             'token': self.token,
         }
-        get_url = reverse('registration:reset_password_confirm', kwargs=get_params)
-        self.client.get(get_url)
         data = {
             'new_password1': self.new_password,
             'new_password2': self.new_password,
         }
-        post_params = {
-            'uidb64': self.uid,
-            'token': 'set-password',
-        }
-        post_url = reverse('registration:reset_password_confirm', kwargs=post_params)
-        response = self.client.post(post_url, data=data, follow=True)
+        url = reverse('registration:reset_password_confirm', kwargs=params)
+        response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_valid_get_reset_password_confirm_view(self):
@@ -782,7 +784,7 @@ class ChangeEmailTests(ModifyPasswordEmailView):
     # ===================
     # ChangeEmailComplete
     # ===================
-    def test_valid_change_email_complete_access(self):
+    def test_valid_change_email_complete_view(self):
         params = {
             'param': dumps(self.user.pk),
             'token': dumps(self.new_email),
@@ -794,11 +796,11 @@ class ChangeEmailTests(ModifyPasswordEmailView):
         _user = UserModel.objects.get(pk=self.user.pk)
         self.assertEqual(_user.email, self.new_email)
 
-    def test_valid_change_email_complete_view(self):
+    def test_valid_change_email_complete_access(self):
         resolver = resolve('/change_email/complete/{}/{}/'.format('123', '456'))
         self.chk_class(resolver, views.ChangeEmailComplete)
 
-    def test_invalid_bad_signature_token_change_email_complete_access(self):
+    def test_invalid_bad_signature_token_change_email_complete_view(self):
         params = {
             'param': dumps(self.user.pk),
             'token': dumps(self.new_email) + 'dummy',
@@ -809,7 +811,7 @@ class ChangeEmailTests(ModifyPasswordEmailView):
         _user = UserModel.objects.get(pk=self.user.pk)
         self.assertEqual(_user.email, self.user.email)
 
-    def test_invalid_bad_signature_param_change_email_complete_access(self):
+    def test_invalid_bad_signature_param_change_email_complete_view(self):
         params = {
             'param': dumps(self.user.pk) + 'dummy',
             'token': dumps(self.new_email),
@@ -821,7 +823,7 @@ class ChangeEmailTests(ModifyPasswordEmailView):
         self.assertEqual(_user.email, self.user.email)
 
     @mock.patch('django.core.signing.TimestampSigner.unsign', side_effect=SignatureExpired)
-    def test_invalid_signature_expired_change_email_complete_access(self, _):
+    def test_invalid_signature_expired_change_email_complete_view(self, _):
         params = {
             'param': dumps(self.user.pk),
             'token': dumps(self.new_email),
@@ -832,7 +834,7 @@ class ChangeEmailTests(ModifyPasswordEmailView):
         _user = UserModel.objects.get(pk=self.user.pk)
         self.assertEqual(_user.email, self.user.email)
 
-    def test_invalid_user_doesnot_exist_change_email_complete_access(self):
+    def test_invalid_user_doesnot_exist_change_email_complete_view(self):
         params = {
             'param': dumps(UserModel.objects.count() + 1),
             'token': dumps(self.new_email),
@@ -843,7 +845,7 @@ class ChangeEmailTests(ModifyPasswordEmailView):
         _user = UserModel.objects.get(pk=self.user.pk)
         self.assertEqual(_user.email, self.user.email)
 
-    def test_invalid_user_pk_change_email_complete_access(self):
+    def test_invalid_user_pk_change_email_complete_view(self):
         _active_user = UserFactory(username='active_user')
         params = {
             'param': dumps(_active_user.pk),
