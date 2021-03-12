@@ -37,8 +37,6 @@ while [ -n "$1" ]; do
 
         -h | --help | --usage )
             echo "Usage: $0 [build|start|stop|restart|down|ps|logs]"
-            echo "       $0 ps"
-            echo "       $0 logs"
             shift
             ;;
 

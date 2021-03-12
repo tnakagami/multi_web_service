@@ -131,3 +131,4 @@ dmypy.json
 # added by user
 migrations/
 storage/
+for_django_test/result_test/
