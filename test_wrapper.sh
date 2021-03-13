@@ -30,9 +30,13 @@ while [ -n "$1" ]; do
             shift
             ;;
 
-        stop | down )
-            exe_opt="$1"
-            docker-compose -f ${yaml_file} ${exe_opt}
+        stop )
+            docker-compose -f ${yaml_file} stop
+            shift
+            ;;
+
+        down )
+            docker-compose -f ${yaml_file} down -v
             shift
             ;;
 
@@ -47,7 +51,7 @@ while [ -n "$1" ]; do
             ;;
 
         -h | --help | --usage )
-            echo "Usage: $0 [build|start|stop|restart|down|ps|logs]"
+            echo "Usage: $0 [build|start|stop|restart|down|ps|logs|zip]"
             shift
             ;;
 

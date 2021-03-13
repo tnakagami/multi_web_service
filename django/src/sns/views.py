@@ -38,6 +38,10 @@ class DeleteTweetView(AccessMixin, DeleteView):
     model = models.Tweet
     success_url = reverse_lazy('sns:time_line')
 
+    def get(self, request, *args, **kwargs):
+        # ignore direct access
+        return self.handle_no_permission()
+
     def dispatch(self, request, *args, **kwargs):
         try:
             tweet = self.model.objects.get(pk=kwargs['pk'])
@@ -63,18 +67,43 @@ class SearchFollowerView(LoginRequiredMixin, FilterView):
         return context
 
 class CreateRelationshipView(LoginRequiredMixin, CreateView):
-    raise_exception = True
     model = models.Relationship
     form_class = forms.CreateRelationshipForm
 
     def get(self, request, *args, **kwargs):
-        redirect('sns:search_follower')
+        return redirect('sns:search_follower')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request_user'] = self.request.user
+
+        return kwargs
 
     def form_valid(self, form):
         form.save()
 
         return redirect('sns:search_follower')
 
-class DeleteRelationshipView(LoginRequiredMixin, DeleteView):
+    def form_invalid(self, form):
+        return redirect('sns:search_follower')
+
+class DeleteRelationshipView(AccessMixin, DeleteView):
+    raise_exception = True
     model = models.Relationship
     success_url = reverse_lazy('sns:search_follower')
+
+    def get(self, request, *args, **kwargs):
+        # ignore direct access
+        return self.handle_no_permission()
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            relationship = self.model.objects.get(pk=kwargs['pk'])
+        except Exception:
+            raise Http404
+
+        # if user is not authenticated or owner is not request user's
+        if not request.user.is_authenticated or request.user.pk != relationship.owner.pk:
+            return self.handle_no_permission()
+        # checks pass let http method handlers process the request
+        return super().dispatch(request, *args, **kwargs)
