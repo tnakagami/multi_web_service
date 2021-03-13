@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, 
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.http import Http404, JsonResponse, HttpResponseBadRequest
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.db.models import Q
 from . import models, forms
 
@@ -148,6 +148,10 @@ class TagDeleteView(AccessMixin, DeleteView):
     raise_exception = True
     model = models.Tag
 
+    def get(self, request, *args, **kwargs):
+        # ignore direct access
+        return self.handle_no_permission()
+
     def dispatch(self, request, *args, **kwargs):
         try:
             tag = self.model.objects.get(pk=kwargs['pk'])
@@ -215,6 +219,10 @@ class PostDeleteView(AccessMixin, DeleteView):
     raise_exception = True
     model = models.Post
 
+    def get(self, request, *args, **kwargs):
+        # ignore direct access
+        return self.handle_no_permission()
+
     def dispatch(self, request, *args, **kwargs):
         try:
             post = self.model.objects.get(pk=kwargs['pk'])
@@ -230,7 +238,7 @@ class PostDeleteView(AccessMixin, DeleteView):
     def get_success_url(self):
         return reverse('blog:own_post', kwargs={'pk': self.request.user.pk})
 
-class PostDetailView(LoginRequiredMixin, DeleteView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     raise_exception = True
     model = models.Post
     template_name = 'blog/post_detail.html'

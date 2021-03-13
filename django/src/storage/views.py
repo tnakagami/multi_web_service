@@ -68,6 +68,10 @@ class FileDeleteView(AccessMixin, DeleteView):
     model = models.FileStorage
     success_url = reverse_lazy('storage:index')
 
+    def get(self, request, *args, **kwargs):
+        # ignore direct access
+        return self.handle_no_permission()
+
     def dispatch(self, request, *args, **kwargs):
         try:
             instance = self.model.objects.get(pk=kwargs['pk'])

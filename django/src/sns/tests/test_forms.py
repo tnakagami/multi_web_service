@@ -82,11 +82,30 @@ class RelationshipFormTests(SNSForm):
             'follower_id': self.follower.pk,
         }
         relationship = self.model()
-        form = self.form(data, instance=relationship)
+        form = self.form(data, instance=relationship, request_user=self.owner)
         self.assertTrue(form.is_valid())
 
     def test_invalid_form_data_is_empty(self):
         data = {}
         relationship = self.model()
         form = self.form(data, instance=relationship)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_form_owner_is_not_request_user(self):
+        data = {
+            'owner_id': self.owner.pk,
+            'follower_id': self.follower.pk,
+        }
+        relationship = self.model()
+        form = self.form(data, instance=relationship)
+        form = self.form(data, instance=relationship, request_user=self.follower)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_form_follower_is_same(self):
+        data = {
+            'owner_id': self.owner.pk,
+            'follower_id': self.owner.pk,
+        }
+        relationship = self.model()
+        form = self.form(data, instance=relationship, request_user=self.owner)
         self.assertFalse(form.is_valid())
