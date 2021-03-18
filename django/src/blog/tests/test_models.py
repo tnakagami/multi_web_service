@@ -75,6 +75,7 @@ class PostTests(BlogModel):
             self.assertEqual(getattr(post, key), value)
         self.assertEqual(post.tags.all().count(), num_tags)
         self.assertEqual(post.relation_posts.all().count(), num_posts)
+        self.assertEqual(str(post), data['title'])
 
     def __create_and_save(self, data):
         post = self.model()

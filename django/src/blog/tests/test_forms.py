@@ -1,7 +1,10 @@
+from unittest import mock
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.db import IntegrityError, transaction
 from registration.tests.factories import UserFactory
 from blog.tests.factories import TagFactory, PostFactory
+from django.core.files.base import ContentFile
 from blog import models, forms
 
 class BlogForm(TestCase):
@@ -122,3 +125,237 @@ class PostSearchFormTests(BlogForm):
         _qs = tags.queryset
         self.assertEqual(_qs.count(), 2)
         self.assertEqual(_qs.filter(name='sample_a').count(), 1)
+
+class TagSearchFormTests(BlogForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.model = models.Tag
+        cls.form = forms.TagSearchForm
+
+    def test_valid_form(self):
+        search_word = 'abc'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+
+    def test_chk_returned_queryset_for_search_word_pattern1(self):
+        search_word = 'sample'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+        form.clean()
+        _queryset = form.filtered_queryset(self.model.objects.all())
+        self.assertEqual(_queryset.count(), 3)
+        self.assertEqual(_queryset.filter(user=self.users[0]).count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[1]).count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[2]).count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[3]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[4]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[5]).count(), 0)
+
+    def test_chk_returned_queryset_for_search_word_pattern2(self):
+        search_word = '_d'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+        form.clean()
+        _queryset = form.filtered_queryset(self.model.objects.all())
+        self.assertEqual(_queryset.count(), 3)
+        self.assertEqual(_queryset.filter(user=self.users[0]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[1]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[2]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[3]).count(), 3)
+        self.assertEqual(_queryset.filter(user=self.users[4]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[5]).count(), 0)
+
+    def test_chk_returned_queryset_for_search_word_pattern3(self):
+        search_word = '_e model'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+        form.clean()
+        _queryset = form.filtered_queryset(self.model.objects.all())
+        self.assertEqual(_queryset.count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[0]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[1]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[2]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[3]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[4]).count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[5]).count(), 0)
+
+class TagFormTests(BlogForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.model = models.Tag
+        cls.form = forms.TagForm
+
+    def test_valid_form(self):
+        search_word = 'sample'
+        data = {
+            'name': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form(self):
+        search_word = ''
+        data = {
+            'name': search_word,
+        }
+        form = self.form(data)
+        self.assertFalse(form.is_valid())
+
+    def test_chk_queryset_for_user(self):
+        data = {}
+        form = self.form(data, user=self.users[3])
+        self.assertEqual(form.fields['name'].queryset.count(), 3)
+        self.assertEqual(form.fields['name'].queryset.filter(name__icontains='_d').count(), 3)
+
+class PostFormTests(BlogForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.model = models.Post
+        cls.form = forms.PostForm
+        cls.targets = ('title', 'text', 'tags', 'relation_posts', 'is_public', 'description', 'keywords')
+
+    def test_valid_form(self):
+        data = {key: '{}1'.format(key) for key in self.targets}
+        data['tags'] = 0
+        data['relation_posts'] = 0
+        data['is_public'] = False
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form(self):
+        targets = [key for key in self.targets if key != 'is_public']
+        data = {key: '{}1'.format(key) for key in self.targets}
+        data['tags'] = 0
+        data['relation_posts'] = 0
+        data['is_public'] = False
+
+        for key in targets:
+            tmp_data = {_key: data[_key] for _key in self.targets}
+
+            if key in ['tags', 'relation_posts']:
+                tmp_data[key] = '{}1'.format(key)
+            else:
+                tmp_data[key] = ''
+
+            form = self.form(tmp_data)
+            self.assertFalse(form.is_valid())
+
+    def test_chk_specific_user(self):
+        data = {}
+        form = self.form(data, user=self.users[3])
+        self.assertEqual(form.fields['tags'].queryset.count(), 3)
+        self.assertEqual(form.fields['tags'].queryset.filter(name__icontains='_d').count(), 3)
+        self.assertEqual(form.fields['relation_posts'].queryset.count(), 3)
+        self.assertEqual(form.fields['relation_posts'].queryset.filter(title__icontains='_user3').count(), 2)
+
+    def test_chk_specific_user_with_pk(self):
+        data = {}
+        form = self.form(data, user=self.users[3], pk=self.posts[-3].pk)
+        self.assertEqual(form.fields['tags'].queryset.count(), 3)
+        self.assertEqual(form.fields['tags'].queryset.filter(name__icontains='_d').count(), 3)
+        self.assertEqual(form.fields['relation_posts'].queryset.count(), 2)
+        self.assertEqual(form.fields['relation_posts'].queryset.filter(title__icontains='_user3').count(), 2)
+
+class CommentFormTests(BlogForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.model = models.Comment
+        cls.form = forms.CommentForm
+
+    def test_valid_form(self):
+        data = {
+            'name': 'no name',
+            'text': 'comment',
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form(self):
+        data = {
+            'name': 'no name',
+            'text': '',
+        }
+        form = self.form(data)
+        self.assertFalse(form.is_valid())
+        data = {
+            'name': '',
+            'text': 'comment',
+        }
+        form = self.form(data)
+        self.assertFalse(form.is_valid())
+
+class ReplyFormTests(BlogForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.model = models.Reply
+        cls.form = forms.ReplyForm
+
+    def test_valid_form(self):
+        data = {
+            'name': 'no name',
+            'text': 'reply',
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form(self):
+        data = {
+            'name': 'no name',
+            'text': '',
+        }
+        form = self.form(data)
+        self.assertFalse(form.is_valid())
+        data = {
+            'name': '',
+            'text': 'reply',
+        }
+        form = self.form(data)
+        self.assertFalse(form.is_valid())
+
+class FileUploadFormTests(BlogForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.form = forms.FileUploadForm
+
+    def test_valid_form(self):
+        file_data = {
+            'upload_file': ContentFile(b'some dummy bcode data: \x00\x01', 'test_valid_file.dat'),
+        }
+        form = self.form({}, file_data)
+        self.assertTrue(form.is_valid())
+
+    @override_settings(MEDIA_URL='/')
+    @mock.patch('django.core.files.storage.default_storage.save', return_value='test_invalid_file.dat')
+    def test_valid_save(self, _):
+        file_data = {
+            'upload_file': ContentFile(b'some dummy bcode data: \x80\x01', 'test_invalid_file.dat'),
+        }
+        form = self.form({}, file_data)
+        self.assertTrue(form.is_valid())
+        ret_url = form.save()
+        self.assertTrue(ret_url, '/test_invalid_file.dat')
+
+    def test_invalid_form(self):
+        data = {
+            'upload_file': '',
+        }
+        form = self.form({}, data)
+        self.assertFalse(form.is_valid())
