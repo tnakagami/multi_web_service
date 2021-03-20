@@ -59,7 +59,7 @@ class PostSearchFormTests(BlogForm):
         cls.model = models.Post
         cls.form = forms.PostSearchForm
 
-    def test_valid_form(self):
+    def test_form(self):
         search_word = 'abc'
         data = {
             'search_word': search_word,
@@ -133,7 +133,7 @@ class TagSearchFormTests(BlogForm):
         cls.model = models.Tag
         cls.form = forms.TagSearchForm
 
-    def test_valid_form(self):
+    def test_form(self):
         search_word = 'abc'
         data = {
             'search_word': search_word,
@@ -199,7 +199,7 @@ class TagFormTests(BlogForm):
         cls.model = models.Tag
         cls.form = forms.TagForm
 
-    def test_valid_form(self):
+    def test_form(self):
         search_word = 'sample'
         data = {
             'name': search_word,
@@ -207,7 +207,7 @@ class TagFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_invalid_form(self):
+    def test_form(self):
         search_word = ''
         data = {
             'name': search_word,
@@ -229,7 +229,7 @@ class PostFormTests(BlogForm):
         cls.form = forms.PostForm
         cls.targets = ('title', 'text', 'tags', 'relation_posts', 'is_public', 'description', 'keywords')
 
-    def test_valid_form(self):
+    def test_form(self):
         data = {key: '{}1'.format(key) for key in self.targets}
         data['tags'] = 0
         data['relation_posts'] = 0
@@ -237,7 +237,7 @@ class PostFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_invalid_form(self):
+    def test_form(self):
         targets = [key for key in self.targets if key != 'is_public']
         data = {key: '{}1'.format(key) for key in self.targets}
         data['tags'] = 0
@@ -278,7 +278,7 @@ class CommentFormTests(BlogForm):
         cls.model = models.Comment
         cls.form = forms.CommentForm
 
-    def test_valid_form(self):
+    def test_form(self):
         data = {
             'name': 'no name',
             'text': 'comment',
@@ -286,7 +286,7 @@ class CommentFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_invalid_form(self):
+    def test_form(self):
         data = {
             'name': 'no name',
             'text': '',
@@ -307,7 +307,7 @@ class ReplyFormTests(BlogForm):
         cls.model = models.Reply
         cls.form = forms.ReplyForm
 
-    def test_valid_form(self):
+    def test_form(self):
         data = {
             'name': 'no name',
             'text': 'reply',
@@ -315,7 +315,7 @@ class ReplyFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_invalid_form(self):
+    def test_form(self):
         data = {
             'name': 'no name',
             'text': '',
@@ -335,25 +335,25 @@ class FileUploadFormTests(BlogForm):
         super().setUpTestData()
         cls.form = forms.FileUploadForm
 
-    def test_valid_form(self):
+    def test_form(self):
         file_data = {
-            'upload_file': ContentFile(b'some dummy bcode data: \x00\x01', 'test_valid_file.dat'),
+            'upload_file': ContentFile(b'some dummy bcode data: \x00\x01', 'test_file.dat'),
         }
         form = self.form({}, file_data)
         self.assertTrue(form.is_valid())
 
     @override_settings(MEDIA_URL='/')
-    @mock.patch('django.core.files.storage.default_storage.save', return_value='test_invalid_file.dat')
-    def test_valid_save(self, _):
+    @mock.patch('django.core.files.storage.default_storage.save', return_value='test_file.dat')
+    def test_save(self, _):
         file_data = {
-            'upload_file': ContentFile(b'some dummy bcode data: \x80\x01', 'test_invalid_file.dat'),
+            'upload_file': ContentFile(b'some dummy bcode data: \x80\x01', 'test_file.dat'),
         }
         form = self.form({}, file_data)
         self.assertTrue(form.is_valid())
         ret_url = form.save()
-        self.assertTrue(ret_url, '/test_invalid_file.dat')
+        self.assertTrue(ret_url, '/test_file.dat')
 
-    def test_invalid_form(self):
+    def test_form(self):
         data = {
             'upload_file': '',
         }

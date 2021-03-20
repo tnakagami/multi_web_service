@@ -250,12 +250,6 @@ class ResetPasswordConfirm(PasswordResetConfirmView):
     success_url = reverse_lazy('registration:reset_password_complete')
     template_name = 'registration/reset_password_confirm.html'
 
-    def form_valid(self, form):
-        user = form.save(commit=False)
-        user.save()
-
-        return super().form_valid(form)
-
 class ResetPasswordComplete(PasswordResetCompleteView):
     template_name = 'registration/reset_password_complete.html'
 

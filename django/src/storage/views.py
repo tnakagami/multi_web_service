@@ -31,7 +31,7 @@ class StorageListView(LoginRequiredMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['search_form'] = forms.FileSearchForm(self.request.GET or None)
-        context['upload_form'] = forms.UploadFileForm(self.request.GET or None)
+        context['upload_form'] = forms.UploadFileForm()
 
         return context
 
