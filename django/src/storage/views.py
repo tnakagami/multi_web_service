@@ -54,12 +54,8 @@ class FileUploadView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_form'] = forms.FileSearchForm(self.request.GET or None)
-
-        if 'form' in context:
-            context['upload_form'] = context['form']
-            del context['form']
-        else:
-            context['upload_form'] = forms.UploadFileForm(self.request.GET or None)
+        context['upload_form'] = context['form']
+        del context['form']
 
         return context
 
