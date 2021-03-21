@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, 
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.http import Http404, JsonResponse, HttpResponseBadRequest
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, FormView
 from django.db.models import Q
 from . import models, forms
 
@@ -244,7 +244,10 @@ class PostDetailView(LoginRequiredMixin, DetailView):
     template_name = 'blog/post_detail.html'
 
     def get_object(self, queryset=None):
-        post = super().get_object()
+        try:
+            post = super().get_object(queryset=queryset)
+        except Exception:
+            raise Http404
 
         if post.is_public or post.user.pk == self.request.user.pk:
             return post
@@ -289,20 +292,18 @@ class ReplyCreateView(LoginRequiredMixin, CreateView):
 
         return redirect('blog:post_detail', pk=comment.target.pk)
 
-def image_upload(request):
-    """
-    upload image data
-    """
-    form = forms.FileUploadForm(files=request.FILES)
+class FileUploadView(LoginRequiredMixin, FormView):
+    form_class = forms.FileUploadForm
 
-    if form.is_valid():
+    def get(self, request, *args, **kwargs):
+        return self.handle_no_permission()
+
+    def form_valid(self, form):
         path = form.save()
+        scheme, hostname = self.request.scheme, self.request.get_host()
+        url = '{}://{}{}'.format(scheme, hostname, path)
 
-        url = '{0}://{1}{2}'.format(
-            request.scheme,
-            request.get_host(),
-            path,
-        )
         return JsonResponse({'url': url})
 
-    return HttpResponseBadRequest()
+    def form_invalid(self, form):
+        return HttpResponseBadRequest()

@@ -24,4 +24,4 @@ class UploadableTextarea(forms.Textarea):
             self.attrs['class'] += ' uploadable vLargeTextField'
         else:
             self.attrs['class'] = 'uploadable vLargeTextField'
-        self.attrs['data-url'] = reverse_lazy('blog:image_upload')
+        self.attrs['data-url'] = reverse_lazy('blog:file_upload')

@@ -231,6 +231,26 @@ class SearchFollowerViewTests(SNSView):
         relationships = response.context['relationships']
         self.assertEqual(relationships.count(), 0)
 
+    @override_settings(AXES_ENABLED=False)
+    def test_valid_extract_user(self):
+        self.client.login(username=self.owner.username, password=self.password)
+        UserFactory(username='alice')
+        UserFactory(username='bob', viewname='bob_')
+        UserFactory(username='robot', viewname='bob_robot')
+        data = {
+            'name': 'alice',
+        }
+        response = self.client.get(self.url, data)
+        filter_info = response.context['filter']
+        self.assertEqual(filter_info.qs().count(), 1)
+
+        data = {
+            'name': 'bob_',
+        }
+        response = self.client.get(self.url, data)
+        filter_info = response.context['filter']
+        self.assertEqual(filter_info.qs().count(), 2)
+
 class CreateRelationshipViewTests(SNSView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):

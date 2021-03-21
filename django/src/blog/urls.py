@@ -24,5 +24,6 @@ urlpatterns = [
     path('comment/create/<int:pk>', views.CommentCreateView.as_view(), name='comment_create'),
     # reply
     path('reply/create/<int:pk>', views.ReplyCreateView.as_view(), name='reply_create'),
-    path('image/upload/', views.image_upload, name='image_upload'),
+    # file upload
+    path('file/upload/', views.FileUploadView.as_view(), name='file_upload'),
 ]

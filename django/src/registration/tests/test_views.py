@@ -1,5 +1,5 @@
 from unittest import mock
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Permission
@@ -19,7 +19,6 @@ class RegistrationView(TestCase):
         super().setUpClass()
 
     def setUp(self):
-        self.client = Client()
         self.password = 'password'
 
     def chk_class(self, resolver, class_view):

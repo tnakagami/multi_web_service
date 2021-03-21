@@ -65,7 +65,7 @@ class Comment(models.Model):
     def __str__(self):
         return self.__unicode__()
     def __unicode__(self):
-        return self.comment_text[:32]
+        return self.text[:32]
 
 class Reply(models.Model):
     """

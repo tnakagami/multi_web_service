@@ -3,6 +3,7 @@ from django.core.files.storage import default_storage
 from django import forms
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy
+from django.db import transaction
 from . import models
 
 class PostSearchForm(forms.Form):
@@ -120,7 +121,7 @@ class PostForm(forms.ModelForm):
 
         if user is not None:
             tag_queryset = models.Tag.objects.filter(user=user).order_by('name')
-            post_queryset = models.Post.objects.filter(user=user).order_by('title')
+            post_queryset = models.Post.objects.filter(is_public=True, user=user).order_by('title')
             self.fields['tags'].queryset = tag_queryset
             # self post is ignored
             self.fields['relation_posts'].queryset = post_queryset if post_pk is None else post_queryset.exclude(pk=post_pk)
