@@ -55,6 +55,7 @@ EXPOSE 18081
 # change work directory
 WORKDIR ${SRC_ROOT_PATH}
 COPY ./test.sh /test.sh
-RUN chmod 777 /test.sh
+COPY ./execute_tests.sh /execute_tests.sh
+RUN chmod 777 /test.sh /execute_tests.sh
 
 CMD ["/test.sh"]
