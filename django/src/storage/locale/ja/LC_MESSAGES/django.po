@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-07 09:58+0900\n"
+"POT-Creation-Date: 2021-03-21 20:45+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,21 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
 #: storage/forms.py:9 storage/models.py:28
 msgid "upload file"
 msgstr "アップロードファイル"
 
-#: storage/forms.py:30
+#: storage/forms.py:31
 msgid "Please keep filesize under {}. Current filesize {}"
 msgstr "ファイルサイズは {} 未満にしてください。現在のファイルサイズ：{}"
 
-#: storage/forms.py:51 storage/forms.py:54
+#: storage/forms.py:55 storage/forms.py:58
 msgid "filename"
 msgstr "ファイル名"
+
+#: storage/forms.py:74 storage/forms.py:77
+#, fuzzy
+#| msgid "filename"
+msgid "new filename"
+msgstr "変更後のファイル名"

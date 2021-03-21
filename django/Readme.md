@@ -32,3 +32,10 @@ python manage.py custom_createsuperuser \
                  --email ${DJANGO_SUPERUSER_EMAIL} \
                  --password ${DJANGO_SUPERUSER_PASSWORD}
 ```
+
+## Create multilingual localization messages
+```bash
+django-admin.py makemessages -l ja
+# edit .po files
+django-admin.py compilemessages
+```
