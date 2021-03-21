@@ -61,8 +61,6 @@ msgid "A user with that username already exists."
 msgstr "指定されたユーザ名は、既に存在します。"
 
 #: registration/models.py:77
-#, fuzzy
-#| msgid "Required. 128 characters or fewer."
 msgid "Option. 128 characters or fewer."
 msgstr "オプション：128文字以下で入力してください。"
 

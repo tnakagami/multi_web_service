@@ -31,7 +31,5 @@ msgid "filename"
 msgstr "ファイル名"
 
 #: storage/forms.py:74 storage/forms.py:77
-#, fuzzy
-#| msgid "filename"
 msgid "new filename"
 msgstr "変更後のファイル名"
