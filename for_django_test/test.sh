@@ -10,13 +10,10 @@ while ! ${db_cmd} -e "show databases;" > /dev/null 2>&1; do
 done
 echo "[Django]" $(date "+%Y/%m/%d-%H:%M:%S") MySQL database ready! "(${counter}sec)"
 
-current_time=$(date "+%Y%m%d_%H%M%S")
-output_dir=/result_test
-rm -f ${output_dir}/*
-coverage run --source='.' --omit='manage.py','*/migrations/*','*/tests/*' manage.py test
-coverage html -d ${output_dir} --title=result_${current_time} --skip-empty
-rm -f .coverage
-chmod 777 -R ${output_dir}
+# execute test
+echo "[Django] execute tests"
+/execute_tests.sh
+echo "[Django] finished"
 
 trap_TERM() {
     echo "["$(date "+%Y/%m/%d-%H:%M:%S")"]" SIGTERM ACCEPTED
