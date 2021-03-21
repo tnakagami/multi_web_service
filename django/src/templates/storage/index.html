@@ -98,10 +98,13 @@
 
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                     <button type="button" class="dropdown-item clip" data-clipboard-text="{{ file.file.url }}">
-                                        リンクをコピー
+                                        リンクのコピー
+                                    </button>
+                                    <button type="button" class="dropdown-item update-filename-modal-button" data-updatefilenameurl="{% url 'storage:update_filename' file.pk %}">
+                                        ファイル名の更新
                                     </button>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{{ file.file.url }}">開く</a>
+                                    <a class="dropdown-item" href="{{ file.file.url }}" target="_blank">開く</a>
                                     <a class="dropdown-item" href="{{ file.file.url }}" download="{{ file.filename }}">ダウンロード</a>
                                     <div class="dropdown-divider"></div>
                                     <button type="button" class="dropdown-item delete-modal-button" data-filename="{{ file.filename }}" data-deleteurl="{% url 'storage:delete' file.pk %}">
@@ -152,6 +155,28 @@
 </div>
 
 {# modalの処理 #}
+<div class="modal" tabindex="-1" role="dialog" id="update-filename-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">ファイル名の更新</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST" id="update-filename-form">
+                    {% csrf_token %}
+                    {{ update_filename_form }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="update-filename-form">ファイル名の更新</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal" tabindex="-1" role="dialog" id="delete-modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -206,6 +231,22 @@
         $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
     });
 
+    // for update filename button
+    const updateFilenameForm = document.getElementById('update-filename-form');
+    const updateFilenameModalButtons = document.getElementsByClassName('update-filename-modal-button');
+
+    for (const button of updateFilenameModalButtons) {
+        button.addEventListener('click', () => {
+            updateFilenameForm.action = button.dataset.updatefilenameurl;
+
+            $('#update-filename-modal').modal({
+                backdrop: false,
+                keyboard: true,
+            });
+        });
+    }
+
+    // for delete button
     const deleteForm = document.getElementById('delete-form');
     const deleteModalButtons = document.getElementsByClassName('delete-modal-button');
 

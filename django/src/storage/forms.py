@@ -68,3 +68,16 @@ class FileSearchForm(forms.Form):
                 queryset = queryset.filter(filename__icontains=word)
 
         return queryset
+
+class UpdateFilenameForm(forms.ModelForm):
+    filename = forms.CharField(
+        label=ugettext_lazy('new filename'),
+        required=True,
+        widget=forms.TextInput(
+            attrs={'placeholder': ugettext_lazy('new filename'), 'class': 'form-control'}
+        ),
+    )
+
+    class Meta:
+        model = models.FileStorage
+        fields = ('filename', )
