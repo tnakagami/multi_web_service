@@ -8,12 +8,12 @@ urlpatterns = [
     path('', views.PostListView.as_view(), name='index'),
     # own post
     path('own/post/<int:pk>', views.OwnPostListView.as_view(), name='own_post'),
-    # own tag
-    path('own/tag/<int:pk>', views.OwnTagListView.as_view(), name='own_tag'),
-    # create, update or delete tag
-    path('tag/create', views.TagCreateView.as_view(), name='tag_create'),
-    path('tag/update/<int:pk>', views.TagUpdateView.as_view(), name='tag_update'),
-    path('tag/delete/<int:pk>', views.TagDeleteView.as_view(), name='tag_delete'),
+    ## own tag
+    #path('own/tag/<int:pk>', views.OwnTagListView.as_view(), name='own_tag'),
+    ## create, update or delete tag
+    #path('tag/create', views.TagCreateView.as_view(), name='tag_create'),
+    #path('tag/update/<int:pk>', views.TagUpdateView.as_view(), name='tag_update'),
+    #path('tag/delete/<int:pk>', views.TagDeleteView.as_view(), name='tag_delete'),
     # create, update or delete post
     path('post/create', views.PostCreateView.as_view(), name='post_create'),
     path('post/update/<int:pk>', views.PostUpdateView.as_view(), name='post_update'),

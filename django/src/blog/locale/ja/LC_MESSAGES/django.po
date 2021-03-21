@@ -31,12 +31,6 @@ msgid "filtered by tag"
 msgstr "タグで絞り込み"
 
 #: blog/forms.py:92
-#, fuzzy
-#| msgid ""
-#| "[TOC]\n"
-#| "\n"
-#| "## Introduction\n"
-#| " This is sample text."
 msgid ""
 "Markdown support\n"
 "\n"
@@ -133,8 +127,6 @@ msgid "name"
 msgstr "名前"
 
 #: blog/models.py:57 blog/models.py:75
-#, fuzzy
-#| msgid "name"
 msgid "no name"
 msgstr "通りすがりの人"
 
