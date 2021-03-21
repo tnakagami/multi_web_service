@@ -69,7 +69,7 @@ class FileSearchForm(forms.Form):
 
         return queryset
 
-class UpdateFilenameForm(forms.ModelForm):
+class FilenameUpdateForm(forms.ModelForm):
     filename = forms.CharField(
         label=ugettext_lazy('new filename'),
         required=True,

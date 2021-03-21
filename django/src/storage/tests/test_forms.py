@@ -199,3 +199,28 @@ class FileSearchFormTests(StorageForm):
         self.assertEqual(_queryset.filter(user=self.users[3]).count(), 2)
         self.assertEqual(_queryset.filter(user=self.users[4]).count(), 3)
         self.assertEqual(_queryset.filter(user=self.users[5]).count(), 0)
+
+class FilenameUpdateFormTests(StorageForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.form = forms.FilenameUpdateForm
+
+    def test_form(self):
+        data = {
+            'filename': 'filename',
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+
+    def test_no_filename(self):
+        data = {}
+        form = self.form(data)
+        self.assertFalse(form.is_valid())
+
+    def test_empty_filename(self):
+        data = {
+            'filename': '',
+        }
+        form = self.form(data)
+        self.assertFalse(form.is_valid())
