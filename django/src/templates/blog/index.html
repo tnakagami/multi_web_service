@@ -51,6 +51,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
+                {% if None %}
                     <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                         <a href="{% url 'blog:tag_create' %}" class="btn btn-primary btn-block">タグ作成</a>
                     </div>
@@ -63,6 +64,14 @@
                     <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                         <a href="{% url 'blog:own_post' user.pk %}" class="btn btn-info btn-block">作成した記事一覧</a>
                     </div>
+                {% else %}
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <a href="{% url 'blog:post_create' %}" class="btn btn-success btn-block">記事を書く</a>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                        <a href="{% url 'blog:own_post' user.pk %}" class="btn btn-info btn-block">作成した記事一覧</a>
+                    </div>
+                {% endif %}
                 </div>
             </div>
         </div>

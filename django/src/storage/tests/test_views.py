@@ -143,7 +143,7 @@ class FileUploadViewTests(StorageView):
         self.client.logout()
         data = self.__create_request_data('target_file.txt', 1)
         response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_access(self):
         response = self.client.get(self.url)
@@ -188,11 +188,118 @@ class FileUploadViewTests(StorageView):
         data = {key: '' for key in data.keys()}
         response = self.client.post(self.url, data, follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('storage/index.html')
         self.assertTrue('upload_form' in response.context.keys())
         _upload_form = response.context['upload_form']
         self.assertTrue('file' in _upload_form.errors.keys())
         self.assertEqual(self.model.objects.filter(user=self.users[0]).count(), 3)
         self.assertEqual(self.model.objects.filter(filename=filename).count(), 0)
+        self.assertTrue('files' in response.context.keys())
+        _files = response.context['files']
+        self.assertEqual(len(list(_files.all())), 3)
+
+class FilenameUpdateViewTests(StorageView):
+    @override_settings(AXES_ENABLED=False)
+    def setUp(self):
+        super().setUp()
+        self.client.login(username=self.users[0].username, password=self.password)
+        self.target = FileStorageFactory(user=self.users[0])
+
+    def test_resolve_url(self):
+        resolver = resolve('/storage/update/filename/123')
+        self.chk_class(resolver, views.FilenameUpdateView)
+
+    def test_no_login_access(self):
+        self.client.logout()
+        data = {
+            'pk': self.target.pk,
+        }
+        url = reverse('storage:update_filename', kwargs=data)
+        data = {
+            'filename': 'new_filename',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_access(self):
+        data = {
+            'pk': self.target.pk,
+        }
+        url = reverse('storage:update_filename', kwargs=data)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_updating_filename(self):
+        target_pk = self.target.pk
+        data = {
+            'pk': target_pk,
+        }
+        url = reverse('storage:update_filename', kwargs=data)
+        filename = 'new_filename'
+        data = {
+            'filename': filename,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _file = self.model.objects.get(pk=target_pk)
+        self.assertEqual(_file.filename, filename)
+
+    def test_empty_filename(self):
+        target_pk = self.target.pk
+        data = {
+            'pk': target_pk,
+        }
+        url = reverse('storage:update_filename', kwargs=data)
+        filename = ''
+        data = {
+            'filename': filename,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _file = self.model.objects.get(pk=target_pk)
+        self.assertEqual(_file.filename, self.target.filename)
+
+    def test_blank_filename(self):
+        target_pk = self.target.pk
+        data = {
+            'pk': target_pk,
+        }
+        url = reverse('storage:update_filename', kwargs=data)
+        filename = ' '
+        data = {
+            'filename': filename,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _file = self.model.objects.get(pk=target_pk)
+        self.assertEqual(_file.filename, self.target.filename)
+
+    def test_updating_other_user_file(self):
+        target = self.files[-1][0]
+        data = {
+            'pk': target.pk,
+        }
+        url = reverse('storage:update_filename', kwargs=data)
+        filename = 'new_filename'
+        data = {
+            'filename': filename,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 403)
+        _file = self.model.objects.get(pk=target.pk)
+        self.assertEqual(_file.filename, target.filename)
+
+    def test_not_exist_file(self):
+        data = {
+            'pk': self.model.objects.count() + 1,
+        }
+        url = reverse('storage:update_filename', kwargs=data)
+        filename = ' '
+        data = {
+            'filename': filename,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 404)
 
 class FileDeleteViewTests(StorageView):
     @override_settings(AXES_ENABLED=False)
