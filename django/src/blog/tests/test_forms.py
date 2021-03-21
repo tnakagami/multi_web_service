@@ -207,7 +207,7 @@ class TagFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_form(self):
+    def test_search_word_is_empty(self):
         search_word = ''
         data = {
             'name': search_word,
@@ -237,7 +237,7 @@ class PostFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_form(self):
+    def test_form_with_private(self):
         targets = [key for key in self.targets if key != 'is_public']
         data = {key: '{}1'.format(key) for key in self.targets}
         data['tags'] = 0
@@ -286,13 +286,15 @@ class CommentFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_form(self):
+    def test_text_is_empty(self):
         data = {
             'name': 'no name',
             'text': '',
         }
         form = self.form(data)
         self.assertFalse(form.is_valid())
+
+    def test_name_is_empty(self):
         data = {
             'name': '',
             'text': 'comment',
@@ -315,13 +317,15 @@ class ReplyFormTests(BlogForm):
         form = self.form(data)
         self.assertTrue(form.is_valid())
 
-    def test_form(self):
+    def test_text_is_empty(self):
         data = {
             'name': 'no name',
             'text': '',
         }
         form = self.form(data)
         self.assertFalse(form.is_valid())
+
+    def test_name_is_empty(self):
         data = {
             'name': '',
             'text': 'reply',
@@ -351,9 +355,9 @@ class FileUploadFormTests(BlogForm):
         form = self.form({}, file_data)
         self.assertTrue(form.is_valid())
         ret_url = form.save()
-        self.assertTrue(ret_url, '/test_file.dat')
+        self.assertEqual(ret_url, '/test_file.dat')
 
-    def test_form(self):
+    def test_invalid_form(self):
         data = {
             'upload_file': '',
         }
