@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'django_bootstrap_breadcrumbs',
     'axes',
     'django_cleanup.apps.CleanupConfig',
+    'channels',
     'registration.apps.RegistrationConfig', # registration app
     'sns.apps.SnsConfig',                   # sns app
     'blog.apps.BlogConfig',                 # blog app
     'storage.apps.StorageConfig',           # storage app
+    'chat.apps.ChatConfig',                 # chat app
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -111,6 +113,17 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 BREADCRUMBS_TEMPLATE = 'django_bootstrap_breadcrumbs/bootstrap4.html'
 
 WSGI_APPLICATION = 'web_service.wsgi.application'
+ASGI_APPLICATION = 'web_service.routing.application'
+
+# Redis
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)],
+        },
+    }
+}
 
 CACHES = {
     'default': {

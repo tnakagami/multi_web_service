@@ -1,0 +1,41 @@
+{% extends 'chat/breadcrumbs_chat.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block header %}
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Create Room" "chat:room_create" %}
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center mb-1">
+    <div class="col-12">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="col-12">
+                    {{ form.as_p }}
+                </div>
+            </div>
+            <div class="form-row mt-3">
+                <div class="col-6">
+                    <button type="submit" class="btn btn-primary btn-block">完了</button>
+                </div>
+                <div class="col-6">
+                    <a href="{% url 'chat:index' %}" class="btn btn-secondary btn-block">戻る</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
