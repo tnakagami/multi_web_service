@@ -1,7 +1,8 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from custom_templatetags.blog_extras import markdown2html
+from custom_templatetags.markdown_extras import markdown2html
 import json
+import re
 from . import models
 from datetime import datetime
 
@@ -9,20 +10,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.group_name = ''
-        self.pk = -1
+        self.room = None
 
     def get_current_time(self):
         return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def escape_process(self, message):
         text = markdown2html(message)
-        return text.replace('<script>', '&lt;script&gt;').replace('</script>', '&lt;/script&gt;')
+        escaped_text = re.sub('<\s*script\s*>(.*)<\s*/script\s*>', r'&lt;script&gt;\1&lt;/script&gt;', text.replace('"', '&quot;').replace("'", '&#39;'))
+        return escaped_text
 
     async def connect(self):
         try:
             user = self.scope['user']
-            self.pk = int(self.scope['url_route']['kwargs']['room_pk'])
-            self.group_name = 'chat-room{}'.format(self.pk)
+            pk = int(self.scope['url_route']['kwargs']['room_pk'])
+            self.room = await database_sync_to_async(models.Room.objects.get)(pk=pk)
+            self.group_name = 'chat-room{}'.format(pk)
             await self.accept()
             await self.channel_layer.group_add(self.group_name, self.channel_name)
         except Exception as e:
@@ -74,10 +77,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_message(self, event):
         try:
-            room = models.Room.objects.get(pk=self.pk)
             models.Message.objects.create(
                 user=self.scope['user'],
-                room=room,
+                room=self.room,
                 content=event['message'],
             )
         except Exception as e:

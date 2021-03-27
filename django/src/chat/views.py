@@ -15,8 +15,6 @@ def paginate_query(request, queryset, count):
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-    except Exception:
-        page_obj = paginator.page(1)
 
     return paginator, page_obj
 
@@ -125,7 +123,7 @@ class ChatRoomDetailView(AccessMixin, DetailView):
             raise Http404
 
         # if user is not assigned
-        if not room.chk_users(request.user):
+        if not room.is_assigned(request.user):
             return self.handle_no_permission()
         # checks pass let http method handlers process the request
         return super().dispatch(request, *args, **kwargs)

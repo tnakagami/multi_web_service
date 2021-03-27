@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-03-27 21:00+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: chat/forms.py:13
+msgid "keyword"
+msgstr "キーワード"
+
+#: chat/forms.py:16 chat/forms.py:35
+msgid "room name"
+msgstr "部屋の名称"
+
+#: chat/models.py:10
+msgid "room_owner"
+msgstr "部屋の所有者"
+
+#: chat/models.py:11
+msgid "name"
+msgstr "部屋の名称"
+
+#: chat/models.py:12
+msgid "description"
+msgstr "概要"
+
+#: chat/models.py:13
+msgid "room_assigned"
+msgstr "割り当てるメンバ"
+
+#: chat/models.py:13
+msgid "assigned users"
+msgstr "割り当てられたメンバ"
+
+#: chat/models.py:14 chat/models.py:33
+msgid "create time"
+msgstr "作成時刻"
+
+#: chat/models.py:31
+msgid "room_meesages"
+msgstr "メッセージに該当する部屋情報"
+
+#: chat/models.py:32
+msgid "content"
+msgstr "チャットメッセージ"

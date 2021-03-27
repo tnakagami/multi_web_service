@@ -17,7 +17,7 @@ class Room(models.Model):
         return self.__unicode__()
     def __unicode__(self):
         return self.name
-    def chk_users(self, user):
+    def is_assigned(self, user):
         try:
             _ = self.assigned.all().get(pk=user.pk)
             ret = True

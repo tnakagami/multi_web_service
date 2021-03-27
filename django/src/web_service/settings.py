@@ -101,7 +101,7 @@ TEMPLATES = [
             'libraries': {
                 'custom_filter': 'custom_templatetags.custom_filter',
                 'user_filter': 'custom_templatetags.user_filter',
-                'blog_extras': 'custom_templatetags.blog_extras',
+                'markdown_extras': 'custom_templatetags.markdown_extras',
                 'pagination': 'custom_templatetags.pagination',
             },
         },
