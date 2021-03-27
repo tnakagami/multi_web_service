@@ -2,7 +2,7 @@ from unittest import mock
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse, resolve
-from registration.tests.factories import UserFactory, UserModel
+from registration.tests.factories import UserFactory
 from chat.tests.factories import RoomFactory, MessageFactory
 from chat import views, models
 
