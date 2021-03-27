@@ -1,5 +1,5 @@
 from django.test import TestCase
-from custom_templatetags import markdown_extras.py
+from custom_templatetags import markdown_extras
 
 class MarkdownExtras(TestCase):
     @classmethod

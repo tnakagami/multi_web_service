@@ -3,8 +3,8 @@ from channels.db import database_sync_to_async
 from custom_templatetags.markdown_extras import markdown2html
 import json
 import re
-from . import models
 from datetime import datetime
+from . import models
 
 class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -26,8 +26,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             pk = int(self.scope['url_route']['kwargs']['room_pk'])
             self.room = await database_sync_to_async(models.Room.objects.get)(pk=pk)
             self.group_name = 'chat-room{}'.format(pk)
-            await self.accept()
-            await self.channel_layer.group_add(self.group_name, self.channel_name)
+
+            if self.room.is_assigned(user):
+                await self.accept()
+                await self.channel_layer.group_add(self.group_name, self.channel_name)
         except Exception as e:
             raise Exception(e)
 

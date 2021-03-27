@@ -1,7 +1,6 @@
 from unittest import mock
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.db import IntegrityError, transaction
 from registration.tests.factories import UserFactory
 from blog.tests.factories import TagFactory, PostFactory
 from django.core.files.base import ContentFile

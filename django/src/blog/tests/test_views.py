@@ -1,4 +1,4 @@
-from unittest import mock
+from unittest import mock, skipIf
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.models import Permission
@@ -7,6 +7,8 @@ from registration.tests.factories import UserFactory, UserModel
 from blog.tests.factories import TagFactory, PostFactory, CommentFactory
 from django.core.files.base import ContentFile
 from blog import views, models
+
+IgnoreTagTests = {'condition': True, 'reason': 'Tag function is not provided'}
 
 class BlogView(TestCase):
     @classmethod
@@ -223,6 +225,7 @@ class OwnPostListViewTests(BlogView):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class OwnTagListViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
@@ -259,6 +262,7 @@ class OwnTagListViewTests(BlogView):
         _tags = response.context.get('tags')
         self.assertEqual(_tags.count(), 1)
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class TagCreateViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
@@ -307,6 +311,7 @@ class TagCreateViewTests(BlogView):
         _form = response.context.get('form')
         self.assertTrue('name' in _form.errors.keys())
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class TagUpdateViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
@@ -371,6 +376,7 @@ class TagUpdateViewTests(BlogView):
         _tag = models.Tag.objects.get(pk=target_tag.pk)
         self.assertEqual(_tag.name, target_tag.name)
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class TagDeleteViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):

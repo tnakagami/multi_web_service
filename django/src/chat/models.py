@@ -10,7 +10,7 @@ class Room(models.Model):
     owner = models.ForeignKey(User, related_name=ugettext_lazy('room_owner'), on_delete=models.CASCADE)
     name = models.CharField(ugettext_lazy('name'), max_length=64)
     description = models.TextField(ugettext_lazy('description'), max_length=128)
-    assigned = models.ManyToManyField(User, related_name=ugettext_lazy('room_assigned'), verbose_name=ugettext_lazy('assigned users'), blank=False)
+    assigned = models.ManyToManyField(User, related_name=ugettext_lazy('room_assigned'), verbose_name=ugettext_lazy('assigned users'), blank=True)
     created_at = models.DateTimeField(ugettext_lazy('create time'), default=timezone.now)
 
     def __str__(self):
@@ -35,4 +35,4 @@ class Message(models.Model):
     def __str__(self):
         return self.__unicode__()
     def __unicode__(self):
-        return '{}: {}'.format(user.username, self.content[:32])
+        return '{}: {}'.format(self.user.username, self.content[:32])
