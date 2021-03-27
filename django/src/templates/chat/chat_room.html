@@ -145,23 +145,27 @@ window.MathJax = {
     document.querySelector('#msg').onkeyup = (e) => {
         const enter_key = 13;
 
+        // press Ctrl key and Enter key
         if (e.ctrlKey) {
             if (e.keyCode === enter_key) {
+                // send message
                 $('#message-form').submit();
             }
         }
     };
 
     const init = () => {
+        // create websocket
         const ws_scheme = (window.location.protocol === 'https:' ? 'wss' : 'ws');
         const hostname = window.location.host;
         const room_pk = '{{ room.pk }}';
         const url = `${ws_scheme}://${hostname}/ws/room/${room_pk}`;
         g_socket = new WebSocket(url);
+        // message received
         g_socket.onmessage = (e) => {
             const receive_data = JSON.parse(e.data);
-
             let user_info;
+
             if (receive_data.viewname) {
                 user_info = `<span>${receive_data.viewname} <font color="gray">@${receive_data.username}</font></span>`;
             }

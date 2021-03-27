@@ -1,12 +1,9 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse_lazy, reverse
 from django.http import Http404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from . import models, forms
-
-User = get_user_model()
 
 def paginate_query(request, queryset, count):
     paginator = Paginator(queryset, count)
