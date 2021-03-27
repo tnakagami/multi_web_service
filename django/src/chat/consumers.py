@@ -25,9 +25,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = self.scope['user']
             pk = int(self.scope['url_route']['kwargs']['room_pk'])
             self.room = await database_sync_to_async(models.Room.objects.get)(pk=pk)
+            ret = await database_sync_to_async(self.room.is_assigned)(user)
             self.group_name = 'chat-room{}'.format(pk)
 
-            if self.room.is_assigned(user):
+            if ret:
                 await self.accept()
                 await self.channel_layer.group_add(self.group_name, self.channel_name)
         except Exception as e:
