@@ -67,7 +67,6 @@ class BlogView(TestCase):
 class PostListViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         self.url = reverse('blog:index')
 
@@ -154,7 +153,6 @@ class PostListViewTests(BlogView):
 class OwnPostListViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         data = {
             'pk': self.users[0].pk
@@ -229,7 +227,6 @@ class OwnPostListViewTests(BlogView):
 class OwnTagListViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         data = {
             'pk': self.users[0].pk
@@ -539,8 +536,8 @@ class PostUpdateViewTests(BlogView):
         self.assertEqual(_post.user, self.users[0])
         self.assertEqual(_post.title, data['title'])
         self.assertEqual(_post.text, data['text'])
-        self.assertEquals(_post.tags.all().count(), 0)
-        self.assertEquals(_post.relation_posts.all().count(), 0)
+        self.assertEqual(_post.tags.all().count(), 0)
+        self.assertEqual(_post.relation_posts.all().count(), 0)
         self.assertEqual(_post.is_public, data['is_public'])
         self.assertEqual(_post.description, data['description'])
         self.assertEqual(_post.keywords, data['keywords'])
@@ -599,7 +596,7 @@ class PostDeleteViewTests(BlogView):
         with self.assertRaises(models.Post.DoesNotExist):
             _ = models.Post.objects.get(pk=self.target_post.pk)
 
-    def test_not_exist_tag(self):
+    def test_not_exist_post(self):
         data = {
             'pk': models.Post.objects.count() + 1,
         }
@@ -785,7 +782,7 @@ class ReplyCreateViewTests(BlogView):
         self.assertEqual(_reply.name, data['name'])
         self.assertEqual(_reply.text, data['text'])
 
-    def test_not_exist_post(self):
+    def test_not_exist_comment(self):
         data = {
             'pk': models.Comment.objects.count() + 1,
         }
@@ -801,7 +798,6 @@ class ReplyCreateViewTests(BlogView):
 class FileUploadViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         self.file_data = {
             'upload_file': ContentFile(b'some dummy bcode data: \x80\x01', 'test_file.dat'),

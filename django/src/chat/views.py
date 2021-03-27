@@ -2,19 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse_lazy, reverse
 from django.http import Http404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator
 from . import models, forms
 
 def paginate_query(request, queryset, count):
     paginator = Paginator(queryset, count)
-
-    try:
-        page = request.GET.get('page')
-        page_obj = paginator.page(page)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
+    page = request.GET.get('page')
+    page_obj = paginator.get_page(page)
 
     return paginator, page_obj
 

@@ -1,5 +1,5 @@
 from unittest import mock
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse, resolve
 from registration.tests.factories import UserFactory, UserModel
@@ -14,6 +14,8 @@ class ChatView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.password = 'password'
+        cls.superuser = UserFactory(username='superuser', is_staff=True, is_superuser=True)
+        cls.staffuser = UserFactory(username='staffuser', is_staff=True, is_superuser=False)
         cls.users = UserFactory.create_batch(5)
         u_pk = [_user.pk for _user in cls.users]
         cls.rooms = [
@@ -33,10 +35,44 @@ class ChatView(TestCase):
     def tearDownClass(cls):
         super().tearDownClass()
 
+class PaginateTests(ChatView):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.factory = RequestFactory()
+        _room = cls.rooms[0][0]
+        _user = cls.users[0]
+        MessageFactory.create_batch(17, user=_user, room=_room)
+        cls.count = 5
+        cls.queryset = models.Message.objects.all().order_by('-created_at')
+
+    def test_get_query_pattern1(self):
+        request = self.factory.get('/', {'page': 3})
+        _, page_obj = views.paginate_query(request, self.queryset, self.count)
+        self.assertEqual(len(page_obj), 5)
+        self.assertEqual(page_obj.number, 3)
+
+    def test_get_query_pattern2(self):
+        request = self.factory.get('/', {'page': 4})
+        _, page_obj = views.paginate_query(request, self.queryset, self.count)
+        self.assertEqual(len(page_obj), 2)
+        self.assertEqual(page_obj.number, 4)
+
+    def test_is_not_integer(self):
+        request = self.factory.get('/', {'page': 'a'})
+        _, page_obj = views.paginate_query(request, self.queryset, self.count)
+        self.assertEqual(len(page_obj), 5)
+        self.assertEqual(page_obj.number, 1)
+
+    def test_is_empty(self):
+        request = self.factory.get('/', {'page': -1})
+        _, page_obj= views.paginate_query(request, self.queryset, self.count)
+        self.assertEqual(len(page_obj), 2)
+        self.assertEqual(page_obj.number, 4)
+
 class RoomListViewTests(ChatView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         self.url = reverse('chat:index')
 
@@ -88,3 +124,252 @@ class RoomListViewTests(ChatView):
         self.assertEqual(response.status_code, 200)
         _rooms = response.context.get('rooms')
         self.assertEqual(_rooms.count(), 3)
+
+class RoomCreateViewTests(ChatView):
+    @override_settings(AXES_ENABLED=False)
+    def setUp(self):
+        self.client.login(username=self.users[0].username, password=self.password)
+        self.url = reverse('chat:room_create')
+
+    def test_resolve_url(self):
+        resolver = resolve('/chat/room/create')
+        self.chk_class(resolver, views.RoomCreateView)
+
+    def test_no_login_access(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_chk_room_form(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed('chat/room_form.html')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('form' in response.context.keys())
+        _form = response.context.get('form')
+        self.assertTrue('assigned' in _form.fields.keys())
+        _assigned_qs = _form.fields['assigned'].queryset
+        self.assertEqual(_assigned_qs.count(), 4)
+        expected = [self.users[idx].pk for idx in [1,2,3,4]]
+        for _user in _assigned_qs:
+            self.assertTrue(_user.pk in expected)
+
+    def test_creating_room(self):
+        data = {
+            'name': 'chat_room_created',
+            'description': 'sample_chat_created',
+            'assigned': [self.users[1].pk, self.users[3].pk],
+        }
+        response = self.client.post(self.url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        _room = models.Room.objects.all().last()
+        _assigned = list(_room.assigned.all().values_list('pk', flat=True))
+        self.assertEqual(_room.owner, self.users[0])
+        self.assertEqual(_room.name, data['name'])
+        self.assertEqual(_room.description, data['description'])
+        self.assertEquals(_assigned, data['assigned'])
+
+class RoomUpdateViewTests(ChatView):
+    @override_settings(AXES_ENABLED=False)
+    def setUp(self):
+        self.client.login(username=self.users[0].username, password=self.password)
+        self.assigned = [self.users[1].pk, self.users[3].pk]
+        self.created_room = RoomFactory.create(owner=self.users[0], assigned=self.assigned)
+
+    def test_resolve_url(self):
+        resolver = resolve('/chat/room/update/123')
+        self.chk_class(resolver, views.RoomUpdateView)
+
+    def test_no_login_access(self):
+        self.client.logout()
+        data = {
+            'pk': self.created_room.pk,
+        }
+        url = reverse('chat:room_update', kwargs=data)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_updating_room(self):
+        data = {
+            'pk': self.created_room.pk,
+        }
+        url = reverse('chat:room_update', kwargs=data)
+        updated_assigned = [self.users[2].pk]
+        data = {
+            'name': 'updated_name',
+            'description': 'updated_description',
+            'assigned': updated_assigned,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertTemplateUsed('chat/room_form.html')
+        self.assertEqual(response.status_code, 200)
+        _room = models.Room.objects.get(pk=self.created_room.pk)
+        self.assertEqual(_room.owner, self.users[0])
+        self.assertEqual(_room.name, data['name'])
+        self.assertEqual(_room.description, data['description'])
+        self.assertEqual(_room.assigned.all().count(), 1)
+        self.assertEquals(list(_room.assigned.all().values_list('pk', flat=True)), updated_assigned)
+
+    def test_not_exist_room(self):
+        data = {
+            'pk': models.Room.objects.count() + 1,
+        }
+        url = reverse('chat:room_update', kwargs=data)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 404)
+        _room = models.Room.objects.get(pk=self.created_room.pk)
+        self.assertEqual(_room.owner, self.created_room.owner)
+        self.assertEqual(_room.name, self.created_room.name)
+        self.assertEqual(_room.description, self.created_room.description)
+        self.assertEquals(_room.assigned.all().count(), self.created_room.assigned.all().count())
+        self.assertEquals(list(_room.assigned.all().values_list('pk', flat=True)), list(self.created_room.assigned.all().values_list('pk', flat=True)))
+
+    def test_room_defined_by_other_user(self):
+        target_room = self.rooms[-1][0]
+        data = {
+            'pk': target_room.pk,
+        }
+        url = reverse('chat:room_update', kwargs=data)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 403)
+        _room = models.Room.objects.get(pk=target_room.pk)
+        self.assertEqual(_room.owner, target_room.owner)
+        self.assertEqual(_room.name, target_room.name)
+        self.assertEqual(_room.description, target_room.description)
+        self.assertEquals(_room.assigned.all().count(), target_room.assigned.all().count())
+        self.assertEquals(list(_room.assigned.all().values_list('pk', flat=True)), list(target_room.assigned.all().values_list('pk', flat=True)))
+
+class RoomDeleteViewTests(ChatView):
+    @override_settings(AXES_ENABLED=False)
+    def setUp(self):
+        self.client.login(username=self.users[0].username, password=self.password)
+        self.assigned = [self.users[1].pk, self.users[3].pk]
+        self.target_room = RoomFactory.create(owner=self.users[0], assigned=self.assigned)
+
+    def test_resolve_url(self):
+        resolver = resolve('/chat/room/delete/123')
+        self.chk_class(resolver, views.RoomDeleteView)
+
+    def test_no_login_access(self):
+        self.client.logout()
+        data = {
+            'pk': self.target_room.pk,
+        }
+        url = reverse('chat:room_delete', kwargs=data)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_access(self):
+        data = {
+            'pk': self.target_room.pk,
+        }
+        url = reverse('chat:room_delete', kwargs=data)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_deleting_target_room(self):
+        data = {
+            'pk': self.target_room.pk,
+        }
+        url = reverse('chat:room_delete', kwargs=data)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(models.Room.DoesNotExist):
+            _ = models.Room.objects.get(pk=self.target_room.pk)
+
+    def test_not_exist_room(self):
+        data = {
+            'pk': models.Room.objects.count() + 1,
+        }
+        url = reverse('chat:room_delete', kwargs=data)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 404)
+        _ = models.Room.objects.get(pk=self.target_room.pk)
+
+    def test_room_defined_by_other_user(self):
+        target_room = self.rooms[-1][0]
+        data = {
+            'pk': target_room.pk,
+        }
+        url = reverse('chat:room_delete', kwargs=data)
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, 403)
+        _ = models.Room.objects.get(pk=target_room.pk)
+
+class ChatRoomDetailViewTests(ChatView):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        data = {
+            'pk': cls.rooms[0][-1].pk,
+        }
+        cls.url = reverse('chat:chat_room', kwargs=data)
+
+    @override_settings(AXES_ENABLED=False)
+    def setUp(self):
+        self.client.login(username=self.users[0].username, password=self.password)
+
+    def test_resolve_url(self):
+        resolver = resolve('/chat/room/123')
+        self.chk_class(resolver, views.ChatRoomDetailView)
+
+    def test_no_login_access(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_access_owner_user0(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed('chat/chat_room.html')
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_access_is_assigned_user1(self):
+        self.client.logout()
+        self.client.login(username=self.users[1].username, password=self.password)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_access_is_assigned_user2(self):
+        self.client.logout()
+        self.client.login(username=self.users[2].username, password=self.password)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_access_is_not_assigned_user3(self):
+        self.client.logout()
+        self.client.login(username=self.users[3].username, password=self.password)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_access_is_not_assigned_user4(self):
+        self.client.logout()
+        self.client.login(username=self.users[4].username, password=self.password)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_access_other_room_is_assigned(self):
+        data = {
+            'pk': self.rooms[1][-1].pk,
+        }
+        url = reverse('chat:chat_room', kwargs=data)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_other_room_is_not_assigned(self):
+        data = {
+            'pk': self.rooms[2][-1].pk,
+        }
+        url = reverse('chat:chat_room', kwargs=data)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_not_exist_room(self):
+        data = {
+            'pk': models.Room.objects.count() + 1,
+        }
+        url = reverse('chat:chat_room', kwargs=data)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
