@@ -1,0 +1,187 @@
+{% extends 'chat/breadcrumbs_chat.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load markdown_extras %}
+{% load humanize %}
+
+{% block header %}
+{# code syntax #}
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/dracula.min.css">
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{# MathJax #}
+<script>
+window.MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process',
+    renderActions: {
+      find: [10, function (doc) {
+        for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+          const display = !!node.type.match(/; *mode=display/);
+          const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+          const text = document.createTextNode('');
+          const sibling = node.previousElementSibling;
+          node.parentNode.replaceChild(text, node);
+          math.start = {node: text, delim: '', n: 0};
+          math.end = {node: text, delim: '', n: 0};
+          doc.math.push(math);
+          if (sibling && sibling.matches('.MathJax_Preview')) {
+            sibling.parentNode.removeChild(sibling);
+          }
+        }
+      }, '']
+    }
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<style>
+    textarea {
+        width: 90%:
+        height: auto;
+        resize: none;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb room.name "chat:chat_room" room.pk %}
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <h5 class="h5">チャットメッセージ</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <form action="" id="message-form">
+                    <textarea placeholder="## メッセージを入力（Markdown形式で入力可能）" id="msg" rows="5" class="form-control"></textarea>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-block" form="message-form">送信（Ctrl + Enter）</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        <div id="chat-header"></div>
+        {% for message in page_obj %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        {% if message.user.viewname %}
+                        <span>{{ message.user.viewname }} <font color="gray">@{{ message.user.username }}</font></span>
+                        {% else %}
+                        <span>{{ message.user.username }}</span>
+                        {% endif %}
+                        <time datetime="{{ message.created_at|date:'Y-m-d' }}">（{{ message.created_at|date:'Y-m-d H:i:s' }}）</time>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        {{ message.content|markdown2html_with_escape }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <p>表示できるメッセージがありません。</p>
+        {% endfor %}
+    </div>
+</div>
+{% if page_obj %}
+<div class="row justify-content-center mt-1">
+    <div class="col-12">
+{% include "pagination.html" %}
+    </div>
+</div>
+{% endif %}
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ログイン後にチャットの内容が表示されます。
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    let g_socket = undefined;
+
+    $('#message-form').submit(() => {
+        const msg = $('#msg').val();
+
+        if (g_socket && msg) {
+            const username = '{{ user.username }}';
+            const viewname = '{{ user.viewname }}';
+
+            const send_data = {
+                username: username,
+                viewname: viewname,
+                message: msg,
+            };
+            g_socket.send(JSON.stringify(send_data));
+            $('#msg').val('');
+        }
+
+        return false;
+    });
+    document.querySelector('#msg').focus();
+    document.querySelector('#msg').onkeyup = (e) => {
+        const enter_key = 13;
+
+        // press Ctrl key and Enter key
+        if (e.ctrlKey) {
+            if (e.keyCode === enter_key) {
+                // send message
+                $('#message-form').submit();
+            }
+        }
+    };
+
+    const init = () => {
+        // create websocket
+        const ws_scheme = (window.location.protocol === 'https:' ? 'wss' : 'ws');
+        const hostname = window.location.host;
+        const room_pk = '{{ room.pk }}';
+        const url = `${ws_scheme}://${hostname}/ws/room/${room_pk}`;
+        g_socket = new WebSocket(url);
+        // message received
+        g_socket.onmessage = (e) => {
+            const receive_data = JSON.parse(e.data);
+            let user_info;
+
+            if (receive_data.viewname) {
+                user_info = `<span>${receive_data.viewname} <font color="gray">@${receive_data.username}</font></span>`;
+            }
+            else {
+                user_info = `<span>${receive_data.username}</span>`;
+            }
+            const datetime = `<time datetime="${receive_data.datetime}">（${receive_data.datetime}）</time>`;
+            const result = `<div class="row"><div class="col-12">${user_info}${datetime}</div></div><div class="row"><div class="col-12">${receive_data.message}</div></div>`;
+            $(`<div class="card"><div class="card-body">${result}</div></div>`).prependTo('#chat-header');
+        };
+        g_socket.onclose = (e) => {
+            ;
+        };
+    };
+
+    $(init);
+}());
+</script>
+{% endblock %}

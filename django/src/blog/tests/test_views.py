@@ -1,4 +1,4 @@
-from unittest import mock
+from unittest import mock, skipIf
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.models import Permission
@@ -7,6 +7,8 @@ from registration.tests.factories import UserFactory, UserModel
 from blog.tests.factories import TagFactory, PostFactory, CommentFactory
 from django.core.files.base import ContentFile
 from blog import views, models
+
+IgnoreTagTests = {'condition': True, 'reason': 'Tag function is not provided'}
 
 class BlogView(TestCase):
     @classmethod
@@ -65,7 +67,6 @@ class BlogView(TestCase):
 class PostListViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         self.url = reverse('blog:index')
 
@@ -152,7 +153,6 @@ class PostListViewTests(BlogView):
 class OwnPostListViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         data = {
             'pk': self.users[0].pk
@@ -223,10 +223,10 @@ class OwnPostListViewTests(BlogView):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class OwnTagListViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         data = {
             'pk': self.users[0].pk
@@ -259,6 +259,7 @@ class OwnTagListViewTests(BlogView):
         _tags = response.context.get('tags')
         self.assertEqual(_tags.count(), 1)
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class TagCreateViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
@@ -307,6 +308,7 @@ class TagCreateViewTests(BlogView):
         _form = response.context.get('form')
         self.assertTrue('name' in _form.errors.keys())
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class TagUpdateViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
@@ -371,6 +373,7 @@ class TagUpdateViewTests(BlogView):
         _tag = models.Tag.objects.get(pk=target_tag.pk)
         self.assertEqual(_tag.name, target_tag.name)
 
+@skipIf(IgnoreTagTests['condition'], IgnoreTagTests['reason'])
 class TagDeleteViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
@@ -533,8 +536,8 @@ class PostUpdateViewTests(BlogView):
         self.assertEqual(_post.user, self.users[0])
         self.assertEqual(_post.title, data['title'])
         self.assertEqual(_post.text, data['text'])
-        self.assertEquals(_post.tags.all().count(), 0)
-        self.assertEquals(_post.relation_posts.all().count(), 0)
+        self.assertEqual(_post.tags.all().count(), 0)
+        self.assertEqual(_post.relation_posts.all().count(), 0)
         self.assertEqual(_post.is_public, data['is_public'])
         self.assertEqual(_post.description, data['description'])
         self.assertEqual(_post.keywords, data['keywords'])
@@ -593,7 +596,7 @@ class PostDeleteViewTests(BlogView):
         with self.assertRaises(models.Post.DoesNotExist):
             _ = models.Post.objects.get(pk=self.target_post.pk)
 
-    def test_not_exist_tag(self):
+    def test_not_exist_post(self):
         data = {
             'pk': models.Post.objects.count() + 1,
         }
@@ -779,7 +782,7 @@ class ReplyCreateViewTests(BlogView):
         self.assertEqual(_reply.name, data['name'])
         self.assertEqual(_reply.text, data['text'])
 
-    def test_not_exist_post(self):
+    def test_not_exist_comment(self):
         data = {
             'pk': models.Comment.objects.count() + 1,
         }
@@ -795,7 +798,6 @@ class ReplyCreateViewTests(BlogView):
 class FileUploadViewTests(BlogView):
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
-        super().setUp()
         self.client.login(username=self.users[0].username, password=self.password)
         self.file_data = {
             'upload_file': ContentFile(b'some dummy bcode data: \x80\x01', 'test_file.dat'),

@@ -1,6 +1,28 @@
 version: '3.4'
 
 services:
+    test_redis:
+        # Build target
+        build:
+            context: ./redis
+            # Dockerfile
+            dockerfile: Dockerfile
+        # Image name
+        image: custom_redis
+        # Container name
+        container_name: test_redis
+        restart: always
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+        # Setup port
+        expose:
+            - "6379"
+        networks:
+            - test_redis_bridge
+
     test_django:
         # Build target
         build:
@@ -81,7 +103,9 @@ services:
 # Setup network
 networks:
     test_backend_bridge:
-        name: backend
+        name: backend_network
+    test_redis_bridge:
+        name: redis_network
 
 volumes:
     test_storage:

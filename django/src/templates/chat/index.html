@@ -1,0 +1,147 @@
+{% extends 'chat/breadcrumbs_chat.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+{% if user.is_authenticated  %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">絞り込み検索</h5>
+                <form action="", method="GET">
+                    <div class="form-group row">
+                        <div class="col-12">
+                            {{ search_form.search_word }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                            <button type="submit" class="btn btn-primary btn-block">検索</button>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                            <a href="{% url 'chat:index' %}" class="btn btn-secondary btn-block">全件表示</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">部屋を作成</h5>
+                <div class="row">
+                    <div class="col-12">
+                        <a href="{% url 'chat:room_create' %}" class="btn btn-success btn-block">作成</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-3">
+    <div class="col-12">
+        <section>
+        {% for room in rooms %}
+            <article>
+                <div class="row">
+                    <div class="col-10">
+                        <h2 class="h2 mt-1"><a href="{% url 'chat:chat_room' room.pk %}">{{ room.name }}</a></h2>
+                        <p>{{ room.description }}</p>
+                        <div>
+                            {% if room.owner.viewname %}
+                            <span>{{ room.owner.viewname }} <font color="gray">@{{ room.owner.username }}</font></span>
+                            {% else %}
+                            <span>{{ room.owner.username }}</span>
+                            {% endif %}
+                            <time datetime="{{ room.created_at|date:'Y-m-d' }}">（{{ room.created_at|naturaltime }}作成）</time>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                    {% if room.owner.pk == user.pk %}
+                            <div class="dropdown mt-2">
+                                <a class="btn btn-outline-secondary btn-block dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    操作
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <a href="{% url 'chat:room_update' room.pk %}" class="dropdown-item">更新</a>
+                                    <div class="dropdown-divider"></div>
+                                    <button type="button" class="dropdown-item delete-room-modal-button" data-deleteurl="{% url 'chat:room_delete' room.pk %}">
+                                        <font color="red">削除</font>
+                                    </button>
+                                </div>
+                            </div>
+                    {% endif %}
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <article>
+                <p>表示できる部屋がありません。</p>
+            </article>
+        {% endfor %}
+        </section>
+    </div>
+</div>
+{% if rooms %}
+<div class="row justify-content-center">
+    <div class="col-12">
+{% include "pagination.html" %}
+    </div>
+</div>
+{% endif %}
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ログイン後に部屋一覧が表示されます。
+    </div>
+</div>
+{% endif %}
+
+<div class="modal" tabindex="-1" role="dialog" id="room-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">削除の確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>本当に削除してよろしいですか？</p>
+            </div>
+            <div class="modal-footer">
+                <form action="" method="POST" id="delete-room-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">本当に削除</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    const deleteRoomForm = document.getElementById('delete-room-form');
+    const deleteRoomModalButtons = document.getElementsByClassName('delete-room-modal-button');
+
+    for (const button of deleteRoomModalButtons) {
+        button.addEventListener('click', () => {
+            deleteRoomForm.action = button.dataset.deleteurl;
+
+            $('#room-modal').modal({
+                backdrop: true,
+                keyboard: true,
+            });
+        });
+    }
+}());
+</script>
+{% endblock %}

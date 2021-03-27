@@ -42,6 +42,28 @@ services:
         networks:
             - frontend_bridge
 
+    redis:
+        # Build target
+        build:
+            context: ./redis
+            # Dockerfile
+            dockerfile: Dockerfile
+        # Image name
+        image: custom_redis
+        # Container name
+        container_name: redis
+        restart: always
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+        # Setup port
+        expose:
+            - "6379"
+        networks:
+            - redis_bridge
+
     django:
         # Build target
         build:
@@ -64,6 +86,7 @@ services:
             - ./staticfiles/storage:/storage
             - ./django/src:/code
             - ./django/uwsgi.ini:/uwsgi.ini:ro
+            - ./logfiles/daphne.log:/var/log/daphne.log
             - ./logfiles/uwsgi.log:/var/log/uwsgi.log
         logging:
             driver: "json-file"
@@ -72,14 +95,18 @@ services:
                 max-file: "3"
         links:
             - mysql
+            - redis
         depends_on:
             - mysql
+            - redis
         # Setup port
         expose:
             - "8081"
+            - "3001"
         networks:
             - frontend_bridge
             - backend_bridge
+            - redis_bridge
 
     # database
     mysql:
@@ -113,9 +140,11 @@ services:
 # Setup network
 networks:
     frontend_bridge:
-        name: frontend
+        name: frontend_network
     backend_bridge:
-        name: backend
+        name: backend_network
+    redis_bridge:
+        name: redis_network
 
 volumes:
     database:

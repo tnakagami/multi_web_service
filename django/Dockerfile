@@ -14,15 +14,15 @@ COPY ./requirements.txt /
 # Install
 RUN    apk --no-cache update \
     && apk add --no-cache bash tzdata gettext pcre-dev mysql-client bind-tools libuuid \
-                          mariadb-dev mariadb-connector-c-dev libsodium libxml2-dev \
+                          mariadb-dev mariadb-connector-c-dev libsodium libxml2-dev supervisor \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     \
     # install temporary libraries
     \
     && apk add --no-cache --virtual .build-deps \
-               gcc musl-dev libffi-dev g++ libgcc libstdc++ libxslt-dev \
-               python3-dev libc-dev linux-headers openssl-dev curl shadow \
+               gcc musl-dev libffi-dev g++ libgcc libstdc++ libxslt-dev python3-dev \
+               libc-dev linux-headers openssl-dev curl shadow cargo rust \
                jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
     \
     # install python3
@@ -52,12 +52,16 @@ RUN    apk --no-cache update \
     \
     && apk --purge del .build-deps \
     && mkdir -p ${SRC_ROOT_PATH} \
+    && mkdir -p /data \
     && echo -n > /var/log/uwsgi.log \
+    && echo -n > /var/log/daphne.log \
     && rm -rf /root/.cache /var/cache/apk/* /tmp/*
 
 EXPOSE 8081
 # change work directory
 WORKDIR ${SRC_ROOT_PATH}
+# add supervisor configuration
+COPY ./supervisord /data/supervisord
 # add shell script
 COPY ./start.sh /start.sh
 RUN chmod 777 /start.sh

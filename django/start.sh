@@ -15,6 +15,20 @@ if [ -e /storage ]; then
     chmod 777 /storage
 fi
 
-# start django
-echo "[start]" $(date "+%Y/%m/%d-%H:%M:%S") Django server with uWSGI
-exec uwsgi --ini /uwsgi.ini
+# start supervisor
+echo "[supervisord]" $(date "+%Y/%m/%d-%H:%M:%S") start
+/usr/bin/supervisord -c /data/supervisord/supervisord.conf
+
+
+
+trap_TERM() {
+    echo "["$(date "+%Y/%m/%d-%H:%M:%S")"]" SIGTERM ACCEPTED
+    exit 0
+}
+
+trap 'trap_TERM' TERM
+
+while :
+do
+    sleep 3
+done

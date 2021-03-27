@@ -19,8 +19,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('registration.urls')),
-    path('sns/', include('sns.urls')),
-    path('blog/', include('blog.urls')),
-    path('storage/', include('storage.urls')),
+    path('', include('registration.urls',  namespace='registration')),
+    path('sns/', include('sns.urls', namespace='sns')),
+    path('blog/', include('blog.urls', namespace='blog')),
+    path('storage/', include('storage.urls', namespace='storage')),
+    path('chat/', include('chat.urls', namespace='chat')),
 ]
