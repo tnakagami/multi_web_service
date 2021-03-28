@@ -55,37 +55,16 @@ window.MathJax = {
 {% if user.is_authenticated  %}
 <div class="row justify-content-center">
     <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">チャットメッセージの検索</h5>
-                <form action="", method="GET">
-                    <div class="form-group row">
-                        <div class="col-12">
-                            {{ search_form.search_word }}
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                            <button type="submit" class="btn btn-primary btn-block">検索</button>
-                        </div>
-                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                            <a href="{% url 'chat:chat_room' room.pk %}" class="btn btn-secondary btn-block">全件表示</a>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row justify-content-center">
-    <div class="col-12">
         <div class="row">
-            <div class="col-12">
-                <h5 class="h5">チャットメッセージ</h5>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-8 col-xl-8">
+                <h5 class="card-title mt-2">チャットメッセージ</h5>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                <button type="button" class="btn btn-outline-primary btn-block search-message-modal-button">検索（Ctrl + Shift + F）</button>
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
+            <div class="col-12 mt-1">
                 <form action="" id="message-form">
                     <textarea placeholder="## メッセージを入力（Markdown形式で入力可能）" id="msg" rows="5" class="form-control"></textarea>
                 </form>
@@ -140,6 +119,30 @@ window.MathJax = {
     </div>
 </div>
 {% endif %}
+
+<div class="modal" tabindex="-1" role="dialog" id="search-message-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">チャットメッセージの検索</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>検索ワードを入力してください。</p>
+                <p>空欄の状態で検索すると、すべてのメッセージが表示されます。</p>
+                <form action="{% url 'chat:chat_room' room.pk %}", method="GET" id="search-message-form">
+                    {{ search_form.search_word }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="search-message-form">検索</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block bodyjs %}
@@ -147,6 +150,7 @@ window.MathJax = {
 (function() {
     let g_socket = undefined;
 
+    // submit function
     $('#message-form').submit(() => {
         const msg = $('#msg').val();
 
@@ -165,19 +169,45 @@ window.MathJax = {
 
         return false;
     });
+
+    // modal function
+    $('.search-message-modal-button').on('click', () => {
+        $('#search-message-modal').modal({
+            backdrop: true,
+            keyboard: true,
+        });
+    });
+    // if modal is shown
+    $('#search-message-modal').on('shown.bs.modal', (e) => {
+        document.querySelector('#{{ search_form.search_word.auto_id }}').focus();
+    });
+    // if modal is hidden
+    $('#search-message-modal').on('hidden.bs.modal', (e) => {
+        document.querySelector('#msg').focus();
+    });
+    // msg setting
     document.querySelector('#msg').focus();
     document.querySelector('#msg').onkeyup = (e) => {
         const enter_key = 13;
 
         // press Ctrl key and Enter key
-        if (e.ctrlKey) {
-            if (e.keyCode === enter_key) {
-                // send message
-                $('#message-form').submit();
-            }
+        if (e.ctrlKey && (e.keyCode === enter_key)) {
+            // send message
+            $('#message-form').submit();
         }
     };
+    // search button setting
+    document.addEventListener('keydown', (e) => {
+        const f_key = 70;
 
+        // press Ctrl key, Shift key and F key
+        if (e.ctrlKey && e.shiftKey && (e.keyCode === f_key)) {
+            // click button
+            $('.search-message-modal-button').click();
+        }
+    });
+
+    // initialization
     const init = () => {
         // create websocket
         const ws_scheme = (window.location.protocol === 'https:' ? 'wss' : 'ws');
@@ -197,7 +227,7 @@ window.MathJax = {
                 user_info = `<span>${receive_data.username}</span>`;
             }
             const datetime = `<time datetime="${receive_data.datetime}">（${receive_data.datetime}）</time>`;
-            const result = `<div class="row"><div class="col-12">${user_info}${datetime}</div></div><div class="row"><div class="col-12">${receive_data.message}</div></div>`;
+            const result = `<div class="row"><div class="col-12">${user_info} ${datetime}</div></div><div class="row"><div class="col-12">${receive_data.message}</div></div>`;
             $(`<div class="card"><div class="card-body">${result}</div></div>`).prependTo('#chat-header');
         };
         g_socket.onclose = (e) => {
