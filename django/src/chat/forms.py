@@ -47,3 +47,25 @@ class RoomForm(forms.ModelForm):
 
         if user is not None:
             self.fields['assigned'].queryset = User.objects.filter(is_superuser=False, is_staff=False).exclude(pk=user.pk)
+
+class MessageSearchForm(forms.Form):
+    """
+    message searching form
+    """
+    search_word = forms.CharField(
+        label=ugettext_lazy('keyword'),
+        required=False,
+        widget=forms.TextInput(
+            attrs={'placeholder': ugettext_lazy('chat message'), 'class': 'form-control'}
+        ),
+    )
+
+    def filtered_queryset(self, queryset):
+        # get search word
+        search_word = self.cleaned_data.get('search_word')
+
+        if search_word:
+            for word in search_word.split():
+                queryset = queryset.filter(name__icontains=word)
+
+        return queryset

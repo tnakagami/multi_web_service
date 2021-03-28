@@ -55,6 +55,30 @@ window.MathJax = {
 {% if user.is_authenticated  %}
 <div class="row justify-content-center">
     <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">チャットメッセージの検索</h5>
+                <form action="", method="GET">
+                    <div class="form-group row">
+                        <div class="col-12">
+                            {{ search_form.search_word }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                            <button type="submit" class="btn btn-primary btn-block">検索</button>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                            <a href="{% url 'chat:chat_room' room.pk %}" class="btn btn-secondary btn-block">全件表示</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-12">
         <div class="row">
             <div class="col-12">
                 <h5 class="h5">チャットメッセージ</h5>
