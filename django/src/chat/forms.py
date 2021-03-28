@@ -66,6 +66,6 @@ class MessageSearchForm(forms.Form):
 
         if search_word:
             for word in search_word.split():
-                queryset = queryset.filter(name__icontains=word)
+                queryset = queryset.filter(content__icontains=word)
 
         return queryset
