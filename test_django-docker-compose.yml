@@ -32,7 +32,7 @@ services:
         # Image name
         image: test_django
         # Container name
-        container_name: test_web
+        container_name: web
         restart: "no"
         # Setup environment variables
         env_file:
