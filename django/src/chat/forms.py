@@ -56,7 +56,7 @@ class MessageSearchForm(forms.Form):
         label=ugettext_lazy('keyword'),
         required=False,
         widget=forms.TextInput(
-            attrs={'placeholder': ugettext_lazy('chat message'), 'class': 'form-control'}
+            attrs={'placeholder': ugettext_lazy('searching chat message'), 'class': 'form-control'}
         ),
     )
 
