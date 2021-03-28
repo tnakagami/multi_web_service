@@ -48,8 +48,8 @@
         {% for room in rooms %}
             <article>
                 <div class="row">
-                    <div class="col-10">
-                        <h2 class="h2 mt-1"><a href="{% url 'chat:chat_room' room.pk %}">{{ room.name }}</a></h2>
+                    <div class="col-8">
+                        <h4 class="h4 mt-1"><a href="{% url 'chat:chat_room' room.pk %}">{{ room.name }}</a></h4>
                         <p>{{ room.description }}</p>
                         <div>
                             {% if room.owner.viewname %}
@@ -60,7 +60,7 @@
                             <time datetime="{{ room.created_at|date:'Y-m-d' }}">（{{ room.created_at|naturaltime }}作成）</time>
                         </div>
                     </div>
-                    <div class="col-2">
+                    <div class="col-4">
                     {% if room.owner.pk == user.pk %}
                             <div class="dropdown mt-2">
                                 <a class="btn btn-outline-secondary btn-block dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
