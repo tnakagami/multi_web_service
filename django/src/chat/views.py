@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse_lazy, reverse
 from django.http import Http404
+from django.db.models import Q
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.core.paginator import Paginator
 from . import models, forms
@@ -22,7 +23,8 @@ class RoomListView(LoginRequiredMixin, ListView):
     context_object_name = 'rooms'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        user = self.request.user
+        queryset = super().get_queryset().filter(Q(owner=user) | Q(assigned__username__iexact=user.username))
         form = forms.RoomSearchForm(self.request.GET or None)
 
         # check form
