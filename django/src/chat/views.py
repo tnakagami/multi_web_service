@@ -31,7 +31,7 @@ class RoomListView(LoginRequiredMixin, ListView):
         if form.is_valid():
             queryset = form.filtered_queryset(queryset)
         # ordering
-        queryset = queryset.order_by('-created_at')
+        queryset = queryset.order_by('-created_at').distinct()
 
         return queryset
 

@@ -93,18 +93,18 @@ class RoomListViewTests(ChatView):
         self.assertTrue('paginator' in response.context.keys())
         _rooms = response.context.get('rooms')
         _paginator = response.context.get('paginator')
-        self.assertEqual(_rooms.count(), 10)
-        self.assertEqual(_paginator.page_range[-1], 2)
+        self.assertEqual(_rooms.count(), 3)
+        self.assertEqual(_paginator.page_range[-1], 1)
 
     def test_chk_pagination(self):
         data = {
-            'page': 2,
+            'page': 1,
         }
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('rooms' in response.context.keys())
         _rooms = response.context.get('rooms')
-        self.assertEqual(_rooms.count(), 4) # 14 % 10: total_rooms_count % paginate_by
+        self.assertEqual(_rooms.count(), 3) # 3 % 10: total_rooms_count % paginate_by
 
     @override_settings(AXES_ENABLED=False)
     def test_no_rooms(self):
@@ -116,14 +116,14 @@ class RoomListViewTests(ChatView):
         _rooms = response.context.get('rooms')
         self.assertEqual(len([room for room in _rooms if room.owner == user]), 0)
 
-    def test_filtered_posts(self):
+    def test_filtered_rooms(self):
         data = {
             'search_word': 'sample',
         }
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         _rooms = response.context.get('rooms')
-        self.assertEqual(_rooms.count(), 3)
+        self.assertEqual(_rooms.count(), 2)
 
 class RoomCreateViewTests(ChatView):
     @override_settings(AXES_ENABLED=False)
