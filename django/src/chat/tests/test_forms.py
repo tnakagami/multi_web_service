@@ -1,6 +1,6 @@
 from unittest import mock
 from django.test import TestCase
-from registration.tests.factories import UserFactory
+from registration.tests.factories import UserFactory, UserModel
 from chat.tests.factories import RoomFactory, MessageFactory
 from chat import models, forms
 
@@ -12,6 +12,7 @@ class ChatForm(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.users = UserFactory.create_batch(5)
+        cls.not_active_user = UserFactory(username='not_active', is_active=False)
         u_pk = [_user.pk for _user in cls.users]
         cls.rooms = [
             (RoomFactory.create(owner=cls.users[0]), RoomFactory.create(owner=cls.users[0], name='sample_a', assigned=[u_pk[1], u_pk[2]]), ),          # invalid: user[3], user[4]
@@ -140,6 +141,9 @@ class RoomFormTests(ChatForm):
 
         for idx in [0, 1, 2, 4]:
             _ = _queryset.get(pk=self.users[idx].pk)
+
+        with self.assertRaises(UserModel.DoesNotExist):
+            _ = _queryset.get(pk=self.not_active_user.pk)
 
 class MessageSearchFormTests(ChatForm):
     @classmethod

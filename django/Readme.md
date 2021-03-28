@@ -39,3 +39,14 @@ django-admin.py makemessages -l ja
 # edit .po files
 django-admin.py compilemessages
 ```
+
+## Set Time Zone for AXES
+In MySQL container, let's run following command to set time zone.
+
+```bash
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -D mysql -u root -proot_password # Must not set space between "-p" and "root_password".
+#
+# please wait for few minutes ...
+#
+mysql -u root -proot_password -e "flush tables;" mysql # if this command succeeded, no message is displayed.
+```

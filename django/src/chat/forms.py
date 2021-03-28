@@ -46,7 +46,7 @@ class RoomForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if user is not None:
-            self.fields['assigned'].queryset = User.objects.filter(is_superuser=False, is_staff=False).exclude(pk=user.pk)
+            self.fields['assigned'].queryset = User.objects.filter(is_staff=False, is_active=True).exclude(pk=user.pk)
 
 class MessageSearchForm(forms.Form):
     """

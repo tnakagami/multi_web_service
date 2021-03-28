@@ -25,4 +25,4 @@ class UserFilter(filters.FilterSet):
     def qs(self):
         queryset = super().qs
 
-        return queryset.filter(is_staff=False).filter(is_active=True)
+        return queryset.filter(is_staff=False, is_active=True)
