@@ -140,6 +140,7 @@ AXES_FAILURE_LIMIT = 11 # failed login counter
 AXES_COOLOFF_TIME = 12  # account lock time
 AXES_META_PRECEDENCE_ORDER = (
     'HTTP_X_FORWARDED_FOR',
+    'REMOTE_ADDR',
 )
 
 # Database
