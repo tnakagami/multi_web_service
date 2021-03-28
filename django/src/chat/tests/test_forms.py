@@ -19,6 +19,12 @@ class ChatForm(TestCase):
             (RoomFactory.create(owner=cls.users[2]), RoomFactory.create(owner=cls.users[2], name='sample_c', assigned=[u_pk[3]]), ),          # invalid: user[0], user[1], user[4]
             (RoomFactory.create(owner=cls.users[3], name='only_user3'), RoomFactory.create(owner=cls.users[3], name='only_c'), ),             # invalid: 0, 1, 2, 4
         ]
+        _room = cls.rooms[0][-1]
+        messages = [
+            (cls.users[0], 'chat'), (cls.users[0], 'sample'), (cls.users[0], 'hello'), (cls.users[0], 'world'), (cls.users[0], 'hello world'), (cls.users[0], 'user0'),
+                                    (cls.users[1], 'sample'),                                                   (cls.users[1], 'hello world'), (cls.users[1], 'user1'),
+        ]
+        cls.messages = [MessageFactory(user=_user, room=_room, content=_msg) for _user, _msg in messages]
 
     @classmethod
     def tearDownClass(cls):
@@ -134,3 +140,61 @@ class RoomFormTests(ChatForm):
 
         for idx in [0, 1, 2, 4]:
             _ = _queryset.get(pk=self.users[idx].pk)
+
+class MessageSearchFormTests(ChatForm):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.model = models.Message
+        cls.form = forms.MessageSearchForm
+
+    def test_form(self):
+        search_word = 'abc'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+
+    def test_chk_returned_queryset_for_search_word_pattern1(self):
+        search_word = 'sample'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+        form.clean()
+        _queryset = form.filtered_queryset(self.model.objects.all())
+        self.assertEqual(_queryset.count(), 2)
+        self.assertEqual(_queryset.filter(user=self.users[0]).count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[1]).count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[2]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[3]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[4]).count(), 0)
+
+    def test_chk_returned_queryset_for_search_word_pattern2(self):
+        search_word = 'hello'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+        form.clean()
+        _queryset = form.filtered_queryset(self.model.objects.all())
+        self.assertEqual(_queryset.count(), 3)
+        self.assertEqual(_queryset.filter(user=self.users[0]).count(), 2)
+        self.assertEqual(_queryset.filter(user=self.users[1]).count(), 1)
+        self.assertEqual(_queryset.filter(user=self.users[2]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[3]).count(), 0)
+        self.assertEqual(_queryset.filter(user=self.users[4]).count(), 0)
+
+    def test_chk_returned_queryset_for_search_word_pattern3(self):
+        search_word = 'not_exist'
+        data = {
+            'search_word': search_word,
+        }
+        form = self.form(data)
+        self.assertTrue(form.is_valid())
+        form.clean()
+        _queryset = form.filtered_queryset(self.model.objects.all())
+        self.assertEqual(_queryset.count(), 0)

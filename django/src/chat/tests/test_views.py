@@ -299,10 +299,16 @@ class ChatRoomDetailViewTests(ChatView):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        _room = cls.rooms[0][-1]
         data = {
-            'pk': cls.rooms[0][-1].pk,
+            'pk': _room.pk,
         }
         cls.url = reverse('chat:chat_room', kwargs=data)
+        messages = [
+            (cls.users[0], 'chat'), (cls.users[0], 'sample'), (cls.users[0], 'hello'), (cls.users[0], 'world'), (cls.users[0], 'hello world'), (cls.users[0], 'user0'),
+                                    (cls.users[1], 'sample'),                                                   (cls.users[1], 'hello world'), (cls.users[1], 'user1'),
+        ]
+        cls.messages = [MessageFactory(user=_user, room=_room, content=_msg) for _user, _msg in messages]
 
     @override_settings(AXES_ENABLED=False)
     def setUp(self):
@@ -373,3 +379,55 @@ class ChatRoomDetailViewTests(ChatView):
         url = reverse('chat:chat_room', kwargs=data)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_search_message_pattern1(self):
+        data = {
+            'search_word': 'sample',
+        }
+        response = self.client.get(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('page_obj' in response.context.keys())
+        _page_obj = response.context['page_obj']
+        self.assertEqual(len(_page_obj), 2)
+        user0_messages = [msg for msg in _page_obj if msg.user.pk == self.users[0].pk]
+        user1_messages = [msg for msg in _page_obj if msg.user.pk == self.users[1].pk]
+        self.assertEqual(len(user0_messages), 1)
+        self.assertEqual(len(user1_messages), 1)
+
+    def test_search_message_pattern2(self):
+        data = {
+            'search_word': 'hello',
+        }
+        response = self.client.get(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('page_obj' in response.context.keys())
+        _page_obj = response.context['page_obj']
+        self.assertEqual(len(_page_obj), 3)
+        user0_messages = [msg for msg in _page_obj if msg.user.pk == self.users[0].pk]
+        user1_messages = [msg for msg in _page_obj if msg.user.pk == self.users[1].pk]
+        self.assertEqual(len(user0_messages), 2)
+        self.assertEqual(len(user1_messages), 1)
+
+    def test_search_message_pattern3(self):
+        data = {
+            'search_word': 'chat',
+        }
+        response = self.client.get(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('page_obj' in response.context.keys())
+        _page_obj = response.context['page_obj']
+        self.assertEqual(len(_page_obj), 1)
+        user0_messages = [msg for msg in _page_obj if msg.user.pk == self.users[0].pk]
+        user1_messages = [msg for msg in _page_obj if msg.user.pk == self.users[1].pk]
+        self.assertEqual(len(user0_messages), 1)
+        self.assertEqual(len(user1_messages), 0)
+
+    def test_search_message_pattern4(self):
+        data = {
+            'search_word': 'not_exist',
+        }
+        response = self.client.get(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('page_obj' in response.context.keys())
+        _page_obj = response.context['page_obj']
+        self.assertEqual(len(_page_obj), 0)

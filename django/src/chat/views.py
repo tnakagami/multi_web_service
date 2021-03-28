@@ -124,8 +124,19 @@ class ChatRoomDetailView(AccessMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # create form
+        form = forms.MessageSearchForm(self.request.GET or None)
+        # get queryset
         messages = models.Message.objects.filter(room=self.object).order_by('-created_at')
+        # check form
+        if form.is_valid():
+            messages = form.filtered_queryset(messages)
+        # ordering
+        messages = messages.order_by('-created_at')
+        # get paginator and page object
         paginator, page_obj = paginate_query(self.request, messages, 20)
+        # set context
+        context['search_form'] = forms.MessageSearchForm(self.request.GET or None)
         context['paginator'] = paginator
         context['page_obj'] = page_obj
 
