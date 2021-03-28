@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-28 15:12+0900\n"
+"POT-Creation-Date: 2021-03-28 21:08+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,33 +31,21 @@ msgid "searching chat message"
 msgstr "検索するチャットメッセージ"
 
 #: chat/models.py:10
-msgid "room_owner"
-msgstr "部屋の所有者"
-
-#: chat/models.py:11
 msgid "name"
 msgstr "部屋の名称"
 
-#: chat/models.py:12
+#: chat/models.py:11
 msgid "description"
 msgstr "概要"
 
-#: chat/models.py:13
-msgid "room_assigned"
-msgstr "割り当てるメンバ"
-
-#: chat/models.py:13
+#: chat/models.py:12
 msgid "assigned users"
 msgstr "割り当てられたメンバ"
 
-#: chat/models.py:14 chat/models.py:33
+#: chat/models.py:13 chat/models.py:32
 msgid "create time"
 msgstr "作成時刻"
 
 #: chat/models.py:31
-msgid "room_meesages"
-msgstr "メッセージに該当する部屋情報"
-
-#: chat/models.py:32
 msgid "content"
 msgstr "チャットメッセージ"

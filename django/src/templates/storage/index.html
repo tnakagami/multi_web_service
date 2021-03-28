@@ -87,7 +87,7 @@
                         <div class="col-8">
                             <ul>
                                 <li>{{ file.filename }}</li>
-                                <li><time datetime="{{ file.created_at|date:'Y-m-d' }}"><font color="gray">作成：{{ file.created_at|date:'Y/m/d H:i:s' }}</font></li>
+                                <li><time datetime="{{ file.created_at|date:'Y-m-d' }}"><font color="gray">作成：{{ file.created_at|date:'Y/m/d H:i:s' }}</font></time></li>
                             </ul>
                         </div>
                         <div class="col-4">
@@ -96,7 +96,7 @@
                                     操作
                                 </a>
 
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                                     <button type="button" class="dropdown-item clip" data-clipboard-text="{{ file.file.url }}">
                                         リンクのコピー
                                     </button>
@@ -118,7 +118,6 @@
                 {% empty %}
                     <p>表示可能なファイルがありません。</p>
                 {% endfor %}
-                </div>
             </div>
         </div>
     </div>

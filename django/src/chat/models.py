@@ -1,16 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy
 
 User = get_user_model()
 
 class Room(models.Model):
-    owner = models.ForeignKey(User, related_name=ugettext_lazy('room_owner'), on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(ugettext_lazy('name'), max_length=64)
     description = models.TextField(ugettext_lazy('description'), max_length=128)
-    assigned = models.ManyToManyField(User, related_name=ugettext_lazy('room_assigned'), verbose_name=ugettext_lazy('assigned users'), blank=True)
+    assigned = models.ManyToManyField(User, related_name='room_assigned', verbose_name=ugettext_lazy('assigned users'), blank=True)
     created_at = models.DateTimeField(ugettext_lazy('create time'), default=timezone.now)
 
     def __str__(self):
@@ -28,7 +27,7 @@ class Room(models.Model):
 
 class Message(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    room = models.ForeignKey(Room, related_name=ugettext_lazy('room_meesages'), on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     content = models.TextField(ugettext_lazy('content'))
     created_at = models.DateTimeField(ugettext_lazy('create time'), default=timezone.now)
 
