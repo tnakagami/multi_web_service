@@ -23,7 +23,7 @@ chmod 755 /data/cron_script.sh
 
 # setup cron
 {
-    cat /data/original.root
+#    cat /data/original.root
     echo '23 1 * * *' "/data/cron_script.sh"
 } > /var/spool/cron/crontabs/root
 
@@ -39,19 +39,5 @@ if [ ! -e ${certs_path}/live/${BASE_DOMAIN_NAME} ]; then
 fi
 
 # start supervisor
-/usr/bin/supervisord -c /data/supervisord/supervisord.conf
 echo "[supervisord]" $(date "+%Y/%m/%d-%H:%M:%S") start
-
-
-
-trap_TERM() {
-    echo "["$(date "+%Y/%m/%d-%H:%M:%S")"]" SIGTERM ACCEPTED
-    exit 0
-}
-
-trap 'trap_TERM' TERM
-
-while :
-do
-    sleep 3
-done
+exec /usr/bin/supervisord -c /data/supervisord/supervisord.conf

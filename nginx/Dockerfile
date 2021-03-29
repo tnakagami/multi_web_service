@@ -10,7 +10,7 @@ RUN    apk --no-cache update \
     && useradd -s /sbin/nologin -M -d /dev/null nginx \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
-    && apk add --no-cache php php-mbstring php-openssl certbot supervisor \
+    && apk add --no-cache php php-mbstring php-openssl certbot supervisor syslog-ng \
     && apk add --no-cache nginx \
     && mkdir -p /static \
     && mkdir -p /etc/letsencrypt \
