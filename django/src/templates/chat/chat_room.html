@@ -154,7 +154,7 @@ window.MathJax = {
     $('#message-form').submit(() => {
         const msg = $('#msg').val();
 
-        if (g_socket && msg) {
+        if (g_socket && msg && msg.match(/\S/g)) {
             const username = '{{ user.username }}';
             const viewname = '{{ user.viewname }}';
 
