@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% load django_bootstrap_breadcrumbs %}
 
+{% block header %}
+<style>
+    .triangle {
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-top: 20px solid black;
+    }
+</style>
+{% endblock %}
+
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Account Info" "registration:detail_account_info" user.pk %}
@@ -38,12 +50,12 @@
                         </tr>
                     </tbody>
                 </table>
+                <hr>
             </div>
         </div>
         {% if not user.is_superuser %}
         <div class="row">
             <div class="col-12">
-                <hr>
                 <h2 class="h2 mt-3">変更操作</h2>
             </div>
         </div>
@@ -60,13 +72,20 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <hr>
-                <h2 class="h2 mt-3">削除操作</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <button type="button" class="btn btn-danger btn-block delete-modal-button">アカウントの削除</button>
+                <div class="accordion" id="AccordionDeleteAccount">
+                    <hr>
+                    <h2 class="h2 mt-3" id="headingDeleteAccount">
+                        削除操作
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#targetDeleteAccount" aria-expanded="false" aria-controls="targetDeleteAccount">
+                                <div class="triangle"></div>
+                        </button>
+                    </h2>
+                    <div id="targetDeleteAccount" class="collapse hide" aria-labelledby="headingDeleteAccount" data-parent="#AccordionDeleteAccount">
+                        <div class="card-body">
+                            <button type="button" class="btn btn-danger btn-block delete-modal-button">アカウントの削除</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         {% endif %}
