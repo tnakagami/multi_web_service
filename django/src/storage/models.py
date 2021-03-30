@@ -15,7 +15,7 @@ def get_filepath(instance, filename):
     extension = str(filename).split('.')[-1]
     hashed_filename = '{}.{}'.format(hashlib.md5(pre_hash_value.encode()).hexdigest(), extension)
 
-    return os.path.join(instance.user.username, hashed_filename)
+    return os.path.join(str(instance.user.id), hashed_filename)
 
 class FileStorage(models.Model):
     # user
