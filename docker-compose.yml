@@ -50,6 +50,7 @@ services:
             - ./staticfiles/static:/static:ro
             - ./staticfiles/storage:/storage
             - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params:ro
+            - ./nginx/htpasswd:/etc/nginx/.htpasswd:ro
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
             - ./syslog-ng.conf:/etc/syslog-ng/conf.d/syslog-ng-extra.conf:ro
 #            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
