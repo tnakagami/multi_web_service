@@ -13,12 +13,20 @@ services:
         # Container name
         container_name: docker_webui
         # Setup port
-        ports :
-            - "9000:9000"
+        expose:
+            - "9000"
         environment:
             APP_VIEW_ONLY: "true"
+            APP_PATH_PREFIX: "/DockerWebUI"
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+        networks:
+            - frontend_bridge
 
     # Setup reverse proxy
     nginx:
@@ -54,8 +62,10 @@ services:
                 max-file: "3"
         links:
             - django
+            - monitoring
         depends_on:
             - django
+            - monitoring
         networks:
             - frontend_bridge
 
