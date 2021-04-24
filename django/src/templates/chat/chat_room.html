@@ -64,6 +64,10 @@ window.MathJax = {
             </div>
         </div>
         <div class="row">
+            <div class="col-12" id="chat-members">
+            </div>
+        </div>
+        <div class="row">
             <div class="col-12 mt-1">
                 <form action="" id="message-form">
                     <textarea placeholder="## メッセージを入力（Markdown形式で入力可能）" id="msg" rows="5" class="form-control"></textarea>
@@ -215,20 +219,54 @@ window.MathJax = {
         const room_pk = '{{ room.pk }}';
         const url = `${ws_scheme}://${hostname}/ws/room/${room_pk}`;
         g_socket = new WebSocket(url);
+
         // message received
         g_socket.onmessage = (e) => {
             const receive_data = JSON.parse(e.data);
-            let user_info;
+            // ユーザ情報の構築
+            const create_user_info = (username, viewname) => {
+                let ret;
 
-            if (receive_data.viewname) {
-                user_info = `<span>${receive_data.viewname} <font color="gray">@${receive_data.username}</font></span>`;
-            }
-            else {
-                user_info = `<span>${receive_data.username}</span>`;
-            }
+                if (viewname) {
+                    ret = `<span>${viewname} <font color="gray">@${username}</font></span>`;
+                }
+                else {
+                    ret = `<span>${username}</span>`;
+                }
+
+                return ret;
+            };
+            // 参加メンバの更新
+            const update_chat_members = (members) => {
+                const arr = [];
+
+                for (const username in members) {
+                    arr.push(create_user_info(username, members[username]));
+                }
+                const num_members = `<label>【参加人数】</label><span>${arr.length}人</span>`;
+                const chat_members = `<label>【参加者】</label>` + arr.join('<span>, </span>');
+                $('#chat-members').html(`${num_members} ${chat_members}`);
+            };
+
+            // 受信したメッセージの処理
+            const user_info = create_user_info(receive_data.username, receive_data.viewname);
             const datetime = `<time datetime="${receive_data.datetime}">（${receive_data.datetime}）</time>`;
             const result = `<div class="row"><div class="col-12">${user_info} ${datetime}</div></div><div class="row"><div class="col-12">${receive_data.message}</div></div>`;
             $(`<div class="card"><div class="card-body">${result}</div></div>`).prependTo('#chat-header');
+
+            // メッセージの種類ごとに処理
+            switch (receive_data.type) {
+                case 'on_message':
+                    break;
+
+                case 'connect':
+                case 'disconnect':
+                    update_chat_members(receive_data.members);
+                    break;
+
+                default:
+                    break;
+            }
         };
         g_socket.onclose = (e) => {
             ;
