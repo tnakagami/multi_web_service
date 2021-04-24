@@ -45,3 +45,15 @@
 </div>
 {% endif %}
 {% endblock %}
+{% block bodyjs %}
+<script>
+(function () {
+    // Bootstrap Dual Listboxの設定
+    $('.dual-listbox').bootstrapDualListbox({
+        nonSelectedListLabel: '関連しない項目',
+        selectedListLabel: '関連する項目',
+        preserveSelectionOnMove: 'moved',
+    });
+}());
+</script>
+{% endblock %}

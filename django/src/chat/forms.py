@@ -34,10 +34,8 @@ class RoomForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': ugettext_lazy('room name'), 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 5, 'cols': 10, 'style':'resize:none;', 'class': 'form-control',}),
-            'assigned': forms.CheckboxSelectMultiple(attrs={
-                'data-toggle': 'toggle',
-                'data-onstyle': 'primary',
-                'data-offstyle': 'secondary',
+            'assigned': forms.SelectMultiple(attrs={
+                'class': 'dual-listbox',
             }),
         }
 
