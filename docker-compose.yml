@@ -45,6 +45,8 @@ services:
             - "443:443"
         env_file:
             - env_file/nginx/.env
+        environment:
+            DEVELOP_MODE: "TRUE"
         volumes:
             - certs:/etc/letsencrypt
             - ./staticfiles/static:/static:ro
@@ -53,9 +55,7 @@ services:
             - ./nginx/htpasswd:/etc/nginx/.htpasswd:ro
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
             - ./syslog-ng.conf:/etc/syslog-ng/conf.d/syslog-ng-extra.conf:ro
-#            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-            - ./nginx/for_development/develop_default.conf:/etc/nginx/conf.d/default.conf:ro  # for development
-            - ./nginx/for_development/develop_execute.sh:/execute.sh:ro                       # for development
+            - ./nginx/default.template:/etc/nginx/template/default.template:ro
         logging:
             driver: "json-file"
             options:

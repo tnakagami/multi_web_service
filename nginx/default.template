@@ -26,19 +26,15 @@ gzip_types text/plain text/css application/javascript application/json applicati
 # HTTP 1.1 support
 proxy_http_version 1.1;
 proxy_buffering off;
-proxy_set_header Host $http_host;
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection $proxy_connection;
-proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#proxy_set_header X-Forwarded-Proto https;
 proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
 proxy_set_header X-Forwarded-Ssl $proxy_x_forwarded_ssl;
 proxy_set_header X-Forwarded-Port $proxy_x_forwarded_port;
 # Mitigate httpoxy attack (see README for details)
 proxy_set_header Proxy "";
 
-upstream web_service {
+upstream web_service_backend {
     ip_hash;
     server django:8081;
 }
@@ -60,11 +56,24 @@ server {
     error_log /dev/null crit;
     return 503;
 }
+server {
+    server_name _; # This is just an invalid value which will never trigger on a real hostname.
+    listen 443 ssl http2;
+    access_log off;
+    error_log /dev/null crit;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_tickets off;
+    ssl_certificate /etc/nginx/default_certs/default.crt;
+    ssl_certificate_key /etc/nginx/default_certs/default.key;
+    ssl_dhparam /etc/nginx/default_certs/dhparam.pem;
+    return 503;
+}
 
 server {
-    ### for development
-    server_name _;
-    ### end development
+    server_name ${VHOST_NAME};
     listen 443 ssl http2;
     access_log /dev/stdout main;
     error_log /dev/stderr error;
@@ -74,11 +83,15 @@ server {
     ssl_prefer_server_ciphers on;
     ssl_session_timeout 5m;
     ssl_session_tickets off;
-    ### for development
-    ssl_certificate /etc/nginx/default_certs/default.crt;
-    ssl_certificate_key /etc/nginx/default_certs/default.key;
+    ssl_certificate     ${SSL_CERT_PATH};
+    ssl_certificate_key ${SSL_CERTKEY_PATH};
     ssl_dhparam /etc/nginx/default_certs/dhparam.pem;
-    ### end development
+    ssl_stapling on;
+    ssl_stapling_verify ${SSL_STAPLING_VERIFY};
+    ssl_trusted_certificate ${SSL_TRUSTED_CERTIFICATE_PATH};
+    resolver 8.8.4.4 8.8.8.8 valid=300s;
+    resolver_timeout 15s;
+    add_header Strict-Transport-Security "max-age=31536000" always;
     client_max_body_size 32M;
 
     location /static/ {
@@ -89,7 +102,7 @@ server {
     }
 
     location / {
-        uwsgi_pass web_service;
+        uwsgi_pass web_service_backend;
         include /etc/nginx/uwsgi_params;
 
         proxy_redirect off;
