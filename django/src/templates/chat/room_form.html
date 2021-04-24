@@ -39,3 +39,15 @@
 </div>
 {% endif %}
 {% endblock %}
+{% block bodyjs %}
+<script>
+(function () {
+    // Bootstrap Dual Listboxの設定
+    $('.dual-listbox').bootstrapDualListbox({
+        nonSelectedListLabel: '許可しないユーザ',
+        selectedListLabel: '許可するユーザ',
+        preserveSelectionOnMove: 'moved',
+    });
+}());
+</script>
+{% endblock %}

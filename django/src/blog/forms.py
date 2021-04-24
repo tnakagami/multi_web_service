@@ -87,21 +87,19 @@ class PostForm(forms.ModelForm):
         model = models.Post
         fields = ('title', 'text', 'tags', 'relation_posts', 'is_public', 'description', 'keywords')
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'title': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
             'text': widgets.UploadableTextarea(attrs={
                 'placeholder': ugettext_lazy('Markdown support\n\n## Introduction\nThis is sample text.'),
                 'rows': 20, 'cols': 10, 'style': 'resize:none;',
                 'class': 'form-control',
             }),
-            'tags': forms.CheckboxSelectMultiple(attrs={
-                'data-toggle': 'toggle',
-                'data-onstyle': 'primary',
-                'data-offstyle': 'secondary',
+            'tags': forms.SelectMultiple(attrs={
+                'class': 'dual-listbox',
             }),
-            'relation_posts': forms.CheckboxSelectMultiple(attrs={
-                'data-toggle': 'toggle',
-                'data-onstyle': 'primary',
-                'data-offstyle': 'secondary',
+            'relation_posts': forms.SelectMultiple(attrs={
+                'class': 'dual-listbox',
             }),
             'is_public': forms.CheckboxInput(attrs={
                 'data-toggle': 'toggle',
@@ -110,8 +108,12 @@ class PostForm(forms.ModelForm):
                 'data-on': 'Public',
                 'data-off': 'Private',
             }),
-            'description': forms.Textarea(attrs={'rows': 5, 'cols': 10, 'style':'resize:none;', 'class': 'form-control',}),
-            'keywords': forms.TextInput(attrs={'placeholder': ugettext_lazy('keyword'), 'class': 'form-control',}),
+            'description': forms.Textarea(attrs={
+                'rows': 5, 'cols': 10, 'style':'resize:none;', 'class': 'form-control',
+            }),
+            'keywords': forms.TextInput(attrs={
+                'placeholder': ugettext_lazy('keyword'), 'class': 'form-control',
+            }),
         }
 
     def __init__(self, *args, **kwargs):
