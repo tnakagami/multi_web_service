@@ -98,7 +98,10 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                                     <button type="button" class="dropdown-item clip" data-clipboard-text="{{ file.file.url }}">
-                                        リンクのコピー
+                                        リンクをクリップボードにコピー
+                                    </button>
+                                    <button type="button" class="dropdown-item clip" data-clipboard-text="![{{ file.filename }}]({{ file.file.url }})">
+                                        Markdown形式でリンクをクリップボードにコピー
                                     </button>
                                     <button type="button" class="dropdown-item update-filename-modal-button" data-updatefilenameurl="{% url 'storage:update_filename' file.pk %}">
                                         ファイル名の更新
@@ -225,6 +228,7 @@
         $('#toast-failed').toast('show');
     });
 
+    // アップロード対象のファイルが指定されたときの処理
     $('.custom-file-input').on('change', function () {
         const fileName = $(this).val().split('\\').pop();
         $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
