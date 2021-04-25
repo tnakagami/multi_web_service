@@ -223,7 +223,7 @@ window.MathJax = {
         // message received
         g_socket.onmessage = (e) => {
             const receive_data = JSON.parse(e.data);
-            // ユーザ情報の構築
+            // create user information
             const create_user_info = (username, viewname) => {
                 let ret;
 
@@ -236,7 +236,7 @@ window.MathJax = {
 
                 return ret;
             };
-            // 参加メンバの更新
+            // update members
             const update_chat_members = (members) => {
                 const arr = [];
 
@@ -248,18 +248,21 @@ window.MathJax = {
                 $('#chat-members').html(`${num_members} ${chat_members}`);
             };
 
-            // 受信したメッセージの処理
+            // processing for received message
             const user_info = create_user_info(receive_data.username, receive_data.viewname);
             const datetime = `<time datetime="${receive_data.datetime}">（${receive_data.datetime}）</time>`;
             const result = `<div class="row"><div class="col-12">${user_info} ${datetime}</div></div><div class="row"><div class="col-12">${receive_data.message}</div></div>`;
             $(`<div class="card"><div class="card-body">${result}</div></div>`).prependTo('#chat-header');
 
-            // メッセージの種類ごとに処理
+            // processing for each message type
             switch (receive_data.type) {
                 case 'on_message':
                     break;
 
                 case 'connect':
+                    update_chat_members(receive_data.members);
+                    break;
+
                 case 'disconnect':
                     update_chat_members(receive_data.members);
                     break;
