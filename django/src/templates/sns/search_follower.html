@@ -33,11 +33,13 @@
             <tbody>
                 {% for target in filter.qs|ignored_userpk:user.pk %}
                 <tr>
+                    {% with relationships|filtered_follower:user.pk|filtered_owner:target.pk|get_first_element as followed_user %}
                     {% if target.viewname %}
-                    <td>{{ target.viewname }} <font color="gray">@{{ target.username }}</td>
+                    <td>{{ target.viewname }} <font color="gray">@{{ target.username }}</font>{% if followed_user %}（フォローされています）{% endif %}</td>
                     {% else %}
-                    <td>{{ target.username }}</td>
+                    <td>{{ target.username }}{% if followed_user %}（フォローされています）{% endif %}</td>
                     {% endif %}
+                    {% endwith %}
                     {% with relationships|filtered_follower:target.pk|filtered_owner:user.pk|get_first_element as exact_relation %}
                     <td>
                         {% if exact_relation %}

@@ -13,7 +13,7 @@ def get_filepath(instance, filename):
     current_time = datetime.now()
     pre_hash_value = '{}{}{}'.format(instance.user.id, filename, current_time)
     extension = str(filename).split('.')[-1]
-    hashed_filename = '{}.{}'.format(hashlib.md5(pre_hash_value.encode()).hexdigest(), extension)
+    hashed_filename = '{}.{}'.format(hashlib.md5(pre_hash_value.encode()).hexdigest(), extension.lower())
 
     return os.path.join(str(instance.user.id), hashed_filename)
 
