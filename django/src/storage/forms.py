@@ -40,7 +40,9 @@ class UploadFileForm(forms.ModelForm):
         # create model instance
         instance = super().save(commit=False)
         # update filename in model instance
-        instance.filename = os.path.basename(file.name)
+        filename = os.path.basename(file.name)
+        name, extension = filename.split('.')
+        instance.filename = '{}.{}'.format(name, extension.lower())
 
         if commit:
             instance.save()
