@@ -22,8 +22,9 @@ class TimeLineView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         user_pk = self.request.user.pk
-        relationship = [element['follower_id'] for element in models.Relationship.objects.filter(owner__pk=user_pk).values()]
-        queryset = models.Tweet.objects.filter(Q(user__pk=user_pk) | Q(user__pk__in=relationship))
+        follower_relationship = [element['follower_id'] for element in models.Relationship.objects.filter(owner__pk=user_pk).values()]
+        follow_relationship = [element['owner_id'] for element in models.Relationship.objects.filter(follower__pk=user_pk).values()]
+        queryset = models.Tweet.objects.filter(Q(user__pk=user_pk) | Q(user__pk__in=follower_relationship) | Q(user__pk__in=follow_relationship))
         kwargs['tweets'] = queryset.order_by('-created')
 
         return super().get_context_data(**kwargs)
