@@ -12,9 +12,10 @@ class RoomSearchForm(forms.Form):
     search_word = forms.CharField(
         label=ugettext_lazy('keyword'),
         required=False,
-        widget=forms.TextInput(
-            attrs={'placeholder': ugettext_lazy('room name'), 'class': 'form-control'}
-        ),
+        widget=forms.TextInput(attrs={
+            'placeholder': ugettext_lazy('room name'),
+            'class': 'form-control',
+        }),
     )
 
     def filtered_queryset(self, queryset):
@@ -32,8 +33,13 @@ class RoomForm(forms.ModelForm):
         model = models.Room
         fields = ('name', 'description', 'assigned')
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': ugettext_lazy('room name'), 'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'rows': 5, 'cols': 10, 'style':'resize:none;', 'class': 'form-control',}),
+            'name': forms.TextInput(attrs={
+                'placeholder': ugettext_lazy('room name'),
+                'class': 'form-control'
+            }),
+            'description': forms.Textarea(attrs={
+                'rows': 5, 'cols': 10, 'style':'resize:none;', 'class': 'form-control',
+            }),
             'assigned': forms.SelectMultiple(attrs={
                 'class': 'dual-listbox',
             }),
@@ -53,9 +59,10 @@ class MessageSearchForm(forms.Form):
     search_word = forms.CharField(
         label=ugettext_lazy('keyword'),
         required=False,
-        widget=forms.TextInput(
-            attrs={'placeholder': ugettext_lazy('searching chat message'), 'class': 'form-control'}
-        ),
+        widget=forms.TextInput(attrs={
+            'placeholder': ugettext_lazy('searching chat message'),
+            'class': 'form-control',
+        }),
     )
 
     def filtered_queryset(self, queryset):

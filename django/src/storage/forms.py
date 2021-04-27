@@ -7,7 +7,9 @@ import os
 class UploadFileForm(forms.ModelForm):
     file = forms.FileField(
         label=ugettext_lazy('upload file'),
-        widget=forms.FileInput(attrs={'class': 'custom-file-input'}),
+        widget=forms.FileInput(attrs={
+            'class': 'custom-file-input'
+        }),
     )
 
     class Meta:
@@ -56,9 +58,10 @@ class FileSearchForm(forms.Form):
     search_word = forms.CharField(
         label=ugettext_lazy('filename'),
         required=True,
-        widget=forms.TextInput(
-            attrs={'placeholder': ugettext_lazy('filename'), 'class': 'form-control'}
-        ),
+        widget=forms.TextInput(attrs={
+            'placeholder': ugettext_lazy('filename'),
+            'class': 'form-control',
+        }),
     )
 
     def filtered_queryset(self, queryset):
@@ -75,9 +78,10 @@ class FilenameUpdateForm(forms.ModelForm):
     filename = forms.CharField(
         label=ugettext_lazy('new filename'),
         required=True,
-        widget=forms.TextInput(
-            attrs={'placeholder': ugettext_lazy('new filename'), 'class': 'form-control'}
-        ),
+        widget=forms.TextInput(attrs={
+            'placeholder': ugettext_lazy('new filename'),
+            'class': 'form-control',
+        }),
     )
 
     class Meta:
