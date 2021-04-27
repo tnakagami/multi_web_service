@@ -13,9 +13,10 @@ class PostSearchForm(forms.Form):
     search_word = forms.CharField(
         label=ugettext_lazy('keyword'),
         required=False,
-        widget=forms.TextInput(
-            attrs={'placeholder': ugettext_lazy('keyword (target: title, text, keywords)'), 'class': 'form-control'}
-        ),
+        widget=forms.TextInput(attrs={
+            'placeholder': ugettext_lazy('keyword (target: title, text, keywords)'),
+            'class': 'form-control',
+        }),
     )
     tags = forms.ModelMultipleChoiceField(
         label=ugettext_lazy('filtered by tag'),
@@ -53,9 +54,10 @@ class TagSearchForm(forms.Form):
     search_word = forms.CharField(
         label=ugettext_lazy('keyword'),
         required=False,
-        widget=forms.TextInput(
-            attrs={'placeholder': ugettext_lazy('keyword'), 'class': 'form-control'}
-        ),
+        widget=forms.TextInput(attrs={
+            'placeholder': ugettext_lazy('keyword'),
+            'class': 'form-control',
+        }),
     )
 
     def filtered_queryset(self, queryset):

@@ -15,12 +15,10 @@ def markdown2html(text):
 
     return mark_safe(html)
 
-
 class EscapeHtml(Extension):
     def extendMarkdown(self, md):
         md.preprocessors.deregister('html_block')
         md.inlinePatterns.deregister('html')
-
 
 @register.filter
 def markdown2html_with_escape(text):

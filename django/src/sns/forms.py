@@ -13,7 +13,9 @@ class CreateTweetForm(forms.ModelForm):
         model = models.Tweet
         fields = ('text', )
         widgets = {
-            'text': forms.Textarea(attrs={'rows': 4, 'cols': 15, 'style':'resize:none;'})
+            'text': forms.Textarea(attrs={
+                'rows': 4, 'cols': 15, 'style':'resize:none;'
+            })
         }
 
     def __init__(self, *args, **kwargs):
