@@ -83,7 +83,7 @@
         </div>
         {% else %}
         <div class="col-12">
-            上記のリンクからログインしてください。
+            <a href="{% url 'deep_learning:index' %}" class="btn btn-outline-primary btn-block" target="_self">深層学習入門</a>
         </div>
         {% endif %}
     {% endif %}

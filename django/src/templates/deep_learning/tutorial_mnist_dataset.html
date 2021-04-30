@@ -1,0 +1,708 @@
+{% extends 'deep_learning/breadcrumbs_deep_learning.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load static %}
+
+{% block header %}
+{# code syntax #}
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/dracula.min.css">
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "MNISTのデータセットを用いた手書き文字認識" "deep_learning:tutorial_mnist_dataset" %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-1">
+    <div class="col-12">
+        <div class="row mt-2">
+            <div class="col-12">
+                <h1 class="h1 mt-2">深層学習入門</h1>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 class="h4 mt-2 border-bottom">目次</h4>
+                <ul>
+                    <li class="tableofcontents_list">
+                        <a href="#abstract" target="_self">実施内容と狙い</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#result_of_handwriting_recognition" target="_self">実行結果一覧</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#download_mnist_dataset" target="_self">MNISTデータセットのダウンロード</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#load_show_mnist_dataset" target="_self">MNISTデータセットの読み込みと表示</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#classification" target="_self">sklearn-kitを利用した手書き文字認識</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="{% url 'deep_learning:index' %}" target="_self">深層学習入門のトップに戻る</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="abstract" class="h4 mt-2 border-bottom">実施内容と狙い</h4>
+                <p>
+                    ここでは、sklearn-kitと呼ばれる機械学習フレームワークを用いて、
+                    手書き文字の画像を読み込み、その画像に描かれている文字の識別を行う（分類問題）。
+                </p>
+                <p>
+                    今回は、手書き文字の認識を行う際に以下の2つの手法を用いる。
+                    <ul>
+                        <li>SVM（サポートベクトルマシン）</li>
+                        <li>MLP（多層パーセプトロン）</li>
+                    </ul>
+                    SVMは、凸2次計画問題として定式化され、目的関数の最適解が大域的最適解となることから広く用いられている手法である。また、MLPは、DeepLearningの基礎となっている手法である。
+                    ここでは、分類対象のデータの調査、SVMとMLPの実装を通して、機械学習を用いた問題解決の方法を体験する。また、ユーザが決めるパラメータ（ハイパーパラメータ）についての理解を深める。必要に応じて専門書を参照してほしい。
+                </p>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="result_of_handwriting_recognition" class="h4 mt-2 border-bottom">実行結果一覧</h4>
+                <p>
+                    結果だけ見たい人のために、分類結果を以下に示す。
+                </p>
+                <p>
+                    <a href="{% url 'deep_learning:handwriting_recognition' %}" class="btn btn-primary btn-md btn-block">手書き文字認識の分類結果</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="download_mnist_dataset" class="h4 mt-2 border-bottom">MNISTデータセットのダウンロード</h4>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        分類問題を解く上で、分類対象のデータセットが必要となる。ここでは、MNISTデータセットを用いる。ダウンロードの対象は、<a href="http://yann.lecun.com/exdb/mnist/" target="_blank">MNISTデータセット</a>にある以下の4つのファイルとなる。
+                        <ul>
+                            <li>train-images-idx3-ubyte.gz</li>
+                            <li>train-labels-idx1-ubyte.gz</li>
+                            <li>t10k-images-idx3-ubyte.gz</li>
+                            <li>t10k-labels-idx1-ubyte.gz</li>
+                        </ul>
+                        <div class="row mt-2">
+                            <div class="col-10">
+                                これらのファイルを「~/work/mnistdataset」以下に保存する。（作業ディレクトリ以下にmnistdatasetディレクトリを作成し、そこに保存する。）自分でダウンロードするのが面倒な人は、以下のPythonスクリプトを実行する。
+                            </div>
+                            <div class="col-2">
+                                <button class="clip btn-primary btn-block" data-clipboard-target="#download-mnist-dataset-script">copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <pre><code id="download-mnist-dataset-script">import os
+import urllib.request as urlreq
+
+# 保存するディレクトリ名
+output_dir = 'mnistdataset'
+# 保存対象
+dataset_files = {
+    'train-images-idx3-ubyte.gz': 'http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz',
+    'train-labels-idx1-ubyte.gz': 'http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz',
+    't10k-images-idx3-ubyte.gz': 'http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz',
+    't10k-labels-idx1-ubyte.gz': 'http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz',
+}
+
+# ディレクトリの存在確認
+if not os.path.exists(output_dir):
+    # 存在しない場合は作成
+    print('Create {} directory'.format(output_dir))
+    os.mkdir(output_dir)
+# 対象のファイルをダウンロード
+for filename, download_url in dataset_files.items():
+    save_filepath = os.path.join(output_dir, filename)
+    print('Please wait ...')
+    urlreq.urlretrieve(download_url, save_filepath)
+    print('Done ({})'.format(save_filepath))
+print('Complete')</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="load_show_mnist_dataset" class="h4 mt-2 border-bottom">MNISTデータセットの読み込みと表示</h4>
+                <p>
+                    以降の処理は、Jupyter Notebookで行うものとする。
+                </p>
+
+                <h5 class="mt-2 border-bottom">■MNISTデータセットの読み込み</h5>
+                <div class="row mt-2">
+                    <div class="col-10">
+                        以下のPythonスクリプトを実行し、MNISTデータセットを読み込むためのクラスを作成する。
+                    </div>
+                    <div class="col-2">
+                        <button class="clip btn-primary btn-block" data-clipboard-target="#read-mnist-dataset-script">copy</button>
+                    </div>
+                </div>
+                <p>
+                    <pre><code id="read-mnist-dataset-script">import gzip
+import numpy as np
+import os
+
+class LoadMnistDataset():
+    def __init__(self):
+        # データディレクトリ定義
+        self.__data_dir = 'mnistdataset'
+        # データセット定義
+        self.__dataset = {
+            'image_train': os.path.join(self.__data_dir, 'train-images-idx3-ubyte.gz'), # 学習用画像データ
+            'label_train': os.path.join(self.__data_dir, 'train-labels-idx1-ubyte.gz'), # 学習用ラベルデータ
+            'image_test':  os.path.join(self.__data_dir, 't10k-images-idx3-ubyte.gz'),  # テスト用画像データ
+            'label_test':  os.path.join(self.__data_dir, 't10k-labels-idx1-ubyte.gz'),  # テスト用ラベルデータ
+        }
+
+    def __load_label(self, filename):
+        """ラベルデータの読み込み
+
+        Parameters
+        ----------
+        filename : str
+            読み込むラベルデータのファイル名（.gz）
+
+        Returns
+        -------
+        labels : ndarray
+            ラベルデータ
+        """
+        with gzip.open(filename, 'rb') as fin:
+            # ラベルデータは先頭8byteを読み飛ばす
+            labels = np.frombuffer(fin.read(), np.uint8, offset=8)
+        return labels
+
+    def __load_image(self, filename):
+        """画像データの読み込み
+
+        Parameters
+        ----------
+        filename : str
+            読み込む画像データのファイル名（.gz）
+
+        Returns
+        -------
+        images : ndarray
+            画像データ
+        """
+        with gzip.open(filename, 'rb') as fin:
+            # 画像データは先頭16byteを読み飛ばす
+            images = np.frombuffer(fin.read(), np.uint8, offset=16)
+        return images
+
+    def load_dataset(self):
+        """データセットを読み込む
+
+        Returns
+        -------
+        ret_data : dict
+            キーにデータ名、値にndarray型の読み込んだデータセットの
+            値を保持する辞書
+        """
+        ret_data = {}
+        ret_data['image_train'] = self.__load_image(self.__dataset['image_train'])
+        ret_data['label_train'] = self.__load_label(self.__dataset['label_train'])
+        ret_data['image_test'] = self.__load_image(self.__dataset['image_test'])
+        ret_data['label_test'] = self.__load_label(self.__dataset['label_test'])
+        return ret_data</code></pre>
+                </p>
+                <div class="row mt-2">
+                    <div class="col-10">
+                        以下のPythonスクリプトを実行し、メモリ上にMNISTデータセットを読み込む。
+                    </div>
+                    <div class="col-2">
+                        <button class="clip btn-primary btn-block" data-clipboard-target="#load-mnist-dataset-script">copy</button>
+                    </div>
+                </div>
+                <p>
+                    <pre><code id="load-mnist-dataset-script">load_mnist_dataset = LoadMnistDataset()
+mnist_dataset = load_mnist_dataset.load_dataset()</code></pre>
+                </p>
+
+                <h5 class="h5 mt-2 border-bottom">■MNISTデータセットの表示</h5>
+                <div class="row mt-2">
+                    <div class="col-10">
+                        以下のPythonスクリプトを実行し、読み込んだMNISTデータセットの最初の20個を表示する。
+                    </div>
+                    <div class="col-2">
+                        <button class="clip btn-primary btn-block" data-clipboard-target="#show-mnist-data-script">copy</button>
+                    </div>
+                </div>
+                <p>
+                    <pre><code id="show-mnist-data-script">%matplotlib inline
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
+px_size = 28
+x_train = mnist_dataset['image_train'].reshape(-1, px_size * px_size)
+for i in np.arange(20):
+    plt.subplot(4, 5, i + 1)
+    plt.imshow(x_train[i, :].reshape(px_size, px_size), cmap=cm.gray)</code></pre>
+                    実行すると以下の結果が得られる。
+                </p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/mnist_dataset/00_handfig20.png' %}" data-title="手書き文字" data-caption="20個の手書き文字">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/mnist_dataset/00_handfig20.png' %}" alt="手書き文字">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="classification" class="h4 mt-2 border-bottom">sklearn-kitを利用した手書き文字認識</h4>
+                <p>
+                    以降の処理は、Jupyter Notebookで行うものとする。
+                </p>
+
+                <h5 class="h5 mt-2 border-bottom">■MNISTデータセットの可視化</h5>
+                <p>
+                    一般的に、対象とするデータについて確認せず、いきなり分類を実施することはない。このため、まずは、主成分分析を用いて分類対象のデータの傾向を見る。データを読み込んでいない人は、以下のスクリプトを実行しておくこと。
+                    <pre><code># 実行していない人のみ実施
+load_mnist_dataset = LoadMnistDataset()
+mnist_dataset = load_mnist_dataset.load_dataset()</code></pre>
+                </p>
+                <p>
+                    手書き文字は28(px) x 28(px)の784次元のデータを持つ。このままではデータの内容を把握できないため、主成分分析を用いて次元圧縮を行う。
+                </p>
+
+                <div class="row mt-2">
+                    <div class="col-10">
+                        sklearnのPCAを用いて次元圧縮を行い、データをプロットするPythonスクリプトを以下に示す。ここで、画像の輝度値をムラを吸収するため、正規化を行う。
+                    </div>
+                    <div class="col-2">
+                        <button class="clip btn-primary btn-block" data-clipboard-target="#preprocess-mnist-dataset-script">copy</button>
+                    </div>
+                </div>
+                <p>
+                    <pre><code id="preprocess-mnist-dataset-script">%matplotlib inline
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.decomposition import PCA
+
+# 正規化用のインスタンスを生成
+mmsc = MinMaxScaler()
+# 画像サイズ
+px_size = 28
+# 圧縮対象のデータを用意
+x_train = mnist_dataset['image_train'].reshape(-1, px_size * px_size)
+# 正規化
+x_train = mmsc.fit_transform(x_train.astype(float))
+# 対応するラベルデータの取得
+t_train = mnist_dataset['label_train']
+
+# =================
+# 主成分分析（PCA）
+# =================
+# 2次元のデータに圧縮
+comp_num = 2
+# PCAクラスのインスタンスを生成
+pca = PCA(n_components=comp_num)
+# PCAの実行
+pca.fit(x_train)
+
+# ==========
+# 結果の描画
+# ==========
+# フォントサイズの指定
+plt.rcParams['font.size'] = 18
+
+# 重ね書き準備
+fig = plt.figure(figsize=(12.8, 7.2))
+ax = fig.add_subplot(1,1,1)
+
+# タイトル
+ax.set_title('MNIST DATASET')
+ax.set_xlabel('first component')
+ax.set_ylabel('second component')
+# マーカーサイズ
+marker_size = 15
+# 透明度（0: 透明、1: 不透明）
+alpha = 0.5
+
+# 得られた固有ベクトルを用いて、0〜9の数字を順に固有空間に射影
+for num in np.arange(10):
+    # 対象の数値に合致する配列のインデックスを取得
+    target_label_idx = np.where(t_train == num)[0]
+    # インデックスに対応する画像データの取得
+    target_image_data = x_train[target_label_idx]
+    # 固有空間に射影
+    prj_image = pca.transform(target_image_data)
+    # 散布図として描画
+    ax.scatter(prj_image[:, 0], prj_image[:, 1], s=marker_size, alpha=alpha, label=num)
+# グリッドの描画
+ax.grid(True)
+# 凡例の描画
+ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+# PNGで保存する場合は以下のコメントを外す
+#fig.savefig('out.png', dpi=100, bbox_inches='tight')</code></pre>
+                </p>
+                実行すると以下の結果を得る。実際のところ、2次元ではデータを表現しきれないため、効果としては薄い。
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/mnist_dataset/01_scatter_plot_by_pca_dim2.png' %}" data-title="次元圧縮" data-caption="次元圧縮後のデータ分布">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/mnist_dataset/01_scatter_plot_by_pca_dim2.png' %}" alt="次元圧縮後のデータ分布">
+                </div>
+
+                <h5 class="h5 mt-2 border-bottom">■SVMによる分類</h5>
+                <p>
+                    データの傾向があまり分からない状態であるが、SVMで分類を実施してみる。ここでは、784次元すべてを特徴として線形SVMで分類する。線形SVMは、内部で乱数を利用するため、random_stateを0とする。また、誤分類を減らすため、ハイパーパラメータCは、大きめのキリの良い数値である128.0とする（ヒューリスティックに決める）。
+                    <ul>
+                        <li>random_state: 0</li>
+                        <li>C: 128.0</li>
+                    </ul>
+                    ここで、Cは誤分類をどの程度を許容するかを表すパラメータである。Cは値が小さい程、誤分類を許容する。値が大きい程ハードマージンSVMに近づく。
+                </p>
+                <div class="row mt-2">
+                    <div class="col-10">
+                        線形SVMによる分類を行うPythonスクリプトを以下に示す。
+                    </div>
+                    <div class="col-2">
+                        <button class="clip btn-primary btn-block" data-clipboard-target="#classification-linear-svm-script">copy</button>
+                    </div>
+                </div>
+                <p>
+                    <pre><code id="classification-linear-svm-script">from sklearn.preprocessing import MinMaxScaler
+from sklearn.svm import LinearSVC
+from sklearn import metrics
+
+# 正規化用のインスタンスを生成
+scaler = MinMaxScaler()
+# 画像サイズ
+px_size = 28
+# 学習用データの用意
+x_train = mnist_dataset['image_train'].reshape(-1, px_size * px_size)
+# テスト用データの用意
+x_test = mnist_dataset['image_test'].reshape(-1, px_size * px_size)
+# 正規化
+scaler.fit(x_train.astype(float))
+# 学習用データセットに合わせてスケーリング
+x_train = scaler.transform(x_train.astype(float))
+x_test = scaler.transform(x_test.astype(float))
+# 対応するラベルデータの取得
+t_train = mnist_dataset['label_train']
+t_test = mnist_dataset['label_test']
+
+# =============
+# SVMによる分類
+# =============
+# インスタンス生成
+clf = LinearSVC(C=128.0, random_state=0)
+# SVMで学習
+# 多クラス分類のため、one-hotベクトルを渡す必要があるが、
+# sklearnのSVMは、自動で判断して内部で生成してくれる
+clf.fit(x_train, t_train)
+# テスト用データを入力し分類を実施（クラスラベルの推定）
+predicted_labels = clf.predict(x_test)
+
+# ==============
+# 結果のレポート
+# ==============
+print('Classification report for classifier {}:'.format(clf))
+print('{}'.format(metrics.classification_report(t_test, predicted_labels)))
+print('Confusion matrix:')
+print('{}'.format(metrics.confusion_matrix(t_test, predicted_labels)))</code></pre>
+
+                    結果は以下のようになる。
+                    <table class="table table-bordered table-hover">
+                        <caption>分類結果</caption>
+                        <thead>
+                            <tr>
+                                <th class="align-middle" scope="col">class</th>
+                                <th class="align-middle" scope="col">precision</th>
+                                <th class="align-middle" scope="col">recall</th>
+                                <th class="align-middle" scope="col">f1-score</th>
+                                <th class="align-middle" scope="col">support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="align-middle" scope="row">0</td>
+                                <td class="align-middle" scope="row">0.90</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.94</td>
+                                <td class="align-middle" scope="row">980</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">1</td>
+                                <td class="align-middle" scope="row">0.96</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">1135</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">2</td>
+                                <td class="align-middle" scope="row">0.82</td>
+                                <td class="align-middle" scope="row">0.88</td>
+                                <td class="align-middle" scope="row">0.85</td>
+                                <td class="align-middle" scope="row">1032</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">3</td>
+                                <td class="align-middle" scope="row">0.96</td>
+                                <td class="align-middle" scope="row">0.70</td>
+                                <td class="align-middle" scope="row">0.81</td>
+                                <td class="align-middle" scope="row">1010</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">4</td>
+                                <td class="align-middle" scope="row">0.93</td>
+                                <td class="align-middle" scope="row">0.86</td>
+                                <td class="align-middle" scope="row">0.90</td>
+                                <td class="align-middle" scope="row">982</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">5</td>
+                                <td class="align-middle" scope="row">0.77</td>
+                                <td class="align-middle" scope="row">0.89</td>
+                                <td class="align-middle" scope="row">0.82</td>
+                                <td class="align-middle" scope="row">892</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">6</td>
+                                <td class="align-middle" scope="row">0.96</td>
+                                <td class="align-middle" scope="row">0.88</td>
+                                <td class="align-middle" scope="row">0.92</td>
+                                <td class="align-middle" scope="row">958</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">7</td>
+                                <td class="align-middle" scope="row">0.93</td>
+                                <td class="align-middle" scope="row">0.88</td>
+                                <td class="align-middle" scope="row">0.90</td>
+                                <td class="align-middle" scope="row">1028</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">8</td>
+                                <td class="align-middle" scope="row">0.75</td>
+                                <td class="align-middle" scope="row">0.87</td>
+                                <td class="align-middle" scope="row">0.81</td>
+                                <td class="align-middle" scope="row">974</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">9</td>
+                                <td class="align-middle" scope="row">0.85</td>
+                                <td class="align-middle" scope="row">0.87</td>
+                                <td class="align-middle" scope="row">0.86</td>
+                                <td class="align-middle" scope="row">1009</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">avg / total</td>
+                                <td class="align-middle" scope="row">0.89</td>
+                                <td class="align-middle" scope="row">0.88</td>
+                                <td class="align-middle" scope="row">0.88</td>
+                                <td class="align-middle" scope="row">10000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    平均が9割弱となっている。内訳を見ると、適合率（precision）から5と8の誤分類が目立つ。また、再現率（recall）から3の分類漏れが目立つ。
+                </p>
+
+                <h5 class="h5 mt-2 border-bottom">■MLPによる分類</h5>
+                <p>
+                    ハイパーパラメータの調節を一切していないが、SVMの結果と比較するためにもMLPで分類を実施する。SVMと同様に784次元すべてを特徴として分類する。MLPは、初期の重みベクトルを乱数で決めるため、random_stateを0とする。また、多層にすることで表現能力が向上するため、中間層を入力層側から順に、200、50としたMLPを構築する（ヒューリスティックに決める）。
+                    <ul>
+                        <li>random_state: 0</li>
+                        <li>hidden_layer_sizes: (200, 50)</li>
+                    </ul>
+                    MLPでは、重みベクトルの更新にデフォルトでadamが利用される。今回は、データセットのサイズが大きいため、デフォルト設定で学習する。
+                </p>
+                <div class="row mt-2">
+                    <div class="col-10">
+                        MLPによる分類を行うPythonスクリプトを以下に示す。
+                    </div>
+                    <div class="col-2">
+                        <button class="clip btn-primary btn-block" data-clipboard-target="#classification-mlp-script">copy</button>
+                    </div>
+                </div>
+                <p>
+                    <pre><code id="classification-mlp-script">from sklearn.preprocessing import MinMaxScaler
+from sklearn.neural_network import MLPClassifier
+from sklearn import metrics
+
+# 正規化用のインスタンスを生成
+scaler = MinMaxScaler()
+# 画像サイズ
+px_size = 28
+# 学習用データの用意
+x_train = mnist_dataset['image_train'].reshape(-1, px_size * px_size)
+# テスト用データの用意
+x_test = mnist_dataset['image_test'].reshape(-1, px_size * px_size)
+# 正規化
+scaler.fit(x_train.astype(float))
+# 学習用データセットに合わせてスケーリング
+x_train = scaler.transform(x_train.astype(float))
+x_test = scaler.transform(x_test.astype(float))
+# 対応するラベルデータの取得
+t_train = mnist_dataset['label_train']
+t_test = mnist_dataset['label_test']
+
+# =============
+# MLPによる分類
+# =============
+# インスタンス生成
+clf = MLPClassifier(hidden_layer_sizes=(200, 50), random_state=0)
+# MLPで学習
+clf.fit(x_train, t_train)
+# テスト用データを入力し分類を実施（クラスラベルの推定）
+predicted_labels = clf.predict(x_test)
+
+# ==============
+# 結果のレポート
+# ==============
+print('Classification report for classifier {}:'.format(clf))
+print('{}'.format(metrics.classification_report(t_test, predicted_labels)))
+print('Confusion matrix:')
+print('{}'.format(metrics.confusion_matrix(t_test, predicted_labels)))</code></pre>
+
+                    結果は以下のようになる。
+                    <table class="table table-bordered table-hover">
+                        <caption>分類結果</caption>
+                        <thead>
+                            <tr>
+                                <th class="align-middle" scope="col">class</th>
+                                <th class="align-middle" scope="col">precision</th>
+                                <th class="align-middle" scope="col">recall</th>
+                                <th class="align-middle" scope="col">f1-score</th>
+                                <th class="align-middle" scope="col">support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="align-middle" scope="row">0</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">980</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">1</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">1135</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">2</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">1032</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">3</td>
+                                <td class="align-middle" scope="row">0.94</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.96</td>
+                                <td class="align-middle" scope="row">1010</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">4</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">982</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">5</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">0.96</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">892</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">6</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">958</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">7</td>
+                                <td class="align-middle" scope="row">0.99</td>
+                                <td class="align-middle" scope="row">0.96</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">1028</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">8</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">974</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">9</td>
+                                <td class="align-middle" scope="row">0.96</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.97</td>
+                                <td class="align-middle" scope="row">1009</td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" scope="row">avg / total</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">0.98</td>
+                                <td class="align-middle" scope="row">10000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    精度よく分類できている。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# toastの処理 #}
+<div id="toast-success" class="toast" role="status" aria-live="polite" aria-atomic="true" data-delay="1000" style="position: absolute; top: 1rem; right: 1rem;">
+    <div class="toast-header bg-info text-white">
+        <strong class="mr-auto">ClipboardJS</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body bg-info text-white">
+        クリップボードにコピーしました
+    </div>
+</div>
+<div id="toast-failed" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000" style="position: absolute; top: 1rem; right: 1rem;">
+    <div class="toast-header bg-danger text-white">
+        <strong class="mr-auto">ClipboardJS</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body bg-danger text-white">
+        クリップボードへのコピーに失敗しました
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+(function() {
+    let clipboard = new ClipboardJS('.clip');
+    // 成功時の処理
+    clipboard.on('success', (e) => {
+        $('#toast-success').toast('show');
+        // テキスト選択状態を解除
+        e.clearSelection();
+    });
+    // エラー時の処理
+    clipboard.on('error', (e) => {
+        $('#toast-failed').toast('show');
+    });
+}());
+</script>
+{% endblock %}

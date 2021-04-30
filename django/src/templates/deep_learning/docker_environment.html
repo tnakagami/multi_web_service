@@ -1,0 +1,283 @@
+{% extends 'deep_learning/breadcrumbs_deep_learning.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load static %}
+
+{% block header %}
+{# code syntax #}
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/dracula.min.css">
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Docker環境構築" "deep_learning:docker_environment" %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-1">
+    <div class="col-12">
+        <div class="row mt-2">
+            <div class="col-xs-12">
+                <h1 class="h1 mt-2">深層学習入門</h1>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 class="h4 mt-2 border-bottom">目次</h4>
+                <ul>
+                    <li class="tableofcontents_list">
+                        <a href="#for_windows7" target="_self">Docker環境構築（Window7編）</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#for_windows10" target="_self">Docker環境構築（Window10編）</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#for_Ubuntu" target="_self">Docker環境構築（Ubuntu編）</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#for_Mac" target="_self">Docker環境構築（Mac編）</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="{% url 'deep_learning:index' %}" target="_self">深層学習入門のトップに戻る</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="for_windows7" class="h4 mt-2 border-bottom">Docker環境構築（Window7編）</h4>
+                <p>
+                    Widows7では、Windows上にDocker環境を構築できない。
+                    このため、仮想マシンでLinux環境を構築しLinux環境でDockerを動かすこととなる。
+                </p>
+                <p>
+                    ここでは、Windows環境にVirtual Boxをインストールし、仮想マシンにUbuntu環境を構築する。
+                    Ubuntu環境でのDocker環境構築は「Docker環境構築（Ubuntu編）」を参照のこと。
+                </p>
+
+                <!-- Virtual Boxのダウンロード・インストール -->
+                <h5 class="h5 mt-2 border-bottom">１．Virtual Boxのダウンロード・インストール</h5>
+                <p>64bit版Windowsを利用している場合、<a href="https://www.virtualbox.org/wiki/Downloads" target="_blank">Download
+                        VirtualBox</a>に移動し、VirtualBox 6.0.0 platform packagesの<span style="color: #f00;">「Windows
+                        hosts」</span>をダウンロードする。（2018/01/12現在の最新版）</p>
+                <div class="fullscreen-image"
+                    data-image="{% static 'deeplearning_img/docker_environment/VirtualBox_win64bit.png' %}"
+                    data-title="64bit版Windows" data-caption="64bit版Windows VirtualBox">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/docker_environment/VirtualBox_win64bit.png' %}"
+                        alt="64bit版Windows VirtualBox Download">
+                </div>
+                <p>32bit版Windowsを利用している場合、<a href="https://www.virtualbox.org/wiki/Download_Old_Builds_5_2"
+                        target="_blank">Download VirtualBox (Old Builds): VirtualBox 5.2</a>に移動し、VirtualBox 5.2.22
+                    (released November 09 2018)の<span style="color: #f00;">「Windows
+                        hosts」</span>をダウンロードする。（2018/01/12現在の最新版）</p>
+                <div class="fullscreen-image"
+                    data-image="{% static 'deeplearning_img/docker_environment/VirtualBox_win32bit.png' %}"
+                    data-title="32bit版Windows" data-caption="32bit版Windows VirtualBox">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/docker_environment/VirtualBox_win32bit.png' %}"
+                        alt="32bit版Windows VirtualBox Download">
+                </div>
+                <p>ダウンロード完了後、<a href="https://www.virtualbox.org/manual/ch02.html#installation_windows"
+                        target="_blank">公式のマニュアル</a>を参考にインストールする。</p>
+
+                <!-- Ubuntu環境の構築 -->
+                <h5 class="h5 mt-2 border-bottom">２．Ubuntu環境の構築</h5>
+                <p>ここでは、仮想ハードディスクイメージを利用してUbuntu環境を構築する。</p>
+                <p><a href="https://www.ubuntulinux.jp/download/ja-remix-vhd"
+                        target="_blank">仮想ハードディスクイメージのダウンロード</a>に移動し、<span
+                        style="color: #f00;">「ubuntu-ja-14.04-desktop-amd64-vhd.zip」</span>をダウンロードする。</p>
+                <div class="fullscreen-image"
+                    data-image="{% static 'deeplearning_img/docker_environment/ubuntuHardDiskImage.png' %}"
+                    data-title="仮想ハードディスクイメージ" data-caption="仮想ハードディスクイメージのページ">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/docker_environment/ubuntuHardDiskImage.png' %}"
+                        alt="仮想ハードディスクイメージ">
+                </div>
+                <p>「仮想ハードディスクイメージのダウンロード」ページにある<span style="color: #f00;">「VirtualBoxでの利用方法」</span>を参考に環境を構築する。</p>
+                <p>環境構築後、<a href="#for_Ubuntu" target="_self">Docker環境構築（Ubuntu編）</a>の内容を実施する。</p>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="for_windows10" class="h4 mt-2 border-bottom">Docker環境構築（Window10編）</h4>
+                <h5 class="h5" style="color: #f00">Windows10（32bit版）を利用している人や下記の方法で動作しない人は、<a href="#for_windows7"
+                        target="_self">Docker環境構築（Window7編）</a>の内容を実施すること。</h5>
+                <p>
+                    Windows10（64bit版）のEditionによりインストール方法が異なる。
+                    また、筆者はWindows10の環境を用意できないため、外部サイトで公開されている方法を展開する。
+                </p>
+
+                <!-- Windows10 Home 64bit向け -->
+                <h5 class="h5 mt-2 border-bottom">■ Windows10 Home 64bitを利用している人・Windows10
+                    ProでHyper-Vに対応していないCPUを利用している人</h5>
+                <p>
+                    Windows10 Home 64bitを利用している人（殆どの人が該当する）やWindows10 ProでHyper-Vに対応していないCPUを利用している人は、「Docker
+                    Toolbox」を利用する。
+                    下記のサイトの<span style="color: #f00;">「ダウンロード」、「インストール」、「ファイル共有」</span>を実施する。<br>
+                    <a href="https://qiita.com/idani/items/fb7681d79eeb48c05144" target="_blank">windows 10 home で
+                        docker を導入するメモ</a>
+                </p>
+
+                <!-- Windows10 Pro 64bit向け -->
+                <h5 class="h5 mt-2 border-bottom">■ Windows10 Pro 64bitを利用している人</h5>
+                <p>
+                    Windows10 Proを利用している人は、Windows自身が持つHyper-V機能を有効にすることで、
+                    Docker for Windowsをインストール可能となる。
+                    下記のサイトの<span style="color: #f00;">「Hyper-Vの有効化」、「Docker Community Edition for
+                        Windowsのインストール」、「インストール確認」</span>を実施する。<br>
+                    <a href="https://dev.classmethod.jp/cloud/aws/win10_docker_python_ecs_cfn/" target="_blank">Windows
+                        10 にDockerをいれてPythonを実行して、その勢いでCloudFormation一発でECS上でも実行してみた</a>
+                </p>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="for_Ubuntu" class="h4 mt-2 border-bottom">Docker環境構築（Ubuntu編）</h4>
+
+                <div class="row">
+                    <div class="col-9">
+                        下記のShell Scriptを<span style="color: #f00;">installer.sh</span>で保存する。
+                    </div>
+                    <div class="col-3">
+                        <button class="clip btn-primary btn-block" data-clipboard-target="#installer-shell-script">copy</button>
+                    </div>
+                </div>
+                <pre class="mt-1"><code id="installer-shell-script">#!/bin/bash
+if [ $# -lt 1 ]; then
+    echo Usage: $0 "user_name"
+    echo "ex)" $0 user
+    exit 1
+fi
+user_name="$1"
+
+# =============
+# system update
+# =============
+echo updating...
+sudo apt-get -y update &gt; /dev/null 2&gt;&amp;1
+sudo apt-get -y upgrade
+# install git
+sudo apt-get install -y git
+
+# ==========
+# set up git
+# ==========
+{
+    echo    "[user]"
+    echo -e "\temail = ${user_name}@localhost"
+    echo -e "\tname = ${user_name}"
+    echo    "[alias]"
+    echo -e "\ttree = log --graph --all --format=\"%x09%C(cyan bold)%an%Creset %C(yellow)%h%Creset %C(magenta reverse)%d%Creset %s\""
+    echo    "[push]"
+    echo -e "\tdefault = simple"
+    echo    "[color]"
+    echo -e "\tui = auto"
+    echo    "[merge]"
+    echo -e "\tff = false"
+    echo    "[pull]"
+    echo -e "\tff = only"
+} &gt; /home/${user_name}/.gitconfig
+sudo chown ${user_name}:${user_name} /home/${user_name}/.gitconfig
+
+# =========================
+# install required packages
+# =========================
+sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
+[ $(which curl) ] || sudo apt-get install -y curl
+# get GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+# add docker repository
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+# =================
+# install docker-ce
+# =================
+echo updating...
+sudo apt-get -y update &gt; /dev/null 2&gt;&amp;1
+sudo apt-get install -y --force-yes docker-ce
+# check Version
+sudo docker version
+# ======================
+# install docker-compose
+# ======================
+curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-$(uname -s)-$(uname -m) -o ~/docker-compose
+sudo mv ~/docker-compose /usr/local/bin/
+sudo chmod +x /usr/local/bin/docker-compose
+sudo docker-compose --version
+
+# ==================
+# add user to docker
+# ==================
+if [ $(which docker) ]; then
+    if [ $(cat /etc/group | grep docker | wc -l) -eq 0 ]; then
+        # add group
+        sudo groupadd  docker
+    fi
+    # add user
+    sudo gpasswd -a ${user_name} docker
+fi</code></pre>
+                <p>
+                    installer.shがあるディレクトリで、下記のコマンドを実行し、Docker環境を構築する。
+                </p>
+                <p>
+                    この時、<span style="color: #f00;">パスワードを求められる</span>のでパスワードを入力する。
+                    インストール完了後、installer.shを削除する。
+                </p>
+                <pre><code>sudo bash installer.sh ${USER}</code></pre>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="for_Mac" class="h4 mt-2 border-bottom">Docker環境構築（Mac OS編）</h4>
+                <p>
+                    下記のサイトの<span style="color: #f00;">「Docker for Macをインストール」</span>を実施し、Docker環境を構築する。<br>
+                    <a href="https://qiita.com/kurkuru/items/127fa99ef5b2f0288b81" target="_blank">DockerをMacにインストールする
+                        (更新：2018/5/14)</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# toastの処理 #}
+<div id="toast-success" class="toast" role="status" aria-live="polite" aria-atomic="true" data-delay="1000" style="position: absolute; top: 1rem; right: 1rem;">
+    <div class="toast-header bg-info text-white">
+        <strong class="mr-auto">ClipboardJS</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body bg-info text-white">
+        クリップボードにコピーしました
+    </div>
+</div>
+<div id="toast-failed" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000" style="position: absolute; top: 1rem; right: 1rem;">
+    <div class="toast-header bg-danger text-white">
+        <strong class="mr-auto">ClipboardJS</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body bg-danger text-white">
+        クリップボードへのコピーに失敗しました
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+(function() {
+    let clipboard = new ClipboardJS('.clip');
+    // 成功時の処理
+    clipboard.on('success', (e) => {
+        $('#toast-success').toast('show');
+        // テキスト選択状態を解除
+        e.clearSelection();
+    });
+    // エラー時の処理
+    clipboard.on('error', (e) => {
+        $('#toast-failed').toast('show');
+    });
+}());
+</script>
+{% endblock %}

@@ -23,4 +23,5 @@ urlpatterns = [
     path('blog/', include('blog.urls', namespace='blog')),
     path('storage/', include('storage.urls', namespace='storage')),
     path('chat/', include('chat.urls', namespace='chat')),
+    path('deep_learning/', include('deep_learning.urls', namespace='deep_learning')),
 ]
