@@ -1,0 +1,34 @@
+{% extends 'deep_learning/breadcrumbs_deep_learning.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Dockerとは" "deep_learning:what_docker" %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-1">
+    <div class="col-12">
+        <div class="row mt-2">
+            <div class="col-xs-12">
+                <h4 class="h4 mt-2 border-bottom">目次</h4>
+                <ul>
+                    <li class="tableofcontents_list">
+                        <a href="#what_docker" target="_self">Dockerとは</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-xs-12">
+                <h4 id="what_docker" class="h4 mt-2 border-bottom">Dockerとは</h4>
+                <p>Dockerについては下記のサイトを参考のこと。</p>
+                <ul>
+                    <li><a href="https://knowledge.sakura.ad.jp/13265/" target="_blank" class="btn btn-link btn-md">【外部サイト】Docker入門（第一回）～Dockerとは何か、何が良いのか～</a></li>
+                    <li><a href="https://qiita.com/wMETAw/items/b9bc643ded4b92bf6add" target="_blank" class="btn btn-link btn-md">【外部サイト】Docker入門 #1 【Dockerとは】</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

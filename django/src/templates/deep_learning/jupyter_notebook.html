@@ -1,0 +1,228 @@
+{% extends 'deep_learning/breadcrumbs_deep_learning.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load static %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Jupyterの使い方" "deep_learning:jupyter_notebook" %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-1">
+    <div class="col-12">
+        <div class="row mt-2">
+            <div class="col-12">
+                <h1 class="h1 mt-2">深層学習入門</h1>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 class="h4 mt-2 border-bottom">目次</h4>
+                <ul>
+                    <li class="tableofcontents_list">
+                        <a href="#abstract" target="_self">Jupyter Notebookとは</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#hello_world" target="_self">Jupyter Notebookを使ってみる</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#shortcut" target="_self">Jupyter Notebookで利用できるショートカット</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="abstract" class="h4 mt-2 border-bottom">Jupyter Notebookとは</h4>
+                <p>
+                    Jupyter Notebookは、プログラムを実行し、実行結果を保存できるツールである。
+                    もともとはiPython Notebookと呼ばれるPythonを実行するためのツールであったが、
+                    Jupyter NotebookはPython以外の言語にも対応している（R、Haskell、Scala等）。
+                </p>
+                <p>
+                    Jupyter Notebookの利点を以下に示す。
+                    <ul>
+                        <li>数行ずつ試しながら実行可能。また、プログラムの一部のみを実行することも可能。</li>
+                        <li>統合開発環境IDLEには付属されていないグラフの描画が可能。</li>
+                        <li>プログラムの共有や実行結果の共有が容易。</li>
+                    </ul>
+
+                    Jupyter Notebookの欠点を以下に示す。
+                    <ul>
+                        <li>本番環境としては向いていない。</li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="hello_world" class="h4 mt-2 border-bottom">Jupyter Notebookを使ってみる</h4>
+
+                <!-- 起動画面 -->
+                <h5 class="h5 mt-2 border-bottom">１．起動画面</h5>
+                <p>
+                    Jupyter Notebookを使って「Hello World」を出力する。
+                    Dockerコンテナを起動後、ブラウザで表示されたURLにアクセスすると以下のような画面が表示される。
+                </p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/00_init.png' %}" data-title="起動画面" data-caption="起動時に表示される画面">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/00_init.png' %}" alt="起動画面">
+                </div>
+
+                <!-- Notebookの作成 -->
+                <h5 class="h5 mt-2 border-bottom">２．Notebookの作成</h5>
+                <p>
+                    下記の手順でNotebookを作成する。
+                    <ol>
+                        <li>右上の「New」を押下する。</li>
+                        <li>「Python3」を押下する。</li>
+                    </ol>
+                </p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/01_create_notebook.png' %}" data-title="Notebookの作成" data-caption="Notebookの作成方法">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/01_create_notebook.png' %}" alt="Notebookの作成">
+                </div>
+                <p>別タブで下記のようなページが表示される。</p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/02_output_notebook.png' %}" data-title="作業ページ" data-caption="作業用のページ">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/02_output_notebook.png' %}" alt="作業ページ">
+                </div>
+
+                <!-- Hello Worldの実行 -->
+                <h5 class="h5 mt-2 border-bottom">３．Hello Worldの実行</h5>
+                <p>「In [ ]」と記述されている部分（セルと呼ぶ）に下記のコードを入力し、<span style="color: #f00;">「Shift + Enter」</span>で実行する。</p>
+                <pre class="pre-scrollable pre-space line-numbers"><code class="language-Python">print('Hello World')</code></pre>
+                <p>下記のような結果が得られることを確認する。</p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/03_hello_world.png' %}" data-title="Hello World" data-caption="Hello Worldの実行結果">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/03_hello_world.png' %}" alt="Hello World">
+                </div>
+
+                <!-- Notebookの保存 -->
+                <h5 class="h5 mt-2 border-bottom">４．Notebookの保存</h5>
+                <p>作成したNotebookに名前をつけて保存する。左上の「Untitled」部分を押下する。</p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/04_save.png' %}" data-title="名前をつけて保存" data-caption="">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/04_save.png' %}" alt="名前をつけて保存">
+                </div>
+                <p>下記のような画面が表示されるので、「hello_world」と入力後、「Rename」を押下する。</p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/05_rename.png' %}" data-title="リネーム" data-caption="">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/05_rename.png' %}" alt="リネーム">
+                </div>
+                <p><span style="color: #f00;">「Ctrl + s」</span>で保存する。保存後、起動時のタブに戻り「hello_world.ipynb」の存在を確認する。</p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/06_exist_file.png' %}" data-title="ファイルの存在確認" data-caption="">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/06_exist_file.png' %}" alt="ファイルの存在確認">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="shortcut" class="h4 mt-2 border-bottom">Jupyter Notebookで利用できるショートカット</h4>
+                <p>
+                    Jupyter Notebookで利用できるショートカットを紹介する。
+                    Jupyter Notebookでは、Notebookで<span style="color: #f00;">「ESC」</span>を押下するとコマンドモードに移行する。
+                    コマンドモードで<span style="color: #f00;">「h」</span>を押下するとショートカットの一覧を確認できる。
+                </p>
+                <div class="fullscreen-image" data-image="{% static 'deeplearning_img/jupyter_notebook/07_shortcut.png' %}" data-title="ショートカット一覧" data-caption="">
+                    <img class="img-fluid" src="{% static 'deeplearning_img/jupyter_notebook/07_shortcut.png' %}" alt="ショートカット一覧">
+                </div>
+                <p>よく使うショートカットを紹介する。また、この時の表記規則を下記に示す。</p>
+                <table class="table table-bordered">
+                    <caption>表記規則</caption>
+                    <thead>
+                        <tr>
+                            <th class="align-middle" scope="col">表記規則</th>
+                            <th class="align-middle" scope="col">意味</th>
+                            <th class="align-middle" scope="col">例</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="align-middle" scope="row">A + B</td>
+                            <td class="align-middle">Aを押下しながらBを押下する。</td>
+                            <td class="align-middle">Shift + Enter</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">A,B,C</td>
+                            <td class="align-middle">A,B,Cの順で押下する。</td>
+                            <td class="align-middle">ESC,d,d</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered table-striped">
+                    <caption>ショートカット一覧</caption>
+                    <thead>
+                        <tr>
+                            <th class="align-middle" scope="col">ショートカット</th>
+                            <th class="align-middle" scope="col">機能</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="align-middle" scope="row">Ctrl + x</td>
+                            <td class="align-middle">カット</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">Ctrl + c</td>
+                            <td class="align-middle">コピー</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">Ctrl + v</td>
+                            <td class="align-middle">ペースト</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">Ctrl + s</td>
+                            <td class="align-middle">保存</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">Ctrl + a</td>
+                            <td class="align-middle">全選択</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">Ctrl + z</td>
+                            <td class="align-middle">元に戻す</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">Ctrl + y</td>
+                            <td class="align-middle">やり直し</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">Shift + Enter</td>
+                            <td class="align-middle">選択したセルを実行</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">ESC,Shift,m</td>
+                            <td class="align-middle">セルの結合</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">ESC,a</td>
+                            <td class="align-middle">セルを上に挿入</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">ESC,b</td>
+                            <td class="align-middle">セルを下に挿入</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">ESC,d,d</td>
+                            <td class="align-middle">選択したセルの削除</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">ESC,z</td>
+                            <td class="align-middle">削除したセルを戻す</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">ESC,l</td>
+                            <td class="align-middle">選択したセルの行番号を表示</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">ESC,0,0</td>
+                            <td class="align-middle">カーネルをリスタート</td>
+                        </tr>
+                        <tr>
+                            <td class="align-middle" scope="row">TAB</td>
+                            <td class="align-middle">コード自動補完、インデント</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

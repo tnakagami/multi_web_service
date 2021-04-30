@@ -1,0 +1,7 @@
+{% extends 'deep_learning/breadcrumbs_deep_learning.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "MNISTのデータセットを用いた手書き文字認識" "deep_learning:tutorial_mnist_dataset" %}
+{% endblock %}

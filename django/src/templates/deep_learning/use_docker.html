@@ -1,0 +1,117 @@
+{% extends 'deep_learning/breadcrumbs_deep_learning.html' %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block header %}
+{# code syntax #}
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/dracula.min.css">
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Dockerコンテナの起動" "deep_learning:use_docker" %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-1">
+    <div class="col-12">
+        <div class="row mt-2">
+            <div class="col-12">
+                <h1 class="h1 mt-2">深層学習入門</h1>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 class="h4 mt-2 border-bottom">目次</h4>
+                <ul>
+                    <li class="tableofcontents_list">
+                        <a href="#docker_image" target="_self">利用するDockerイメージの紹介</a>
+                    </li>
+                    <li class="tableofcontents_list">
+                        <a href="#docker_container" target="_self">Dockerイメージからコンテナの作成・起動</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="docker_image" class="h4 mt-2 border-bottom">利用するDockerイメージの紹介</h4>
+                <p>
+                    Docker環境でアプリケーションを実行する際の方法は、下記に示す2通りある。
+                </p>
+                <ul>
+                    <li>Docker Hubに公開されているDockerイメージを利用する。</li>
+                    <li>Docker HubからベースとなるOSイメージだけを参照し、Dockerfileからイメージを作成する。</li>
+                </ul>
+                <p>
+                    通常、Dockerイメージが存在しない場合、自分でDockerfileを記述しイメージを作成することとなる。<br>今回は、都合よく深層学習環境一式が揃ったイメージが存在したため、このイメージを利用する。
+                </p>
+                <p>
+                    <a href="https://hub.docker.com/r/smizy/keras" target="_blank">docker-keras-tensorflow(Docker Hub)</a><br>
+                    <a href="https://github.com/smizy/docker-keras-tensorflow" target="_blank">docker-keras-tensorflow(Git Hub)</a>
+                </p>
+                <p>
+                    Dockerイメージは、コンテナの作成時に存在しなければ自動的にダウンロードされる。
+                    このため、<span style="color: #f00;">Dockerイメージを自分でダウンロードする必要はない</span>。
+                </p>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <h4 id="docker_container" class="h4 mt-2 border-bottom">Dockerイメージからコンテナの作成・起動</h4>
+                <!-- Windows10 Home 64bit向け -->
+                <h5 class="h5 mt-2 border-bottom">■ Windows10 Home 64bitを利用している人・Windows10 ProでHyper-Vに対応していないCPUを利用している人</h5>
+                <ol>
+                    <li>「Docker Quickstart Terminal」を起動し、「bash」と入力する。</li>
+                    <li>下記のコマンドを実行し、デスクトップに移動する。</li>
+                    <pre><code>cd /c/Users/(Windowsのユーザ名)/Desktop</code></pre>
+                    <li>下記のコマンドを実行し、作業ディレクトリに移動する。</li>
+                    <pre><code>mkdir work
+cd work</code></pre>
+                    <li>下記のコマンドを実行し、コンテナを起動する。</li>
+                    <pre><code>docker run -it --rm -v $(pwd):/work -w /work -p 8888:8888 smizy/keras:2.1-cpu-alpine</code></pre>
+                    <li>コンテナ起動後、表示されるURLにアクセスする。</li>
+                    <pre><code># 例
+Copy/paste this URL into your browser when you connect for the first time,
+to login with a token:
+    http://localhost:8888/?token=abcdefghijklmnopqrstuvwxyz0123456789abcdefghijkl</code></pre>
+                </ol>
+
+                <!-- Windows10 Pro 64bit向け -->
+                <h5 class="h5 mt-2 border-bottom">■ Windows10 Pro 64bitを利用している人</h5>
+                <ol>
+                    <li>Windows10 Pro 64bitの人は、<span style="color: #f00;">管理者権限で</span>「Power Shell」を起動する。</li>
+                    <li>下記のコマンドを実行し、デスクトップに移動する。</li>
+                    <pre><code>Set-Location (Join-Path $Env:USERPROFILE Desktop);</code></pre>
+                    <li>下記のコマンドを実行し、作業フォルダに移動する。</li>
+                    <pre><code>New-Item work -ItemType Directory;
+Set-Location work;</code></pre>
+                    <li>下記のコマンドを実行し、コンテナを起動する。</li>
+                    <pre><code>$cdir = "/$((Get-Location).Drive.Name.ToLowerInvariant())/$((Get-Location).Path.Replace('\', '/').Substring(3))";
+docker run -it --rm -v "$cdir:/work" -w /work -p 8888:8888 smizy/keras:2.1-cpu-alpine;</code></pre>
+                    <li>コンテナ起動後、表示されるURLにアクセスする。</li>
+                    <pre><code># 例
+Copy/paste this URL into your browser when you connect for the first time,
+to login with a token:
+    http://localhost:8888/?token=abcdefghijklmnopqrstuvwxyz0123456789abcdefghijkl</code></pre>
+                </ol>
+                <!-- Linux or Mac向け -->
+                <h5 class="h5 mt-2 border-bottom">■ Linux or Macを利用している人</h5>
+                <ol>
+                    <li>「Terminal」を起動後、下記のコマンドを実行し、作業ディレクトリに移動する。</li>
+                    <pre><code>mkdir work
+cd work</code></pre>
+                    <li>下記のコマンドを実行し、コンテナを起動する。</li>
+                    <pre><code>docker run -it --rm -v $(pwd):/work -w /work -p 8888:8888 smizy/keras:2.1-cpu-alpine</code></pre>
+                    <li>コンテナ起動後、表示されるURLにアクセスする。</li>
+                    <pre><code># 例
+Copy/paste this URL into your browser when you connect for the first time,
+to login with a token:
+    http://localhost:8888/?token=abcdefghijklmnopqrstuvwxyz0123456789abcdefghijkl</code></pre>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
