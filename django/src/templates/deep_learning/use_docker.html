@@ -2,6 +2,7 @@
 {% load django_bootstrap_breadcrumbs %}
 
 {% block header %}
+{{ block.super }}
 {# code syntax #}
 <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/dracula.min.css">
 <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
@@ -112,6 +113,7 @@ to login with a token:
                 </ol>
             </div>
         </div>
+        <p class="page-top"><a href="#wrap">TOPに戻る</a></p>
     </div>
 </div>
 {% endblock %}

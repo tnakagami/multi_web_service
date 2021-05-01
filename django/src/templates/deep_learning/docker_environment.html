@@ -3,6 +3,7 @@
 {% load static %}
 
 {% block header %}
+{{ block.super }}
 {# code syntax #}
 <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/dracula.min.css">
 <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
@@ -232,11 +233,12 @@ fi</code></pre>
                 </p>
             </div>
         </div>
+        <p class="page-top"><a href="#wrap">TOPに戻る</a></p>
     </div>
 </div>
 
 {# toastの処理 #}
-<div class="position-fixed p-3" style="z-index: 5; right: 0; bottom: 0;">
+<div class="position-fixed p-3" style="z-index: 5; right: 0; top: 0;">
     <div id="toast-success" class="toast hide" role="status" aria-live="assertive" aria-atomic="true" data-delay="1000">
         <div class="toast-header bg-info text-white">
             <strong class="mr-auto">ClipboardJS</strong>
@@ -249,7 +251,7 @@ fi</code></pre>
         </div>
     </div>
 </div>
-<div class="position-fixed p-3" style="z-index: 5; right: 0; bottom: 0;">
+<div class="position-fixed p-3" style="z-index: 5; right: 0; top: 0;">
     <div id="toast-failed" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000">
         <div class="toast-header bg-danger text-white">
             <strong class="mr-auto">ClipboardJS</strong>
@@ -265,6 +267,7 @@ fi</code></pre>
 {% endblock %}
 
 {% block bodyjs %}
+{{ block.super }}
 <script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
 <script>
 (function() {
