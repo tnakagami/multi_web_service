@@ -66,12 +66,14 @@
         <div class="row mt-2">
             <div class="col-12">
                 <h4 id="result_of_handwriting_recognition" class="h4 mt-2 border-bottom">実行結果一覧</h4>
-                <p>
-                    結果だけ見たい人のために、分類結果を以下に示す。
-                </p>
-                <p>
-                    <a href="{% url 'deep_learning:handwriting_recognition' %}" class="btn btn-primary btn-md btn-block">手書き文字認識の分類結果</a>
-                </p>
+                <div class="row">
+                    <div class="col-9 mt-1">
+                        結果だけ見たい人のために、分類結果を右記に示す。
+                    </div>
+                    <div class="col-3">
+                        <a href="{% url 'deep_learning:handwriting_recognition' %}" class="btn btn-primary btn-block">手書き文字認識の分類結果</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -87,14 +89,15 @@
                             <li>t10k-images-idx3-ubyte.gz</li>
                             <li>t10k-labels-idx1-ubyte.gz</li>
                         </ul>
-                        <div class="row mt-2">
-                            <div class="col-10">
-                                これらのファイルを「~/work/mnistdataset」以下に保存する。（作業ディレクトリ以下にmnistdatasetディレクトリを作成し、そこに保存する。）自分でダウンロードするのが面倒な人は、以下のPythonスクリプトを実行する。
-                            </div>
-                            <div class="col-2">
-                                <button class="clip btn-primary btn-block" data-clipboard-target="#download-mnist-dataset-script">copy</button>
-                            </div>
-                        </div>
+                        これらのファイルを「~/work/mnistdataset」以下に保存する。（作業ディレクトリ以下にmnistdatasetディレクトリを作成し、そこに保存する。）
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-10 mt-1">
+                        自分でダウンロードするのが面倒な人は、以下のPythonスクリプトを実行する。
+                    </div>
+                    <div class="col-2">
+                        <button class="clip btn btn-primary btn-block" data-clipboard-target="#download-mnist-dataset-script">copy</button>
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -138,11 +141,11 @@ print('Complete')</code></pre>
 
                 <h5 class="mt-2 border-bottom">■MNISTデータセットの読み込み</h5>
                 <div class="row mt-2">
-                    <div class="col-10">
+                    <div class="col-10 mt-1">
                         以下のPythonスクリプトを実行し、MNISTデータセットを読み込むためのクラスを作成する。
                     </div>
                     <div class="col-2">
-                        <button class="clip btn-primary btn-block" data-clipboard-target="#read-mnist-dataset-script">copy</button>
+                        <button class="clip btn btn-primary btn-block" data-clipboard-target="#read-mnist-dataset-script">copy</button>
                     </div>
                 </div>
                 <p>
@@ -215,11 +218,11 @@ class LoadMnistDataset():
         return ret_data</code></pre>
                 </p>
                 <div class="row mt-2">
-                    <div class="col-10">
+                    <div class="col-10 mt-1">
                         以下のPythonスクリプトを実行し、メモリ上にMNISTデータセットを読み込む。
                     </div>
                     <div class="col-2">
-                        <button class="clip btn-primary btn-block" data-clipboard-target="#load-mnist-dataset-script">copy</button>
+                        <button class="clip btn btn-primary btn-block" data-clipboard-target="#load-mnist-dataset-script">copy</button>
                     </div>
                 </div>
                 <p>
@@ -229,11 +232,11 @@ mnist_dataset = load_mnist_dataset.load_dataset()</code></pre>
 
                 <h5 class="h5 mt-2 border-bottom">■MNISTデータセットの表示</h5>
                 <div class="row mt-2">
-                    <div class="col-10">
+                    <div class="col-10 mt-1">
                         以下のPythonスクリプトを実行し、読み込んだMNISTデータセットの最初の20個を表示する。
                     </div>
                     <div class="col-2">
-                        <button class="clip btn-primary btn-block" data-clipboard-target="#show-mnist-data-script">copy</button>
+                        <button class="clip btn btn-primary btn-block" data-clipboard-target="#show-mnist-data-script">copy</button>
                     </div>
                 </div>
                 <p>
@@ -277,7 +280,7 @@ mnist_dataset = load_mnist_dataset.load_dataset()</code></pre>
                         sklearnのPCAを用いて次元圧縮を行い、データをプロットするPythonスクリプトを以下に示す。ここで、画像の輝度値をムラを吸収するため、正規化を行う。
                     </div>
                     <div class="col-2">
-                        <button class="clip btn-primary btn-block" data-clipboard-target="#preprocess-mnist-dataset-script">copy</button>
+                        <button class="clip btn btn-primary btn-block" data-clipboard-target="#preprocess-mnist-dataset-script">copy</button>
                     </div>
                 </div>
                 <p>
@@ -359,11 +362,11 @@ ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
                     ここで、Cは誤分類をどの程度を許容するかを表すパラメータである。Cは値が小さい程、誤分類を許容する。値が大きい程ハードマージンSVMに近づく。
                 </p>
                 <div class="row mt-2">
-                    <div class="col-10">
+                    <div class="col-10 mt-1">
                         線形SVMによる分類を行うPythonスクリプトを以下に示す。
                     </div>
                     <div class="col-2">
-                        <button class="clip btn-primary btn-block" data-clipboard-target="#classification-linear-svm-script">copy</button>
+                        <button class="clip btn btn-primary btn-block" data-clipboard-target="#classification-linear-svm-script">copy</button>
                     </div>
                 </div>
                 <p>
@@ -514,11 +517,11 @@ print('{}'.format(metrics.confusion_matrix(t_test, predicted_labels)))</code></p
                     MLPでは、重みベクトルの更新にデフォルトでadamが利用される。今回は、データセットのサイズが大きいため、デフォルト設定で学習する。
                 </p>
                 <div class="row mt-2">
-                    <div class="col-10">
+                    <div class="col-10 mt-1">
                         MLPによる分類を行うPythonスクリプトを以下に示す。
                     </div>
                     <div class="col-2">
-                        <button class="clip btn-primary btn-block" data-clipboard-target="#classification-mlp-script">copy</button>
+                        <button class="clip btn btn-primary btn-block" data-clipboard-target="#classification-mlp-script">copy</button>
                     </div>
                 </div>
                 <p>
@@ -661,26 +664,30 @@ print('{}'.format(metrics.confusion_matrix(t_test, predicted_labels)))</code></p
 </div>
 
 {# toastの処理 #}
-<div id="toast-success" class="toast" role="status" aria-live="polite" aria-atomic="true" data-delay="1000" style="position: absolute; top: 1rem; right: 1rem;">
-    <div class="toast-header bg-info text-white">
-        <strong class="mr-auto">ClipboardJS</strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="toast-body bg-info text-white">
-        クリップボードにコピーしました
+<div class="position-fixed p-3" style="z-index: 5; right: 0; bottom: 0;">
+    <div id="toast-success" class="toast hide" role="status" aria-live="assertive" aria-atomic="true" data-delay="1000">
+        <div class="toast-header bg-info text-white">
+            <strong class="mr-auto">ClipboardJS</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body bg-info text-white">
+            クリップボードにコピーしました
+        </div>
     </div>
 </div>
-<div id="toast-failed" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000" style="position: absolute; top: 1rem; right: 1rem;">
-    <div class="toast-header bg-danger text-white">
-        <strong class="mr-auto">ClipboardJS</strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="toast-body bg-danger text-white">
-        クリップボードへのコピーに失敗しました
+<div class="position-fixed p-3" style="z-index: 5; right: 0; bottom: 0;">
+    <div id="toast-failed" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000">
+        <div class="toast-header bg-danger text-white">
+            <strong class="mr-auto">ClipboardJS</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body bg-danger text-white">
+            クリップボードへのコピーに失敗しました
+        </div>
     </div>
 </div>
 {% endblock %}
