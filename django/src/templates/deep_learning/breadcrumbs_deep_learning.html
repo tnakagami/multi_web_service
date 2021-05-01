@@ -5,3 +5,52 @@
     {{ block.super }}
     {% breadcrumb "Deep Learing" "deep_learning:index" %}
 {% endblock %}
+
+{% block header %}
+<style>
+    .page-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        font-size: 77%;
+        visibility: hidden;
+    }
+    .page-top a {
+        background: #666;
+        text-decoration: none;
+        color: #fff;
+        width: 100px;
+        padding: 15px 0;
+        text-align: center;
+        display: block;
+        border-radius: 5px;
+    }
+    .page-top a:hover {
+        text-decoration: none;
+        background: #999;
+    }
+</style>
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+    $(function() {
+        const topBtn = $('.page-top');
+        topBtn.hide();
+        topBtn.css('visibility', 'visible');
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 100) {
+                topBtn.fadeIn();
+            } else {
+                topBtn.fadeOut();
+            }
+        });
+        topBtn.click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+            }, 500);
+            return false;
+        });
+    });
+</script>
+{% endblock %}
