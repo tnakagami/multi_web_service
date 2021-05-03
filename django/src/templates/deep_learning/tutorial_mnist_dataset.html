@@ -68,10 +68,12 @@
             <div class="col-12">
                 <h4 id="result_of_handwriting_recognition" class="h4 mt-2 border-bottom">実行結果一覧</h4>
                 <div class="row">
-                    <div class="col-9 mt-1">
-                        結果だけ見たい人のために、分類結果を右記に示す。
+                    <div class="col-12">
+                        結果だけ見たい人のために、分類結果を下記に示す。
                     </div>
-                    <div class="col-3">
+                </div>
+                <div class="row">
+                    <div class="col-12">
                         <a href="{% url 'deep_learning:handwriting_recognition' %}" class="btn btn-primary btn-block">手書き文字認識の分類結果</a>
                     </div>
                 </div>
@@ -94,10 +96,10 @@
                     </div>
                 </div>
                 <div class="row mt-2">
-                    <div class="col-10 mt-1">
+                    <div class="col-9">
                         自分でダウンロードするのが面倒な人は、以下のPythonスクリプトを実行する。
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="clip btn btn-primary btn-block" data-clipboard-target="#download-mnist-dataset-script">copy</button>
                     </div>
                 </div>
@@ -142,10 +144,10 @@ print('Complete')</code></pre>
 
                 <h5 class="mt-2 border-bottom">■MNISTデータセットの読み込み</h5>
                 <div class="row mt-2">
-                    <div class="col-10 mt-1">
+                    <div class="col-9">
                         以下のPythonスクリプトを実行し、MNISTデータセットを読み込むためのクラスを作成する。
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="clip btn btn-primary btn-block" data-clipboard-target="#read-mnist-dataset-script">copy</button>
                     </div>
                 </div>
@@ -219,10 +221,10 @@ class LoadMnistDataset():
         return ret_data</code></pre>
                 </p>
                 <div class="row mt-2">
-                    <div class="col-10 mt-1">
+                    <div class="col-9">
                         以下のPythonスクリプトを実行し、メモリ上にMNISTデータセットを読み込む。
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="clip btn btn-primary btn-block" data-clipboard-target="#load-mnist-dataset-script">copy</button>
                     </div>
                 </div>
@@ -233,10 +235,10 @@ mnist_dataset = load_mnist_dataset.load_dataset()</code></pre>
 
                 <h5 class="h5 mt-2 border-bottom">■MNISTデータセットの表示</h5>
                 <div class="row mt-2">
-                    <div class="col-10 mt-1">
+                    <div class="col-9">
                         以下のPythonスクリプトを実行し、読み込んだMNISTデータセットの最初の20個を表示する。
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="clip btn btn-primary btn-block" data-clipboard-target="#show-mnist-data-script">copy</button>
                     </div>
                 </div>
@@ -277,10 +279,10 @@ mnist_dataset = load_mnist_dataset.load_dataset()</code></pre>
                 </p>
 
                 <div class="row mt-2">
-                    <div class="col-10">
+                    <div class="col-9">
                         sklearnのPCAを用いて次元圧縮を行い、データをプロットするPythonスクリプトを以下に示す。ここで、画像の輝度値をムラを吸収するため、正規化を行う。
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="clip btn btn-primary btn-block" data-clipboard-target="#preprocess-mnist-dataset-script">copy</button>
                     </div>
                 </div>
@@ -363,10 +365,10 @@ ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
                     ここで、Cは誤分類をどの程度を許容するかを表すパラメータである。Cは値が小さい程、誤分類を許容する。値が大きい程ハードマージンSVMに近づく。
                 </p>
                 <div class="row mt-2">
-                    <div class="col-10 mt-1">
+                    <div class="col-9">
                         線形SVMによる分類を行うPythonスクリプトを以下に示す。
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="clip btn btn-primary btn-block" data-clipboard-target="#classification-linear-svm-script">copy</button>
                     </div>
                 </div>
@@ -518,10 +520,10 @@ print('{}'.format(metrics.confusion_matrix(t_test, predicted_labels)))</code></p
                     MLPでは、重みベクトルの更新にデフォルトでadamが利用される。今回は、データセットのサイズが大きいため、デフォルト設定で学習する。
                 </p>
                 <div class="row mt-2">
-                    <div class="col-10 mt-1">
+                    <div class="col-9">
                         MLPによる分類を行うPythonスクリプトを以下に示す。
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="clip btn btn-primary btn-block" data-clipboard-target="#classification-mlp-script">copy</button>
                     </div>
                 </div>
