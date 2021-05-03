@@ -217,19 +217,8 @@ class SearchFollowerViewTests(SNSView):
         self.assertTrue('filter' in context_keys)
         relationships = response.context['relationships']
         filter_info = response.context['filter']
-        self.assertEqual(relationships.count(), 2)
+        self.assertEqual(relationships.count(), 7)
         self.assertEqual(filter_info.qs().count(), UserModel.objects.count())
-
-    @override_settings(AXES_ENABLED=False)
-    def test_valid_no_follower(self):
-        follower3 = self.candidate_followers[2]
-        self.client.login(username=follower3.username, password=self.password)
-        response = self.client.get(self.url)
-        context_keys = response.context.keys()
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('relationships' in context_keys)
-        relationships = response.context['relationships']
-        self.assertEqual(relationships.count(), 0)
 
     @override_settings(AXES_ENABLED=False)
     def test_valid_extract_user(self):
