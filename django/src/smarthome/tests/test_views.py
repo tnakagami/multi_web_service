@@ -149,7 +149,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         self.assertEqual(response.status_code, 404)
 
     @mock.patch('smarthome.models.AccessToken.send_post_request', return_value=None)
-    def test_valid_access_token(self):
+    def test_valid_access_token(self, _):
         url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
         response = self.client.get(url)
         self.assertRedirects(response, reverse('registration:top_page'), status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)

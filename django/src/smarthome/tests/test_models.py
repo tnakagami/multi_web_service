@@ -23,6 +23,7 @@ class AccessTokenTests(SmartHomeModel):
 
     def __create_and_save(self, token):
         target = self.model()
+        target.access_token = token
         target.save()
 
         return target
@@ -35,4 +36,4 @@ class AccessTokenTests(SmartHomeModel):
         _access_token = self.__create_and_save(token)
         self.__chk_instance_data(_access_token.pk, token)
         self.assertEqual(self.model.objects.count(), 1)
-        self.assertEqual(str(_access_token), access_token)
+        self.assertEqual(str(_access_token), token)
