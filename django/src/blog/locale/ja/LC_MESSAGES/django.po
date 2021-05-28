@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-28 21:08+0900\n"
+"POT-Creation-Date: 2021-05-29 07:48+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: blog/forms.py:14 blog/forms.py:54 blog/forms.py:57 blog/forms.py:114
+#: blog/forms.py:14 blog/forms.py:55 blog/forms.py:58 blog/forms.py:117
 msgid "keyword"
 msgstr "キーワード"
 
@@ -26,11 +26,11 @@ msgstr "キーワード"
 msgid "keyword (target: title, text, keywords)"
 msgstr "キーワード（対象：タイトル、本文、関連キーワード）"
 
-#: blog/forms.py:21
+#: blog/forms.py:22
 msgid "filtered by tag"
 msgstr "タグで絞り込み"
 
-#: blog/forms.py:92
+#: blog/forms.py:96
 msgid ""
 "Markdown support\n"
 "\n"
@@ -42,7 +42,7 @@ msgstr ""
 "## 概要\n"
 "こんな感じ"
 
-#: blog/forms.py:135
+#: blog/forms.py:139
 msgid ""
 "Markdown support\n"
 "\n"
@@ -62,7 +62,7 @@ msgstr ""
 "\n"
 "![image alt](path/to/image)"
 
-#: blog/forms.py:152
+#: blog/forms.py:156
 msgid ""
 "Markdown support\n"
 "\n"

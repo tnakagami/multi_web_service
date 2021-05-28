@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'blog.apps.BlogConfig',                 # blog app
     'storage.apps.StorageConfig',           # storage app
     'chat.apps.ChatConfig',                 # chat app
+    'smarthome.apps.SmarthomeConfig',       # smarthome app
 ]
 
 AUTHENTICATION_BACKENDS = [

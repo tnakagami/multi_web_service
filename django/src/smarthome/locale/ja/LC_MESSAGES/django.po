@@ -17,15 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+#: smarthome/forms.py:11 smarthome/models.py:8
+msgid "access token"
+msgstr "アクセストークン"
 
-#: sns/filters.py:12
-msgid "username or viewname"
-msgstr "ユーザ名または表示名"
-
-#: sns/forms.py:48
-msgid "Error: This POST request must be submitted by login user."
-msgstr "エラー：ログイン後にPOSTリスクエストを送信してください。"
-
-#: sns/forms.py:56
-msgid "Error: Login users cannot be registered as followers."
-msgstr "エラー：ログインユーザは、フォロワーとして登録できません。"
+#: smarthome/models.py:10
+msgid "create time"
+msgstr "作成日時"
