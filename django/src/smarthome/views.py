@@ -19,7 +19,7 @@ class IndexView(OnlyStaffUserMixin, ListView):
     model = models.AccessToken
     template_name = 'smarthome/index.html'
     paginate_by = 10
-    queryset = models.AccessToken.objects.order_by('created_at')
+    queryset = models.AccessToken.objects.order_by('-created_at')
     context_object_name = 'access_tokens'
 
 class AccessTokenCreateView(OnlyStaffUserMixin, CreateView):
