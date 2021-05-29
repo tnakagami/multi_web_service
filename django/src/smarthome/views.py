@@ -1,9 +1,10 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.urls.exceptions import NoReverseMatch
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, View
 from django.http import Http404, HttpResponse
 from . import models, forms
+import secrets
 
 class OnlyStaffUserMixin(UserPassesTestMixin):
     raise_exception = True
@@ -43,6 +44,18 @@ class AccessTokenCreateView(OnlyStaffUserMixin, CreateView):
             pass
 
         return super().form_valid(form)
+
+class GenerateTokenView(OnlyStaffUserMixin, View):
+    """
+    generate token
+    """
+    def get(self, request, *args, **kwargs):
+        token = secrets.token_urlsafe(128)
+
+        return HttpResponse(token, content_type='text/plain; charset=utf-8')
+
+    def post(self, request, *args, **kwargs):
+        return self.handle_no_permission()
 
 def get_access_url(request, method='dummy', token=''):
     if request.method == 'GET':
