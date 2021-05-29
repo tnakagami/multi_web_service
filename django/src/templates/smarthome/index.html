@@ -32,7 +32,7 @@
                         </tr>
                         <tr>
                             {% if access_tokens %}
-                            {% with access_tokens|first as newest_token %}
+                            {% with access_tokens|last as newest_token %}
                             <td class="align-middle" scope="row">
                                 <a href="{% url 'smarthome:open_entrance' newest_token.access_token %}" class="btn btn-link btn-md btn-block">オートロック解除</a>
                             </td>
