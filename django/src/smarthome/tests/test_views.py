@@ -129,6 +129,38 @@ class AccessTokenCreateView(SmartHomeView):
         self.assertEqual(_access_token.access_token, data['access_token'])
         self.assertEqual(models.AccessToken.objects.count(), 3)
 
+class GenerateToken(SmartHomeView):
+    @override_settings(AXES_ENABLED=False)
+    def setUp(self):
+        self.client.login(username=self.staffuser.username, password=self.password)
+        self.url = reverse('smarthome:generate_token')
+
+    def test_resolve_url(self):
+        resolver = resolve('/smarthome/generate/token')
+        self.chk_class(resolver, views.GenerateTokenView)
+
+    def test_no_login_access(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(AXES_ENABLED=False)
+    def test_normal_user_login_access(self):
+        self.client.logout()
+        self.client.login(username=self.user.username, password=self.password)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_error_post_request(self):
+        data = {}
+        response = self.client.post(self.url, data, follow=True)
+        self.assertEqual(response.status_code, 403)
+
+    @mock.patch('smarthome.views.secrets.token_urlsafe', return_value='sample10ken')
+    def test_valid_access_token(self, _):
+        response = self.client.get(self.url)
+        self.assertEqual('sample10ken', response.content.decode())
+
 class GetAccessUrl(SmartHomeView):
     def setUp(self):
         self.token = 'sample10ken'
