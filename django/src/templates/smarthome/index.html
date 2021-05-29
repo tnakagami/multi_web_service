@@ -40,7 +40,7 @@
                                 エントランスからの呼び出しに応答し、オートロックを解除（扉を開く）
                             </td>
                             <td class="align-middle">
-                                <button type="button" class="btn btn-primary btn-md btn-block clip" data-clipboard-text="{% url 'smarthome:open_entrance' newest_token.access_token %}">
+                                <button type="button" class="btn btn-primary btn-md btn-block clip" data-clipboard-text="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'smarthome:open_entrance' newest_token.access_token %}">
                                     URL をクリップボードにコピー
                                 </button>
                             </td>
@@ -66,9 +66,9 @@
                         {% for target in access_tokens %}
                         <tr>
                             <td class="align-middle" scope="row">{{ target.created_at|date:'Y/m/d H:i:s' }}</td>
-                            <td class="align-middle">{{ target.access_token }}</td>
+                            <td class="align-middle">{{ target.short_token }}</td>
                             <td class="align-middle">
-                                <button type="button" class="btn btn-primary btn-md btn-block clip" data-clipboard-text="{% url 'smarthome:open_entrance' target.access_token %}">
+                                <button type="button" class="btn btn-outline-primary btn-md btn-block clip" data-clipboard-text="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url     'smarthome:open_entrance' target.access_token %}{% url 'smarthome:open_entrance' target.access_token %}">
                                     URL をクリップボードにコピー
                                 </button>
                             </td>
