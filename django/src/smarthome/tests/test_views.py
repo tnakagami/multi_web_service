@@ -4,6 +4,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse, resolve
 from registration.tests.factories import UserFactory
+from requests.models import Response
 from smarthome.tests.factories import AccessTokenFactory
 from smarthome import views, models
 
@@ -173,8 +174,12 @@ class OpenEntranceFuncTests(SmartHomeView):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch('smarthome.models.requests.post', return_value=None)
-    def test_valid_access_token(self, _):
+    @mock.patch('smarthome.models.requests.post')
+    def test_valid_access_token(self, mock_method):
+        mock_response = Response()
+        mock_response.status_code = 200
+        mock_response._content = b'ok'
+        mock_method.return_value = mock_response
         url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
         response = self.client.get(url)
-        self.assertRedirects(response, reverse('registration:top_page'), status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
+        self.assertEqual('status: 200, msg: ok', response.content.decode())

@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.urls.exceptions import NoReverseMatch
 from django.views.generic import ListView, CreateView
@@ -62,10 +61,11 @@ def open_entrance(request, token):
         target = models.AccessToken.objects.order_by('-created_at').first()
 
         if target.is_valid_access_token(token):
-            url = 'http://analyzer.localnet.jp:1880/curtain'
+            url = 'http://analyzer.localnet.jp:1880/entrance'
             data = {'payload': 'open'}
-            target.send_post_request(url, data)
+            response = target.send_post_request(url, data)
+            ret = 'status: {}, msg: {}'.format(response.status_code, response.text)
 
-            return redirect('registration:top_page')
+            return HttpResponse(ret, content_type='text/plain; charset=utf-8')
 
     raise Http404('Invalid access')
