@@ -50,7 +50,7 @@ class GenerateTokenView(OnlyStaffUserMixin, View):
     generate token
     """
     def get(self, request, *args, **kwargs):
-        token = secrets.token_urlsafe(128)
+        token = secrets.token_urlsafe(90)
 
         return HttpResponse(token, content_type='text/plain; charset=utf-8')
 

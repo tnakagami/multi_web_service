@@ -27,6 +27,13 @@
                 </div>
             </div>
             <div class="form-row mt-3">
+                <div class="col-12">
+                    <button type="button" class="btn btn-success btn-block generate-button" data-genurl="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'smarthome:generate_token' %}">
+                        Token 生成
+                    </button>
+                </div>
+            </div>
+            <div class="form-row mt-3">
                 <div class="col-6">
                     <button type="submit" class="btn btn-primary btn-block">完了</button>
                 </div>
@@ -44,4 +51,55 @@
     </div>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block bodyjs %}
+<script>
+(function() {
+    // ========================
+    // ajaxのカスタマイズ
+    var orgAjax = $.ajax;
+
+    function customAjax(ajaxArgs) {
+        var settings = $.extend({}, $.ajaxSettings, ajaxArgs);
+        var deferred_org = $.Deferred();
+        var jqXHR_org = orgAjax(settings)
+            .then(
+                function cmnDone(data, textStatus, jqXHR) {
+                    // 個別のdone()を呼び出す
+                    deferred_org.resolveWith(this, [data, textStatus, jqXHR])
+                },
+                function cmnFail(jqXHR, textStatus, errorThrown) {
+                    // 個別のfail()を呼び出す
+                    deferred_org.rejectWith(this, [jqXHR, textStatus, errorThrown]);
+                }
+            )
+            .catch((e) => {
+                // 個別のdoneで発生した例外をcatchできる
+                console.trace(e);
+            });
+
+        return $.extend({}, jqXHR_org, deferred_org);
+    }
+    $.ajax = customAjax;
+    // ========================
+
+    const generateButtons = document.getElementsByClassName('generate-button');
+
+    for (const button of generateButtons) {
+        button.addEventListener('click', () => {
+            const url = button.dataset.genurl;
+
+            $.ajax({
+                url: url,
+                type: 'GET'
+            }).done(function (response, textStatus, jqXHR) {
+                $('#{{ form.access_token.auto_id }}').val(response);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                ;
+            });
+        });
+    }
+}());
+</script>
 {% endblock %}
