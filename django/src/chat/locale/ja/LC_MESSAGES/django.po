@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-28 21:08+0900\n"
+"POT-Creation-Date: 2021-05-29 07:48+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: chat/forms.py:13 chat/forms.py:56
+#: chat/forms.py:13 chat/forms.py:60
 msgid "keyword"
 msgstr "キーワード"
 
-#: chat/forms.py:16 chat/forms.py:35
+#: chat/forms.py:16 chat/forms.py:37
 msgid "room name"
 msgstr "部屋の名称"
 
-#: chat/forms.py:59
+#: chat/forms.py:63
 msgid "searching chat message"
 msgstr "検索するチャットメッセージ"
 

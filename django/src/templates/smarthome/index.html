@@ -1,0 +1,143 @@
+{% extends 'smarthome/breadcrumbs_smarthome.html' %}
+
+{% block content %}
+{% if user.is_staff %}
+<div class="row justify-content-center mt-1">
+    <div class="col-12">
+        <div class="row mt-2">
+            <div class="col-12">
+                <h2 class="h2 mt-2">Smart Home</h2>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <table class="table table-bordered table-hover">
+                    <caption>ページ一覧</caption>
+                    <thead>
+                        <tr>
+                            <th class="align-middle" scope="col">リンク</th>
+                            <th class="align-middle" scope="col">対象ページの概要</th>
+                            <th class="align-middle" scope="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="align-middle" scope="row">
+                                <a href="{% url 'smarthome:create_access_token' %}" class="btn btn-link btn-md btn-block">Access Token の作成</a>
+                            </td>
+                            <td class="align-middle">
+                                外部からアクセスするための Access Token を作成する。
+                            </td>
+                            <td class="align-middle">-</td>
+                        </tr>
+                        <tr>
+                            {% if access_tokens %}
+                            {% with access_tokens|first as newest_token %}
+                            <td class="align-middle" scope="row">
+                                <a href="{% url 'smarthome:open_entrance' newest_token.access_token %}" class="btn btn-link btn-md btn-block">オートロック解除</a>
+                            </td>
+                            <td class="align-middle">
+                                エントランスからの呼び出しに応答し、オートロックを解除（扉を開く）
+                            </td>
+                            <td class="align-middle">
+                                <button type="button" class="btn btn-primary btn-md btn-block clip" data-clipboard-text="{% url 'smarthome:open_entrance' newest_token.access_token %}">
+                                    URL をクリップボードにコピー
+                                </button>
+                            </td>
+                            {% endwith %}
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <table class="table table-bordered table-hover">
+                    <caption>登録されている Access Token 一覧</caption>
+                    <thead>
+                        <tr>
+                            <th class="align-middle" scope="col">登録日</th>
+                            <th class="align-middle" scope="col">Access Token</th>
+                            <th class="align-middle" scope="col">アクセス URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for target in access_tokens %}
+                        <tr>
+                            <td class="align-middle" scope="row">{{ target.created_at|date:'Y/m/d H:i:s' }}</td>
+                            <td class="align-middle">{{ target.access_token }}</td>
+                            <td class="align-middle">
+                                <button type="button" class="btn btn-primary btn-md btn-block clip" data-clipboard-text="{% url 'smarthome:open_entrance' target.access_token %}">
+                                    URL をクリップボードにコピー
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td class="align-middle" scope="row">-</td>
+                            <td class="align-middle">-</td>
+                            <td class="align-middle">-</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# toastの処理 #}
+<div class="position-fixed p-3" style="z-index: 5; right: 0; top: 0;">
+    <div id="toast-success" class="toast hide" role="status" aria-live="assertive" aria-atomic="true" data-delay="1000">
+        <div class="toast-header bg-info text-white">
+            <strong class="mr-auto">ClipboardJS</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body bg-info text-white">
+            クリップボードにコピーしました
+        </div>
+    </div>
+</div>
+<div class="position-fixed p-3" style="z-index: 5; right: 0; top: 0;">
+    <div id="toast-failed" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1000">
+        <div class="toast-header bg-danger text-white">
+            <strong class="mr-auto">ClipboardJS</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body bg-danger text-white">
+            クリップボードへのコピーに失敗しました
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        ページを表示する権限がありません。
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bodyjs %}
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+(function() {
+    let clipboard = new ClipboardJS('.clip');
+    // 成功時の処理
+    clipboard.on('success', (e) => {
+        $('#toast-success').toast('show');
+        // テキスト選択状態を解除
+        e.clearSelection();
+    });
+    // エラー時の処理
+    clipboard.on('error', (e) => {
+        $('#toast-failed').toast('show');
+    });
+}());
+</script>
+{% endblock %}
