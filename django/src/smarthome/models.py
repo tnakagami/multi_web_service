@@ -14,7 +14,9 @@ class AccessToken(models.Model):
 
     def send_post_request(self, url, data):
         # send POST request
-        requests.post(url, data=data)
+        response = requests.post(url, data=data)
+
+        return response
 
     def short_token(self):
         return '{}...'.format(self.access_token[:10])
