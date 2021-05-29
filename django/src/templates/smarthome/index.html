@@ -32,7 +32,7 @@
                         </tr>
                         <tr>
                             {% if access_tokens %}
-                            {% with access_tokens|first as newest_token %}
+                            {% with access_tokens|last as newest_token %}
                             <td class="align-middle" scope="row">
                                 <a href="{% url 'smarthome:open_entrance' newest_token.access_token %}" class="btn btn-link btn-md btn-block">オートロック解除</a>
                             </td>
@@ -47,39 +47,6 @@
                             {% endwith %}
                             {% endif %}
                         </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-12">
-                <table class="table table-bordered table-hover">
-                    <caption>登録されている Access Token 一覧</caption>
-                    <thead>
-                        <tr>
-                            <th class="align-middle" scope="col">登録日</th>
-                            <th class="align-middle" scope="col">Access Token</th>
-                            <th class="align-middle" scope="col">アクセス URL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for target in access_tokens %}
-                        <tr>
-                            <td class="align-middle" scope="row">{{ target.created_at|date:'Y/m/d H:i:s' }}</td>
-                            <td class="align-middle">{{ target.short_token }}</td>
-                            <td class="align-middle">
-                                <button type="button" class="btn btn-outline-primary btn-md btn-block clip" data-clipboard-text="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url     'smarthome:open_entrance' target.access_token %}{% url 'smarthome:open_entrance' target.access_token %}">
-                                    URL のコピー
-                                </button>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td class="align-middle" scope="row">-</td>
-                            <td class="align-middle">-</td>
-                            <td class="align-middle">-</td>
-                        </tr>
-                        {% endfor %}
                     </tbody>
                 </table>
             </div>
