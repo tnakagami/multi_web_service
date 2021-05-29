@@ -128,6 +128,31 @@ class AccessTokenCreateView(SmartHomeView):
         self.assertEqual(_access_token.access_token, data['access_token'])
         self.assertEqual(models.AccessToken.objects.count(), 3)
 
+class GetAccessUrl(SmartHomeView):
+    def setUp(self):
+        self.token = 'sample10ken'
+
+    def test_resolve_url(self):
+        resolver = resolve('/smarthome/get/url/open_entrance/{}'.format(self.token))
+        self.assertEqual(resolver.func, views.get_access_url)
+
+    def test_error_post_request(self):
+        data = {}
+        url = reverse('smarthome:get_access_url', kwargs={'method': 'open_entrance', 'token': self.token})
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 404)
+
+    def test_invalid_method(self):
+        url = reverse('smarthome:get_access_url', kwargs={'method': 'not_exist_url_name', 'token': self.token})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_valid_url(self):
+        url = reverse('smarthome:get_access_url', kwargs={'method': 'open_entrance', 'token': self.token})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('/smarthome/open/entrance/{}'.format(self.token) in response.content.decode())
+
 class OpenEntranceFuncTests(SmartHomeView):
     def setUp(self):
         self.token = 'target10ken'
@@ -148,7 +173,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch('smarthome.models.AccessToken.send_post_request', return_value=None)
+    @mock.patch('smarthome.models.requests.post', return_value=None)
     def test_valid_access_token(self, _):
         url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
         response = self.client.get(url)

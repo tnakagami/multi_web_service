@@ -16,6 +16,8 @@ class AccessToken(models.Model):
         # send POST request
         requests.post(url, data=data)
 
+    def short_token(self):
+        return '{}...'.format(self.access_token[:10])
     def __str__(self):
         return self.__unicode__()
     def __unicode__(self):

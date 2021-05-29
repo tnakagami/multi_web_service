@@ -37,3 +37,12 @@ class AccessTokenTests(SmartHomeModel):
         self.__chk_instance_data(_access_token.pk, token)
         self.assertEqual(self.model.objects.count(), 1)
         self.assertEqual(str(_access_token), token)
+
+    def test_create_long_access_token(self):
+        import hashlib
+        data = 'token1234'
+        token = hashlib.sha512(data.encode()).hexdigest()
+        _access_token = self.__create_and_save(token)
+        self.__chk_instance_data(_access_token.pk, token)
+        self.assertEqual(self.model.objects.count(), 1)
+        self.assertEqual(_access_token.short_token(), '{}...'.format(token[:10]))

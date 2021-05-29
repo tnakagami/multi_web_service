@@ -7,7 +7,7 @@ class AccessTokenForm(forms.ModelForm):
         model = models.AccessToken
         fields = ('access_token', )
         widgets = {
-            'token': forms.TextInput(attrs={
+            'access_token': forms.TextInput(attrs={
                 'placeholder': ugettext_lazy('access token'), 'class': 'form-control',
             }),
         }

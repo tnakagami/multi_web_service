@@ -31,6 +31,7 @@
                             <td class="align-middle">-</td>
                         </tr>
                         <tr>
+                            {% if access_tokens %}
                             {% with access_tokens|first as newest_token %}
                             <td class="align-middle" scope="row">
                                 <a href="{% url 'smarthome:open_entrance' newest_token.access_token %}" class="btn btn-link btn-md btn-block">オートロック解除</a>
@@ -44,6 +45,7 @@
                                 </button>
                             </td>
                             {% endwith %}
+                            {% endif %}
                         </tr>
                     </tbody>
                 </table>
@@ -70,6 +72,12 @@
                                     URL をクリップボードにコピー
                                 </button>
                             </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td class="align-middle" scope="row">-</td>
+                            <td class="align-middle">-</td>
+                            <td class="align-middle">-</td>
                         </tr>
                         {% endfor %}
                     </tbody>

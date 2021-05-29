@@ -1,8 +1,9 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.urls.exceptions import NoReverseMatch
 from django.views.generic import ListView, CreateView
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from . import models, forms
 
 class OnlyStaffUserMixin(UserPassesTestMixin):
@@ -43,6 +44,18 @@ class AccessTokenCreateView(OnlyStaffUserMixin, CreateView):
             pass
 
         return super().form_valid(form)
+
+def get_access_url(request, method='dummy', token=''):
+    if request.method == 'GET':
+        try:
+            uri = reverse('smarthome:{}'.format(method), kwargs={'token': token})
+            access_url = '{}://{}{}'.format(request.scheme, request.get_host(), uri)
+
+            return HttpResponse(access_url, content_type='text/plain; charset=utf-8')
+        except NoReverseMatch:
+            raise Http404('Invalid method name')
+
+    raise Http404('Invalid access')
 
 def open_entrance(request, token):
     if request.method == 'GET':
