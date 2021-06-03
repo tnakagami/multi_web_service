@@ -7,7 +7,7 @@ from registration.tests.factories import UserFactory
 from requests.models import Response
 from smarthome.tests.factories import AccessTokenFactory
 from smarthome import views, models
-from websocket._exceptions import WebSocketTimeoutException
+from websocket._exceptions import WebSocketTimeoutException, WebSocketConnectionClosedException
 
 class SmartHomeView(TestCase):
     @classmethod
@@ -226,7 +226,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         # first
         mock_response = Response()
         mock_response.status_code = 200
-        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press"}'
+        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press","message":"none"}'
         mock_get_method.return_value = mock_response
         # second
         mock_ws_method.return_value = _WebSocket()
@@ -236,10 +236,10 @@ class OpenEntranceFuncTests(SmartHomeView):
 
     @mock.patch('smarthome.models.create_connection') # second
     @mock.patch('smarthome.models.requests.get') # first
-    def test_websocket_timeout(self, mock_get_method, mock_ws_method):
+    def test_websocket_timeout_exception(self, mock_get_method, mock_ws_method):
         class _WebSocket(MockWebSocket):
             def recv(self):
-                raise WebSocketTimeoutException
+                raise WebSocketTimeoutException('Timeout')
         # first
         mock_response = Response()
         mock_response.status_code = 200
@@ -249,4 +249,21 @@ class OpenEntranceFuncTests(SmartHomeView):
         mock_ws_method.return_value = _WebSocket()
         url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
         response = self.client.get(url)
-        self.assertEqual('status code: 500, msg: Internal Server Error', response.content.decode())
+        self.assertEqual('status code: 500, msg: Internal Server Error (Timeout)', response.content.decode())
+
+    @mock.patch('smarthome.models.create_connection') # second
+    @mock.patch('smarthome.models.requests.get') # first
+    def test_websocket_connection_closed_exception(self, mock_get_method, mock_ws_method):
+        class _WebSocket(MockWebSocket):
+            def recv(self):
+                raise WebSocketConnectionClosedException('ConnectionClosed')
+        # first
+        mock_response = Response()
+        mock_response.status_code = 200
+        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press"}'
+        mock_get_method.return_value = mock_response
+        # second
+        mock_ws_method.return_value = _WebSocket()
+        url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
+        response = self.client.get(url)
+        self.assertEqual('status code: 500, msg: Internal Server Error (ConnectionClosed)', response.content.decode())
