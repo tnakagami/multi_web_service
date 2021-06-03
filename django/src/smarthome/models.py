@@ -29,9 +29,9 @@ class AccessToken(models.Model):
             ws_conn.send(data)
             # receive response from websocket server
             response = ws_conn.recv()
-            # close connection
         except (WebSocketTimeoutException, WebSocketConnectionClosedException) as e:
             response = json.dumps({'status_code': 500, 'message': 'Internal Server Error ({})'.format(e)})
+        # close connection
         ws_conn.close()
 
         return json.loads(response)
