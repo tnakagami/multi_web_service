@@ -217,7 +217,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch('smarthome.models.websocket_communication.create_connection') # second
+    @mock.patch('smarthome.models.create_connection') # second
     @mock.patch('smarthome.models.requests.get') # first
     def test_valid_access_token(self, mock_get_method, mock_ws_method):
         class _WebSocket(MockWebSocket):
@@ -234,7 +234,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         response = self.client.get(url)
         self.assertEqual('status code: 200, msg: ok', response.content.decode())
 
-    @mock.patch('smarthome.models.websocket_communication.create_connection') # second
+    @mock.patch('smarthome.models.create_connection') # second
     @mock.patch('smarthome.models.requests.get') # first
     def test_websocket_timeout(self, mock_get_method, mock_ws_method):
         class _WebSocket(MockWebSocket):
