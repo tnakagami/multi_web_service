@@ -74,10 +74,11 @@ def open_entrance(request, token):
         target = models.AccessToken.objects.order_by('-created_at').first()
 
         if target.is_valid_access_token(token):
-            url = 'http://analyzer.localnet.jp:1880/entrance'
-            data = {'payload': 'open'}
-            response = target.send_post_request(url, data)
-            ret = 'status: {}, msg: {}'.format(response.status_code, response.text)
+            get_url = 'http://analyzer.localnet.jp:1880/externalconnection/entrance'
+            data = target.get_reqres(get_url)
+            ws_url = 'ws://analyzer.localnet.jp:1881/'
+            response = target.websocket_communication(ws_url, data)
+            ret = 'status code: {}, msg: {}'.format(response['status_code'], response['message'])
 
             return HttpResponse(ret, content_type='text/plain; charset=utf-8')
 

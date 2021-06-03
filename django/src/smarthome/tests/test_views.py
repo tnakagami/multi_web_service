@@ -7,6 +7,7 @@ from registration.tests.factories import UserFactory
 from requests.models import Response
 from smarthome.tests.factories import AccessTokenFactory
 from smarthome import views, models
+from websocket._exceptions import WebSocketTimeoutException
 
 class SmartHomeView(TestCase):
     @classmethod
@@ -186,6 +187,16 @@ class GetAccessUrl(SmartHomeView):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('/smarthome/open/entrance/{}'.format(self.token) in response.content.decode())
 
+class MockWebSocket:
+    def __init__(self):
+        pass
+    def send(self, data):
+        pass
+    def recv(self):
+        return ''
+    def close(self):
+        pass
+
 class OpenEntranceFuncTests(SmartHomeView):
     def setUp(self):
         self.token = 'target10ken'
@@ -206,12 +217,36 @@ class OpenEntranceFuncTests(SmartHomeView):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch('smarthome.models.requests.post')
-    def test_valid_access_token(self, mock_method):
+    @mock.patch('smarthome.models.websocket_communication.create_connection') # second
+    @mock.patch('smarthome.models.requests.get') # first
+    def test_valid_access_token(self, mock_get_method, mock_ws_method):
+        class _WebSocket(MockWebSocket):
+            def recv(self):
+                return '{"status_code": 200, "message": "ok"}'
+        # first
         mock_response = Response()
         mock_response.status_code = 200
-        mock_response._content = b'ok'
-        mock_method.return_value = mock_response
+        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press"}'
+        mock_get_method.return_value = mock_response
+        # second
+        mock_ws_method.return_value = _WebSocket()
         url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
         response = self.client.get(url)
-        self.assertEqual('status: 200, msg: ok', response.content.decode())
+        self.assertEqual('status code: 200, msg: ok', response.content.decode())
+
+    @mock.patch('smarthome.models.websocket_communication.create_connection') # second
+    @mock.patch('smarthome.models.requests.get') # first
+    def test_websocket_timeout(self, mock_get_method, mock_ws_method):
+        class _WebSocket(MockWebSocket):
+            def recv(self):
+                raise WebSocketTimeoutException
+        # first
+        mock_response = Response()
+        mock_response.status_code = 200
+        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press"}'
+        mock_get_method.return_value = mock_response
+        # second
+        mock_ws_method.return_value = _WebSocket()
+        url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
+        response = self.client.get(url)
+        self.assertEqual('status code: 500, msg: Internal Server Error', response.content.decode())
