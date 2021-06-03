@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy
 from websocket import create_connection
-from websocket._exceptions import WebSocketTimeoutException
+from websocket._exceptions import WebSocketTimeoutException, WebSocketConnectionClosedException
 import requests
 import json
 
@@ -30,8 +30,8 @@ class AccessToken(models.Model):
             # receive response from websocket server
             response = ws_conn.recv()
             # close connection
-        except WebSocketTimeoutException:
-            response = json.dumps({'status_code': 500, 'message': 'Internal Server Error'})
+        except (WebSocketTimeoutException, WebSocketConnectionClosedException) as e:
+            response = json.dumps({'status_code': 500, 'message': 'Internal Server Error ({})'.format(e)})
         ws_conn.close()
 
         return json.loads(response)
