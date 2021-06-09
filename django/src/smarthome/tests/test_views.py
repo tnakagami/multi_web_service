@@ -243,7 +243,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         # first
         mock_response = Response()
         mock_response.status_code = 200
-        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press"}'
+        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press","message":"none"}'
         mock_get_method.return_value = mock_response
         # second
         mock_ws_method.return_value = _WebSocket()
@@ -260,7 +260,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         # first
         mock_response = Response()
         mock_response.status_code = 200
-        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press"}'
+        mock_response._content = b'{"device":"00:11:22:33:44:55","command":"press","message":"none"}'
         mock_get_method.return_value = mock_response
         # second
         mock_ws_method.return_value = _WebSocket()
@@ -276,7 +276,7 @@ class OpenEntranceFuncTests(SmartHomeView):
         mock_get_method.return_value = mock_response
         url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
         response = self.client.get(url)
-        self.assertEqual('status code: 404, msg: Not Found', response.content.decode())
+        self.assertEqual('status code: 506, msg: Variant Also Negotiates', response.content.decode())
 
     @mock.patch('smarthome.models.create_connection', side_effect=WebSocketTimeoutException('Connection Timeout'))
     @mock.patch('smarthome.models.requests.get')
@@ -287,4 +287,4 @@ class OpenEntranceFuncTests(SmartHomeView):
         mock_get_method.return_value = mock_response
         url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
         response = self.client.get(url)
-        self.assertEqual('status code: 404, msg: Not Found', response.content.decode())
+        self.assertEqual('status code: 506, msg: Variant Also Negotiates', response.content.decode())

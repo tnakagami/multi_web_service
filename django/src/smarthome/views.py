@@ -82,7 +82,7 @@ def open_entrance(request, token):
                 response = target.websocket_communication(ws_url, data)
                 ret = 'status code: {}, msg: {}'.format(response['status_code'], response['message'])
             except Exception:
-                ret = 'status code: 404, msg: Not Found'
+                ret = 'status code: 506, msg: Variant Also Negotiates'
 
             return HttpResponse(ret, content_type='text/plain; charset=utf-8')
 
