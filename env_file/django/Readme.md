@@ -11,4 +11,6 @@ DJANGO_SUPERUSER_PASSWORD=superuserpassword
 DJANGO_DEBUG_FLAG=True
 DJANGO_WWW_VHOST=www.example.com
 DJANGO_MEDIA_ROOT=/storage
+DJANGO_OPEN_ENTRANCE_URI=http://www.example.com
+DJANGO_OPEN_ENTRANCE_WS=ws://www.example.com
 ```

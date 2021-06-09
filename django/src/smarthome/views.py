@@ -5,6 +5,7 @@ from django.views.generic import ListView, CreateView, View
 from django.http import Http404, HttpResponse
 from . import models, forms
 import secrets
+import os
 
 class OnlyStaffUserMixin(UserPassesTestMixin):
     raise_exception = True
@@ -74,11 +75,14 @@ def open_entrance(request, token):
         target = models.AccessToken.objects.order_by('-created_at').first()
 
         if target.is_valid_access_token(token):
-            get_url = 'http://analyzer.localnet.jp:1880/externalconnection/entrance'
-            data = target.get_reqres(get_url)
-            ws_url = 'ws://analyzer.localnet.jp:1881/'
-            response = target.websocket_communication(ws_url, data)
-            ret = 'status code: {}, msg: {}'.format(response['status_code'], response['message'])
+            try:
+                get_url = os.getenv('DJANGO_OPEN_ENTRANCE_URI', None)
+                data = target.get_reqres(get_url)
+                ws_url = os.getenv('DJANGO_OPEN_ENTRANCE_WS', None)
+                response = target.websocket_communication(ws_url, data)
+                ret = 'status code: {}, msg: {}'.format(response['status_code'], response['message'])
+            except Exception:
+                ret = 'status code: 506, msg: Variant Also Negotiates'
 
             return HttpResponse(ret, content_type='text/plain; charset=utf-8')
 

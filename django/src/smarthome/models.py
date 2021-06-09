@@ -18,12 +18,16 @@ class AccessToken(models.Model):
     def get_reqres(self, url):
         # send GET request
         response = requests.get(url)
+        # check status code
+        if response.status_code != 200:
+            raise response.raise_for_status()
 
         return response.text
 
     def websocket_communication(self, url, data):
         # open connection
         ws_conn = create_connection(url, timeout=4.25)
+
         try:
             # send request to websocket server
             ws_conn.send(data)
