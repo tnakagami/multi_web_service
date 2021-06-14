@@ -2,42 +2,41 @@
 {% block content %}
 <div class="row justify-content-center">
     {% if user.is_staff %}
-    <div class="col-12">
-        <div class="row">
-            <div class="col-12">
-            {% if user.viewname %}
-                <h2 class="h2">ようこそ！{{ user.viewname }}さん</h2>
-            {% else %}
-                <h2 class="h2">ようこそ！{{ user.username }}さん</h2>
-            {% endif %}
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
+                {% if user.viewname %}
+                    <h2 class="h2">ようこそ！{{ user.viewname }}さん</h2>
+                {% else %}
+                    <h2 class="h2">ようこそ！{{ user.username }}さん</h2>
+                {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-12">
-        <div class="row">
-            <div class="col-12">
-                <h3 class="h3">リンク一覧</h3>
-                <table class="table table-striped">
-                    <thead>
-                        <tr><th scope="col">リンク</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td scope="row">
-                            <a href="/admin">Admin管理サイト</a>
-                        </td></tr>
-                        {% if user.is_superuser %}
-                        <tr><td scope="row">
-                            <a href="{% url 'registration:accounts_page' %}">登録アカウント一覧</a>
-                        </td></tr>
-                        {% endif %}
-                        <tr><td scope="row">
-                            <a href="{% url 'smarthome:index' %}">Smart Home トップページ</a>
-                        </td></tr>
-                    </tbody>
-                </table>
+        <div class="col-12">
+            <div class="card-columns">
+                <div class="card">
+                    <div class="card-header">Admin 管理サイト</div>
+                    <div class="card-body">
+                        <a href="/admin" class="btn btn-link btn-block" target="_self">Admin 管理サイト</a>
+                    </div>
+                </div>
+                {% if user.is_superuser %}
+                <div class="card">
+                    <div class="card-header">登録アカウント一覧</div>
+                    <div class="card-body">
+                        <a href="{% url 'registration:accounts_page' %}" class="btn btn-link btn-block" target="_self">登録アカウント一覧</a>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card">
+                    <div class="card-header">Smart Home トップページ</div>
+                    <div class="card-body">
+                        <a href="{% url 'smarthome:index' %}" class="btn btn-link btn-block" target="_self">Smart Home トップページ</a>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     {% else %}
         {% if user.is_authenticated  %}
         <div class="col-12">
@@ -52,56 +51,38 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">サービス</th>
-                                <th>リンク</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td scope="row">SNS</td>
-                                <td>
-                                    <a href="{% url 'sns:time_line' %}" class="btn btn-outline-primary btn-block" target="_self">
-                                        Let's go!
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">Blog</td>
-                                <td>
-                                    <a href="{% url 'blog:index' %}" class="btn btn-outline-primary btn-block" target="_self">
-                                        Let's go!
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">Storage</td>
-                                <td>
-                                    <a href="{% url 'storage:index' %}" class="btn btn-outline-primary btn-block" target="_self">
-                                        Let's go!
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">Chat</td>
-                                <td>
-                                    <a href="{% url 'chat:index' %}" class="btn btn-outline-primary btn-block" target="_self">
-                                        Let's go!
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">Deep Learning Tutorial</td>
-                                <td>
-                                    <a href="{% url 'deep_learning:index' %}" class="btn btn-outline-primary btn-block" target="_self">
-                                        Let's go!
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="card-columns">
+                        <div class="card">
+                            <div class="card-header">SNS</div>
+                            <div class="card-body">
+                                <a href="{% url 'sns:time_line' %}" class="btn btn-link btn-block" target="_self">SNS</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Blog</div>
+                            <div class="card-body">
+                                <a href="{% url 'blog:index' %}" class="btn btn-link btn-block" target="_self">Blog</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Storage</div>
+                            <div class="card-body">
+                                <a href="{% url 'storage:index' %}" class="btn btn-link btn-block" target="_self">Storage</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Chat</div>
+                            <div class="card-body">
+                                <a href="{% url 'chat:index' %}" class="btn btn-link btn-block" target="_self">Chat</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Deep Learning Tutorial</div>
+                            <div class="card-body">
+                                <a href="{% url 'deep_learning:index' %}" class="btn btn-link btn-block" target="_self">Deep Learning Tutorial</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -114,24 +95,12 @@
             </div>
             <div class="row mt-3">
                 <div class="col-12">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">項目</th>
-                                <th>リンク</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td scope="row">深層学習入門</td>
-                                <td>
-                                    <a href="{% url 'deep_learning:index' %}" class="btn btn-outline-primary btn-block" target="_self">
-                                        Let's go!
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="card">
+                        <div class="card-header">深層学習入門</div>
+                        <div class="card-body">
+                            <a href="{% url 'deep_learning:index' %}" class="btn btn-link btn-block" target="_self">深層学習入門</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
