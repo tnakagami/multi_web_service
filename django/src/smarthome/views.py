@@ -77,12 +77,11 @@ def open_entrance(request, token):
         if target.is_valid_access_token(token):
             try:
                 get_url = os.getenv('DJANGO_OPEN_ENTRANCE_URI', None)
-                data = target.get_reqres(get_url)
-                ws_url = os.getenv('DJANGO_OPEN_ENTRANCE_WS', None)
-                response = target.websocket_communication(ws_url, data)
+                data = {'payload': 'open'}
+                response = target.post_request(get_url, data)
                 ret = 'status code: {}, msg: {}'.format(response['status_code'], response['message'])
-            except Exception:
-                ret = 'status code: 506, msg: Variant Also Negotiates'
+            except Exception as e:
+                ret = 'status code: 500, msg: {}'.format(e)
 
             return HttpResponse(ret, content_type='text/plain; charset=utf-8')
 
