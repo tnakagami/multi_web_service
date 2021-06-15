@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy
 import requests
-import json
 
 class AccessToken(models.Model):
     # token
@@ -20,7 +19,7 @@ class AccessToken(models.Model):
         if response.status_code != 200:
             raise response.raise_for_status()
 
-        return json.loads(response.text)
+        return response
 
     def short_token(self):
         return '{}...'.format(self.access_token[:10])

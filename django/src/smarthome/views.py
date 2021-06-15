@@ -79,7 +79,7 @@ def open_entrance(request, token):
                 get_url = os.getenv('DJANGO_OPEN_ENTRANCE_URI', None)
                 data = {'payload': 'open'}
                 response = target.post_request(get_url, data)
-                ret = 'status code: {}, msg: {}'.format(response['status_code'], response['message'])
+                ret = 'status code: {}, msg: {}'.format(response.status_code, response.text)
             except Exception as e:
                 ret = 'status code: 500, msg: {}'.format(e)
 

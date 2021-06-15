@@ -206,13 +206,34 @@ class OpenEntranceFuncTests(SmartHomeView):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    @mock.patch('smarthome.views.os.getenv')
+    def test_invalid_environment_variable(self, mock_getenv_method):
+        mock_getenv_method.return_value = None
+        url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
+        response = self.client.get(url)
+        self.assertIn("status code: 500, msg: Invalid URL 'None'", response.content.decode())
+
+    @mock.patch('smarthome.views.os.getenv') # second
+    @mock.patch('smarthome.models.requests.post') # first
+    def test_invalid_response(self, mock_post_method, mock_getenv_method):
+        # first
+        mock_response = Response()
+        mock_response.status_code = 404
+        mock_response._content = b'ng'
+        mock_post_method.return_value = mock_response
+        # second
+        mock_getenv_method.return_value = 'http://www.example.com'
+        url = reverse('smarthome:open_entrance', kwargs={'token': self.token})
+        response = self.client.get(url)
+        self.assertIn('status code: 500, msg: 404 Client Error', response.content.decode())
+
     @mock.patch('smarthome.views.os.getenv') # second
     @mock.patch('smarthome.models.requests.post') # first
     def test_valid_access_token(self, mock_post_method, mock_getenv_method):
         # first
         mock_response = Response()
         mock_response.status_code = 200
-        mock_response._content = b'{"status_code": 200, "message": "ok"}'
+        mock_response._content = b'ok'
         mock_post_method.return_value = mock_response
         # second
         mock_getenv_method.return_value = 'http://www.example.com'
