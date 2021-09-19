@@ -1,4 +1,4 @@
-FROM golang:alpine3.14
+FROM golang:alpine
 
 ENV APP_MODE=production
 ENV APP_PORT=9000
